@@ -193,7 +193,7 @@ jobs:
             APP_ENV: prod
             APP_DEBUG: 0
         run: |
-          for code in Api42 Coupon42 MailMagazine42 ProductReview42 Recommend42 RelatedProduct42 SalesReport42 Securitychecker42 SiteKit42
+          for code in Api42 Coupon42 MailMagazine42 ProductReview42 Recommend42 RelatedProduct42 SalesReport42 Securitychecker42
           do
               docker compose exec -u www-data:www-data ec-cube bin/console eccube:composer:require "ec-cube/${code,,}"
               docker compose exec -u www-data:www-data ec-cube bin/console eccube:plugin:enable --code ${code}
