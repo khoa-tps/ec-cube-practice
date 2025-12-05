@@ -20,6 +20,8 @@
     {% set meta_og_type = 'website' %}
     {% set meta_canonical = url('homepage') %}
 {% elseif Page is defined and Page.edit_type == 0 and Page.url is defined %}
+    {# 新規ページのコントローラー側のルートがuser_dataのため他のページと同様ハードコーディングにする
+        see https://github.com/EC-CUBE/ec-cube/issues/6492 #}
     {% set meta_canonical = url('user_data', {'route': Page.url}) %}
 {% endif %}
 
