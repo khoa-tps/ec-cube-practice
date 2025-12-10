@@ -85,9 +85,10 @@ abstract class AbstractRepository extends ServiceEntityRepository
      * @param string $alias
      * @param array $sortColumns
      * @param array $searchData
+     *
      * @return void
      */
-    protected function setQueryBuilderAdminSearchDataOrderBy($qb, $alias='p', $sortColumns=[], $searchData=[])
+    protected function setQueryBuilderAdminSearchDataOrderBy($qb, $alias = 'p', $sortColumns = [], $searchData = [])
     {
         if (isset($searchData['sortkey']) && !empty($searchData['sortkey'])) {
             $sortOrder = (isset($searchData['sorttype']) && $searchData['sorttype'] == 'a') ? 'ASC' : 'DESC';
