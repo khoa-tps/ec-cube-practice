@@ -75,8 +75,11 @@ class ProductRepository extends AbstractRepository
     public function findWithSortedClassCategories($productId)
     {
         $qb = $this->createQueryBuilder('p');
-        $qb->addSelect(['pc', 'cc1', 'cc2', 'pi', 'pt'])
+        $qb->addSelect(['pc', 'cc1', 'cc2', 'pi', 'pt', 'ps', 'tr'])
             ->innerJoin('p.ProductClasses', 'pc')
+            // Joined 'ProductStock' and 'TaxRule' to prevent lazy loading
+            ->leftJoin('pc.ProductStock', 'ps')
+            ->leftJoin('pc.TaxRule', 'tr')
             ->leftJoin('pc.ClassCategory1', 'cc1')
             ->leftJoin('pc.ClassCategory2', 'cc2')
             ->leftJoin('p.ProductImage', 'pi')
@@ -90,6 +93,7 @@ class ProductRepository extends AbstractRepository
 
         $product = $qb
             ->getQuery()
+            ->useResultCache(true, $this->eccubeConfig['eccube_result_cache_lifetime_short'])
             ->getSingleResult();
 
         return $product;
