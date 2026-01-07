@@ -67,7 +67,7 @@ class ProductRepositoryTest extends AbstractProductRepositoryTestCase
 
         // Verify product is loaded
         self::assertNotNull($Result);
-        self::assertEquals('商品-多規格', $Result->getName());
+        self::assertSame('商品-多規格', $Result->getName());
 
         // Clear the query log for the next test
         $queriesBeforeCalc = count($logger->queries);
@@ -82,7 +82,7 @@ class ProductRepositoryTest extends AbstractProductRepositoryTestCase
 
         // Assert that no additional queries were executed (N+1 problem is solved)
         // If ProductStock and TaxRule are not eagerly loaded, this would cause 200+ additional queries
-        self::assertEquals(
+        self::assertSame(
             $queriesBeforeCalc,
             $queriesAfterCalc,
             'N+1 problem detected: Additional queries were executed during _calc(). ProductStock and TaxRule should be eagerly loaded.'
