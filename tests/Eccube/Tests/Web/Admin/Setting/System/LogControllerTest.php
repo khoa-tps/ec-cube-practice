@@ -36,6 +36,8 @@ class LogControllerTest extends AbstractAdminWebTestCase
             '_token' => 'dummy',
             'files' => 'site_'.date('Y-m-d').'.log',
             'line_max' => '50',
+            'log_level' => '',
+            'keyword' => '',
         ];
 
         $logDir = static::getContainer()->getParameter('kernel.logs_dir');
@@ -140,5 +142,89 @@ class LogControllerTest extends AbstractAdminWebTestCase
         if (!file_exists($this->logTest)) {
             file_put_contents($this->logTest, $faker->paragraphs($number));
         }
+    }
+
+    /**
+     * Test log level filtering
+     */
+    public function testLogLevelFiltering()
+    {
+        $testLogs = [
+            '[2025-01-10 10:00:00] admin.DEBUG [] [] [] [] - Debug message',
+            '[2025-01-10 10:01:00] admin.INFO [] [] [] [] - Info message',
+            '[2025-01-10 10:02:00] admin.WARNING [] [] [] [] - Warning message',
+            '[2025-01-10 10:03:00] admin.ERROR [] [] [] [] - Error message',
+            '[2025-01-10 10:04:00] admin.CRITICAL [] [] [] [] - Critical message',
+        ];
+        file_put_contents($this->logTest, implode("\n", $testLogs));
+
+        $this->formData['log_level'] = 'ERROR';
+        $crawler = $this->client->request(
+            'POST',
+            $this->generateUrl('admin_setting_system_log'),
+            ['admin_system_log' => $this->formData]
+        );
+
+        $this->assertTrue($this->client->getResponse()->isSuccessful());
+        $html = $crawler->filter('.log-viewer')->html();
+
+        $this->assertStringContainsString('Error message', $html);
+        $this->assertStringContainsString('Critical message', $html);
+        $this->assertStringNotContainsString('Debug message', $html);
+        $this->assertStringNotContainsString('Warning message', $html);
+    }
+
+    /**
+     * Test keyword search filtering
+     */
+    public function testKeywordFiltering()
+    {
+        $testLogs = [
+            '[2025-01-10 10:00:00] admin.ERROR [] [] [] [OrderController.php:100] - Payment failed',
+            '[2025-01-10 10:01:00] admin.INFO [] [] [] [ProductController.php:200] - Product updated',
+        ];
+        file_put_contents($this->logTest, implode("\n", $testLogs));
+
+        $this->formData['keyword'] = 'Payment';
+        $crawler = $this->client->request(
+            'POST',
+            $this->generateUrl('admin_setting_system_log'),
+            ['admin_system_log' => $this->formData]
+        );
+
+        $this->assertTrue($this->client->getResponse()->isSuccessful());
+        $html = $crawler->filter('.log-viewer')->html();
+
+        $this->assertStringContainsString('Payment failed', $html);
+        $this->assertStringNotContainsString('Product updated', $html);
+    }
+
+    /**
+     * Test combined filtering (log level + keyword)
+     */
+    public function testCombinedFiltering()
+    {
+        $testLogs = [
+            '[2025-01-10 10:00:00] admin.ERROR [] [] [] [] - Payment validation error',
+            '[2025-01-10 10:01:00] admin.WARNING [] [] [] [] - Payment warning',
+            '[2025-01-10 10:02:00] admin.ERROR [] [] [] [] - Database connection error',
+        ];
+        file_put_contents($this->logTest, implode("\n", $testLogs));
+
+        $this->formData['log_level'] = 'ERROR';
+        $this->formData['keyword'] = 'Payment';
+
+        $crawler = $this->client->request(
+            'POST',
+            $this->generateUrl('admin_setting_system_log'),
+            ['admin_system_log' => $this->formData]
+        );
+
+        $this->assertTrue($this->client->getResponse()->isSuccessful());
+        $html = $crawler->filter('.log-viewer')->html();
+
+        $this->assertStringContainsString('Payment validation error', $html);
+        $this->assertStringNotContainsString('Payment warning', $html);
+        $this->assertStringNotContainsString('Database connection error', $html);
     }
 }
