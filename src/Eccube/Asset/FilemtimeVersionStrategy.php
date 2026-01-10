@@ -40,8 +40,11 @@ class FilemtimeVersionStrategy implements VersionStrategyInterface
     {
         $fullPath = $this->basePath.'/'.$path;
 
-        if (file_exists($fullPath)) {
-            return (string) filemtime($fullPath);
+        if (file_exists($fullPath) && is_readable($fullPath)) {
+            $mtime = @filemtime($fullPath);
+            if ($mtime !== false) {
+                return (string) $mtime;
+            }
         }
 
         return '';

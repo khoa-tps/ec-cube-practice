@@ -245,4 +245,4 @@ services:
     eccube.asset.user_data_version_strategy:
         class: Eccube\Asset\FilemtimeVersionStrategy
         arguments:
-            - '%kernel.project_dir%/html/user_data'
+            - '%eccube_html_dir%/user_data'
