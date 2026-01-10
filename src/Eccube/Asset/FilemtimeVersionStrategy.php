@@ -38,11 +38,14 @@ class FilemtimeVersionStrategy implements VersionStrategyInterface
      */
     public function getVersion(string $path): string
     {
+        // パスの先頭のスラッシュを削除
+        $path = ltrim($path, '/');
         $fullPath = $this->basePath.'/'.$path;
 
-        if (file_exists($fullPath) && is_readable($fullPath)) {
+        // ファイルが存在する場合のみバージョンを返す
+        if (@is_file($fullPath)) {
             $mtime = @filemtime($fullPath);
-            if ($mtime !== false) {
+            if (false !== $mtime) {
                 return (string) $mtime;
             }
         }
