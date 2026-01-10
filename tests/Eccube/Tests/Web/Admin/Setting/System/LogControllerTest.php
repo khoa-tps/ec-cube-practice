@@ -150,11 +150,11 @@ class LogControllerTest extends AbstractAdminWebTestCase
     public function testLogLevelFiltering()
     {
         $testLogs = [
-            '[2025-01-10 10:00:00] admin.DEBUG [] [] [] [] - Debug message',
-            '[2025-01-10 10:01:00] admin.INFO [] [] [] [] - Info message',
-            '[2025-01-10 10:02:00] admin.WARNING [] [] [] [] - Warning message',
-            '[2025-01-10 10:03:00] admin.ERROR [] [] [] [] - Error message',
-            '[2025-01-10 10:04:00] admin.CRITICAL [] [] [] [] - Critical message',
+            '[2025-01-10 10:00:00] admin.DEBUG [a1b2c3d4] [uid123] [1] [TestClass::testMethod:100] - Debug message {} [GET, /admin, 127.0.0.1, http://example.com, Mozilla/5.0]',
+            '[2025-01-10 10:01:00] admin.INFO [a1b2c3d4] [uid123] [1] [TestClass::testMethod:101] - Info message {} [GET, /admin, 127.0.0.1, http://example.com, Mozilla/5.0]',
+            '[2025-01-10 10:02:00] admin.WARNING [a1b2c3d4] [uid123] [1] [TestClass::testMethod:102] - Warning message {} [GET, /admin, 127.0.0.1, http://example.com, Mozilla/5.0]',
+            '[2025-01-10 10:03:00] admin.ERROR [a1b2c3d4] [uid123] [1] [TestClass::testMethod:103] - Error message {} [GET, /admin, 127.0.0.1, http://example.com, Mozilla/5.0]',
+            '[2025-01-10 10:04:00] admin.CRITICAL [a1b2c3d4] [uid123] [1] [TestClass::testMethod:104] - Critical message {} [GET, /admin, 127.0.0.1, http://example.com, Mozilla/5.0]',
         ];
         file_put_contents($this->logTest, implode("\n", $testLogs));
 
@@ -180,8 +180,8 @@ class LogControllerTest extends AbstractAdminWebTestCase
     public function testKeywordFiltering()
     {
         $testLogs = [
-            '[2025-01-10 10:00:00] admin.ERROR [] [] [] [OrderController.php:100] - Payment failed',
-            '[2025-01-10 10:01:00] admin.INFO [] [] [] [ProductController.php:200] - Product updated',
+            '[2025-01-10 10:00:00] admin.ERROR [a1b2c3d4] [uid123] [1] [OrderController::payment:100] - Payment failed {} [POST, /admin/order, 127.0.0.1, http://example.com, Mozilla/5.0]',
+            '[2025-01-10 10:01:00] admin.INFO [a1b2c3d4] [uid123] [1] [ProductController::update:200] - Product updated {} [POST, /admin/product, 127.0.0.1, http://example.com, Mozilla/5.0]',
         ];
         file_put_contents($this->logTest, implode("\n", $testLogs));
 
@@ -205,9 +205,9 @@ class LogControllerTest extends AbstractAdminWebTestCase
     public function testCombinedFiltering()
     {
         $testLogs = [
-            '[2025-01-10 10:00:00] admin.ERROR [] [] [] [] - Payment validation error',
-            '[2025-01-10 10:01:00] admin.WARNING [] [] [] [] - Payment warning',
-            '[2025-01-10 10:02:00] admin.ERROR [] [] [] [] - Database connection error',
+            '[2025-01-10 10:00:00] admin.ERROR [a1b2c3d4] [uid123] [1] [PaymentService::validate:300] - Payment validation error {} [POST, /admin/order, 127.0.0.1, http://example.com, Mozilla/5.0]',
+            '[2025-01-10 10:01:00] admin.WARNING [a1b2c3d4] [uid123] [1] [PaymentService::check:301] - Payment warning {} [POST, /admin/order, 127.0.0.1, http://example.com, Mozilla/5.0]',
+            '[2025-01-10 10:02:00] admin.ERROR [a1b2c3d4] [uid123] [1] [Database::connect:400] - Database connection error {} [POST, /admin, 127.0.0.1, http://example.com, Mozilla/5.0]',
         ];
         file_put_contents($this->logTest, implode("\n", $testLogs));
 
