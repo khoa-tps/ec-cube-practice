@@ -20,12 +20,15 @@ use Symfony\Component\Asset\VersionStrategy\VersionStrategyInterface;
  */
 class FilemtimeVersionStrategy implements VersionStrategyInterface
 {
+    /**
+     * @var string
+     */
     private $basePath;
 
     /**
      * @param string $basePath アセットファイルのベースパス
      */
-    public function __construct($basePath)
+    public function __construct(string $basePath)
     {
         $this->basePath = rtrim($basePath, '/');
     }
@@ -33,7 +36,7 @@ class FilemtimeVersionStrategy implements VersionStrategyInterface
     /**
      * {@inheritdoc}
      */
-    public function getVersion($path)
+    public function getVersion(string $path): string
     {
         $fullPath = $this->basePath.'/'.$path;
 
@@ -47,7 +50,7 @@ class FilemtimeVersionStrategy implements VersionStrategyInterface
     /**
      * {@inheritdoc}
      */
-    public function applyVersion($path)
+    public function applyVersion(string $path): string
     {
         $version = $this->getVersion($path);
 
