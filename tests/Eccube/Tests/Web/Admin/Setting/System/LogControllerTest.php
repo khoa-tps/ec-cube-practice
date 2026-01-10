@@ -140,7 +140,17 @@ class LogControllerTest extends AbstractAdminWebTestCase
         $faker = $this->getFaker();
 
         if (!file_exists($this->logTest)) {
-            file_put_contents($this->logTest, $faker->paragraphs($number));
+            $paragraphs = $faker->paragraphs($number);
+            $logLines = [];
+            foreach ($paragraphs as $index => $paragraph) {
+                $logLines[] = sprintf(
+                    '[2025-01-10 10:%02d:00] app.INFO [a1b2c3d4] [uid123] [1] [TestClass::testMethod:%d] - %s {} [GET, /admin/test, 127.0.0.1, http://example.com, Mozilla/5.0]',
+                    $index,
+                    100 + $index,
+                    $paragraph
+                );
+            }
+            file_put_contents($this->logTest, implode("\n", $logLines));
         }
     }
 
