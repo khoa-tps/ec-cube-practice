@@ -40,9 +40,16 @@ class LogControllerTest extends AbstractAdminWebTestCase
             'keyword' => '',
         ];
 
-        $logDir = static::getContainer()->getParameter('kernel.logs_dir');
+        $logDir = static::getContainer()->getParameter('kernel.logs_dir')
+            .DIRECTORY_SEPARATOR
+            .static::getContainer()->getParameter('kernel.environment');
 
         $this->logTest = $logDir.'/'.$this->formData['files'];
+
+        // ログディレクトリが存在しない場合は作成
+        if (!is_dir($logDir)) {
+            mkdir($logDir, 0755, true);
+        }
 
         if (!file_exists($this->logTest)) {
             // 正しいMonologフォーマットでダミーログを作成
