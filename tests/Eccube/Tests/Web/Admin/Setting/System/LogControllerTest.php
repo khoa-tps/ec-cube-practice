@@ -45,7 +45,9 @@ class LogControllerTest extends AbstractAdminWebTestCase
         $this->logTest = $logDir.'/'.$this->formData['files'];
 
         if (!file_exists($this->logTest)) {
-            file_put_contents($this->logTest, 'test');
+            // 正しいMonologフォーマットでダミーログを作成
+            $dummyLog = '[2025-01-10 10:00:00] app.INFO [a1b2c3d4] [uid123] [1] [TestClass::setUp:100] - Test log entry {} [GET, /admin/test, 127.0.0.1, http://example.com, Mozilla/5.0]';
+            file_put_contents($this->logTest, $dummyLog);
         }
     }
 
