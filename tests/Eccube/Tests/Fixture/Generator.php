@@ -704,7 +704,7 @@ class Generator
         $BaseInfo = $this->entityManager->getRepository(BaseInfo::class)->get();
 
         // OrderItemを1-2個にランダム化（高速化のため）
-        $visibleProductClasses = array_filter($ProductClasses, function($pc) { return $pc->isVisible(); });
+        $visibleProductClasses = array_filter($ProductClasses, function ($pc) { return $pc->isVisible(); });
         $numOrderItems = min($faker->numberBetween(1, 2), count($visibleProductClasses));
         $selectedProductClasses = $faker->randomElements($visibleProductClasses, $numOrderItems);
 
