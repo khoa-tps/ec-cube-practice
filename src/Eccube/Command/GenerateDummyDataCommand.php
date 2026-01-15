@@ -89,6 +89,12 @@ EOF
         $numberOfOrder = $input->getOption('orders');
         $numberOfCustomer = $input->getOption('customers');
 
+        // SQL Loggerを無効化してパフォーマンス向上
+        $this->entityManager->getConnection()->getConfiguration()->setSQLLogger(null);
+
+        // バッチサイズ（何件ごとにflushするか）
+        $batchSize = 100;
+
         $Customers = [];
         $Products = [];
 
@@ -109,9 +115,11 @@ EOF
                     $output->writeln('Customer: id='.$Customer->getId().' '.$Customer->getEmail());
                     break;
             }
-            if ($output->getVerbosity() >= OutputInterface::VERBOSITY_NORMAL && (($i + 1) % 100) === 0) {
+            if ((($i + 1) % $batchSize) === 0) {
                 $this->entityManager->flush();
-                $output->writeln(' ...'.$i);
+                if ($output->getVerbosity() >= OutputInterface::VERBOSITY_NORMAL) {
+                    $output->writeln(' ...'.$i);
+                }
             }
             $Customers[] = $Customer;
         }
@@ -134,9 +142,11 @@ EOF
                     $output->writeln('Product: id='.$Product->getId().' '.$Product->getName());
                     break;
             }
-            if ($output->getVerbosity() >= OutputInterface::VERBOSITY_NORMAL && (($i + 1) % 100) === 0) {
+            if ((($i + 1) % $batchSize) === 0) {
                 $this->entityManager->flush();
-                $output->writeln(' ...'.$i);
+                if ($output->getVerbosity() >= OutputInterface::VERBOSITY_NORMAL) {
+                    $output->writeln(' ...'.$i);
+                }
             }
             $Products[] = $Product;
         }
@@ -186,9 +196,11 @@ EOF
                         break;
                 }
                 $j++;
-                if ($output->getVerbosity() >= OutputInterface::VERBOSITY_NORMAL && ($j % 100) === 0) {
+                if (($j % $batchSize) === 0) {
                     $this->entityManager->flush();
-                    $output->writeln(' ...'.$j);
+                    if ($output->getVerbosity() >= OutputInterface::VERBOSITY_NORMAL) {
+                        $output->writeln(' ...'.$j);
+                    }
                 }
             }
         }
