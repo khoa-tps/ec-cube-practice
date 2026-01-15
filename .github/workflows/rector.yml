@@ -21,5 +21,20 @@ jobs:
       - name: Initialize Composer
         uses: ./.github/actions/composer
 
+      - name: Restore Rector cache
+        uses: actions/cache/restore@v4
+        with:
+          path: var/rector_cache
+          key: ${{ runner.os }}-rector-${{ hashFiles('rector.php', 'composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-rector-
+
       - name: Rector (dry-run)
         run: vendor/bin/rector process --dry-run --ansi --config=rector.php
+
+      - name: Save Rector cache
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: var/rector_cache
+          key: ${{ runner.os }}-rector-${{ hashFiles('rector.php', 'composer.lock') }}

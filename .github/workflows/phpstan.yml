@@ -21,5 +21,20 @@ jobs:
     - name: Initialize Composer
       uses: ./.github/actions/composer
 
+    - name: Restore PHPStan cache
+      uses: actions/cache/restore@v4
+      with:
+        path: /tmp/phpstan
+        key: ${{ runner.os }}-phpstan-${{ hashFiles('phpstan.neon.dist', 'composer.lock', 'src/**/*.php') }}
+        restore-keys: |
+          ${{ runner.os }}-phpstan-
+
     - name: PHPStan
       run: vendor/bin/phpstan analyze src/ --error-format=github
+
+    - name: Save PHPStan cache
+      if: always()
+      uses: actions/cache/save@v4
+      with:
+        path: /tmp/phpstan
+        key: ${{ runner.os }}-phpstan-${{ hashFiles('phpstan.neon.dist', 'composer.lock', 'src/**/*.php') }}

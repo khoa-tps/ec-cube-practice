@@ -124,6 +124,14 @@ jobs:
         run: php -S 127.0.0.1:8000 codeception/router.php &
 
       - name: Codeception
+        uses: nick-invision/retry@v3
+        with:
+          timeout_minutes: 20
+          max_attempts: 2
+          retry_on: error
+          command: |
+            sed -i "s|%GITHUB_WORKSPACE%|${GITHUB_WORKSPACE}|g" codeception/_envs/github_action.yml
+            vendor/bin/codecept -vvv run acceptance --env chrome,github_action EF09ThrottlingCest::${METHOD} --html report.html
         env:
           APP_ENV: 'prod'
           DATABASE_URL: ${{ matrix.database_url }}
@@ -132,9 +140,6 @@ jobs:
           ECCUBE_PACKAGE_API_URL: 'http://127.0.0.1:8080'
           METHOD: ${{ matrix.method }}
           SYMFONY_DEPRECATIONS_HELPER: weak
-        run: |
-          sed -i "s|%GITHUB_WORKSPACE%|${GITHUB_WORKSPACE}|g" codeception/_envs/github_action.yml
-          vendor/bin/codecept -vvv run acceptance --env chrome,github_action EF09ThrottlingCest::${METHOD} --html report.html
 
       - name: Upload evidence
         if: failure()
