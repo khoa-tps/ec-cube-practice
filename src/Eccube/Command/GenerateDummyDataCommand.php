@@ -95,7 +95,7 @@ EOF
         $faker = Faker::create($locale);
         for ($i = 0; $i < $numberOfCustomer; $i++) {
             $email = microtime(true).'.'.$faker->safeEmail;
-            $Customer = $this->generator->createCustomer($email);
+            $Customer = $this->generator->createCustomer($email, false);
             $Customer->setBirth($faker->dateTimeBetween('-110 years', '- 5 years'));
             switch ($output->getVerbosity()) {
                 case OutputInterface::VERBOSITY_QUIET:
@@ -109,16 +109,19 @@ EOF
                     $output->writeln('Customer: id='.$Customer->getId().' '.$Customer->getEmail());
                     break;
             }
-            if ($output->getVerbosity() >= OutputInterface::VERBOSITY_NORMAL && ($i % 100) === 0 && $i > 0) {
+            if ($output->getVerbosity() >= OutputInterface::VERBOSITY_NORMAL && (($i + 1) % 100) === 0) {
+                $this->entityManager->flush();
                 $output->writeln(' ...'.$i);
             }
             $Customers[] = $Customer;
         }
+        // Flush remaining entities
+        $this->entityManager->flush();
         for ($i = 0; $i < $numberOfProducts; $i++) {
             // @see https://github.com/fzaninotto/Faker/issues/1125#issuecomment-268676186
             gc_collect_cycles();
 
-            $Product = $this->generator->createProduct(null, 3, !$notImage);
+            $Product = $this->generator->createProduct(null, 3, !$notImage, false);
             switch ($output->getVerbosity()) {
                 case OutputInterface::VERBOSITY_QUIET:
                     break;
@@ -131,11 +134,14 @@ EOF
                     $output->writeln('Product: id='.$Product->getId().' '.$Product->getName());
                     break;
             }
-            if ($output->getVerbosity() >= OutputInterface::VERBOSITY_NORMAL && ($i % 100) === 0 && $i > 0) {
+            if ($output->getVerbosity() >= OutputInterface::VERBOSITY_NORMAL && (($i + 1) % 100) === 0) {
+                $this->entityManager->flush();
                 $output->writeln(' ...'.$i);
             }
             $Products[] = $Product;
         }
+        // Flush remaining entities
+        $this->entityManager->flush();
         $Deliveries = $this->deliveryRepository->findAll();
         $j = 0;
         $randomOrderStatus = [
@@ -163,7 +169,7 @@ EOF
                 // @see https://github.com/fzaninotto/Faker/issues/1125#issuecomment-268676186
                 gc_collect_cycles();
 
-                $Order = $this->generator->createOrder($Customer, $Product->getProductClasses()->toArray(), $Delivery, $charge, $discount);
+                $Order = $this->generator->createOrder($Customer, $Product->getProductClasses()->toArray(), $Delivery, $charge, $discount, null, false);
                 $Status = $this->entityManager->find(OrderStatus::class, $faker->randomElement($randomOrderStatus));
                 $Order->setOrderStatus($Status);
                 $Order->setOrderDate($faker->dateTimeThisYear());
@@ -179,13 +185,15 @@ EOF
                         $output->writeln('Order: id='.$Order->getId());
                         break;
                 }
-                $this->entityManager->flush();
                 $j++;
-                if ($output->getVerbosity() >= OutputInterface::VERBOSITY_NORMAL && ($j % 100) === 0 && $j > 0) {
+                if ($output->getVerbosity() >= OutputInterface::VERBOSITY_NORMAL && ($j % 100) === 0) {
+                    $this->entityManager->flush();
                     $output->writeln(' ...'.$j);
                 }
             }
         }
+        // Flush remaining entities
+        $this->entityManager->flush();
         $output->writeln('');
         $output->writeln(sprintf('%s <info>success</info>', 'eccube:fixtures:generate'));
 
