@@ -129,7 +129,10 @@ EOF
             // @see https://github.com/fzaninotto/Faker/issues/1125#issuecomment-268676186
             gc_collect_cycles();
 
-            $Product = $this->generator->createProduct(null, 3, !$notImage, false);
+            // 商品規格数を1-3個にランダム化（平均2個で高速化）
+            $productClassNum = $faker->numberBetween(1, 3);
+            // simple_mode=true でProductCategoryとProductTagをスキップ（大幅高速化）
+            $Product = $this->generator->createProduct(null, $productClassNum, !$notImage, false, true);
             switch ($output->getVerbosity()) {
                 case OutputInterface::VERBOSITY_QUIET:
                     break;

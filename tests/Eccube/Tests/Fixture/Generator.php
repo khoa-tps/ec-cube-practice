@@ -395,7 +395,7 @@ class Generator
      *
      * @return Product
      */
-    public function createProduct($product_name = null, $product_class_num = 3, $with_image = false, $flush = true)
+    public function createProduct($product_name = null, $product_class_num = 3, $with_image = false, $flush = true, $simple_mode = false)
     {
         $faker = $this->getFaker();
         $Member = $this->entityManager->find(Member::class, 2);
@@ -558,39 +558,42 @@ class Generator
 
         $Product->addProductClass($ProductClass);
 
-        // ProductCategoryとProductTagにはProduct IDが必要なので、ここでflush
-        if (!$flush) {
-            $this->entityManager->flush();
-        }
-
-        $Categories = $this->categoryRepository->findAll();
-        foreach ($Categories as $Category) {
-            $ProductCategory = new ProductCategory();
-            $ProductCategory
-                ->setCategory($Category)
-                ->setProduct($Product)
-                ->setCategoryId($Category->getId())
-                ->setProductId($Product->getId());
-            $this->entityManager->persist($ProductCategory);
-            if ($flush) {
+        // simple_modeの場合はProductCategoryとProductTagをスキップ（高速化）
+        if (!$simple_mode) {
+            // ProductCategoryとProductTagにはProduct IDが必要なので、ここでflush
+            if (!$flush) {
                 $this->entityManager->flush();
             }
-            $Product->addProductCategory($ProductCategory);
-        }
 
-        $Tags = $this->tagRepository->findAll();
-        foreach ($Tags as $Tag) {
-            $ProductTag = new ProductTag();
-            $ProductTag
-                ->setProduct($Product)
-                ->setTag($Tag)
-                ->setCreateDate(new \DateTime()) // FIXME
-                ->setCreator($Member);
-            $this->entityManager->persist($ProductTag);
-            if ($flush) {
-                $this->entityManager->flush();
+            $Categories = $this->categoryRepository->findAll();
+            foreach ($Categories as $Category) {
+                $ProductCategory = new ProductCategory();
+                $ProductCategory
+                    ->setCategory($Category)
+                    ->setProduct($Product)
+                    ->setCategoryId($Category->getId())
+                    ->setProductId($Product->getId());
+                $this->entityManager->persist($ProductCategory);
+                if ($flush) {
+                    $this->entityManager->flush();
+                }
+                $Product->addProductCategory($ProductCategory);
             }
-            $Product->addProductTag($ProductTag);
+
+            $Tags = $this->tagRepository->findAll();
+            foreach ($Tags as $Tag) {
+                $ProductTag = new ProductTag();
+                $ProductTag
+                    ->setProduct($Product)
+                    ->setTag($Tag)
+                    ->setCreateDate(new \DateTime()) // FIXME
+                    ->setCreator($Member);
+                $this->entityManager->persist($ProductTag);
+                if ($flush) {
+                    $this->entityManager->flush();
+                }
+                $Product->addProductTag($ProductTag);
+            }
         }
 
         if ($flush) {
@@ -685,7 +688,8 @@ class Generator
         }
 
         if (empty($ProductClasses)) {
-            $Product = $this->createProduct(null, 3, false, $flush);
+            // 注文生成時は高速化のためsimple_mode=trueを使用
+            $Product = $this->createProduct(null, 3, false, $flush, true);
             $ProductClasses = $Product->getProductClasses();
         }
         $Taxation = $this->entityManager->find(TaxType::class, TaxType::TAXATION);
@@ -699,11 +703,13 @@ class Generator
         $ItemPoint = $this->entityManager->find(OrderItemType::class, OrderItemType::POINT);
         $BaseInfo = $this->entityManager->getRepository(BaseInfo::class)->get();
 
+        // OrderItemを1-2個にランダム化（高速化のため）
+        $visibleProductClasses = array_filter($ProductClasses, function($pc) { return $pc->isVisible(); });
+        $numOrderItems = min($faker->numberBetween(1, 2), count($visibleProductClasses));
+        $selectedProductClasses = $faker->randomElements($visibleProductClasses, $numOrderItems);
+
         /** @var ProductClass $ProductClass */
-        foreach ($ProductClasses as $ProductClass) {
-            if (!$ProductClass->isVisible()) {
-                continue;
-            }
+        foreach ($selectedProductClasses as $ProductClass) {
             $Product = $ProductClass->getProduct();
 
             $OrderItem = new OrderItem();
