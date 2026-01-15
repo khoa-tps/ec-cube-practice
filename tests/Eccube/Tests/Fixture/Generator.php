@@ -615,7 +615,7 @@ class Generator
      *
      * @return Order
      */
-    public function createOrder(Customer $Customer, array $ProductClasses = [], ?Delivery $Delivery = null, $add_charge = 0, $add_discount = 0, $statusTypeId = null, $flush = true)
+    public function createOrder(Customer $Customer, array $ProductClasses = [], ?Delivery $Delivery = null, $add_charge = 0, $add_discount = 0, $statusTypeId = null, $flush = true, $randomizeOrderItems = false)
     {
         $faker = $this->getFaker();
         $quantity = $faker->numberBetween(1, 10);
@@ -703,10 +703,15 @@ class Generator
         $ItemPoint = $this->entityManager->find(OrderItemType::class, OrderItemType::POINT);
         $BaseInfo = $this->entityManager->getRepository(BaseInfo::class)->get();
 
-        // OrderItemを1-2個にランダム化（高速化のため）
-        $visibleProductClasses = array_filter($ProductClasses, function ($pc) { return $pc->isVisible(); });
-        $numOrderItems = min($faker->numberBetween(1, 2), count($visibleProductClasses));
-        $selectedProductClasses = $faker->randomElements($visibleProductClasses, $numOrderItems);
+        // OrderItemを1-2個にランダム化（高速化のため、GenerateDummyDataCommandからのみ使用）
+        if ($randomizeOrderItems) {
+            $visibleProductClasses = array_filter($ProductClasses, function ($pc) { return $pc->isVisible(); });
+            $numOrderItems = min($faker->numberBetween(1, 2), count($visibleProductClasses));
+            $selectedProductClasses = $faker->randomElements($visibleProductClasses, $numOrderItems);
+        } else {
+            // 通常はすべてのProductClassをOrderItemとして追加（テスト互換性のため）
+            $selectedProductClasses = $ProductClasses;
+        }
 
         /** @var ProductClass $ProductClass */
         foreach ($selectedProductClasses as $ProductClass) {

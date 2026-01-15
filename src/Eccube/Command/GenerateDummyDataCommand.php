@@ -182,7 +182,7 @@ EOF
                 // @see https://github.com/fzaninotto/Faker/issues/1125#issuecomment-268676186
                 gc_collect_cycles();
 
-                $Order = $this->generator->createOrder($Customer, $Product->getProductClasses()->toArray(), $Delivery, $charge, $discount, null, false);
+                $Order = $this->generator->createOrder($Customer, $Product->getProductClasses()->toArray(), $Delivery, $charge, $discount, null, false, true);
                 $Status = $this->entityManager->find(OrderStatus::class, $faker->randomElement($randomOrderStatus));
                 $Order->setOrderStatus($Status);
                 $Order->setOrderDate($faker->dateTimeThisYear());
