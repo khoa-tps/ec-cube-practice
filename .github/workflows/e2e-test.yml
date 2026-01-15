@@ -60,6 +60,25 @@ jobs:
       - name: Initialize Composer
         uses: ./.github/actions/composer
 
+      - name: Cache npm dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
+
+      - name: Cache Database Schema
+        uses: actions/cache@v4
+        id: schema-cache
+        with:
+          path: |
+            var/cache/dev/schema.sql
+            var/cache/dev/db_populated
+          key: ${{ runner.os }}-e2e-schema-${{ hashFiles('src/Eccube/Entity/**/*.php', 'app/Customize/Entity/**/*.php') }}
+          restore-keys: |
+            ${{ runner.os }}-e2e-schema-
+
       - name: Build Sass and JavaScript
         run: |
           npm ci
