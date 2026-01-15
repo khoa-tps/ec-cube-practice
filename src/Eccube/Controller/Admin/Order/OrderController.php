@@ -310,12 +310,37 @@ class OrderController extends AbstractController
         $this->eventDispatcher->dispatch($event, EccubeEvents::ADMIN_ORDER_INDEX_SEARCH);
         $paginate_options = $event->getArgument('paginate_options');
 
-        $pagination = $paginator->paginate(
-            $qb,
-            $page_no,
-            $page_count,
-            $paginate_options
-        );
+        // JOIN必要な検索条件がない場合はカスタムカウントを使用
+        $useCustomCount = !isset($searchData['buy_product_name'])
+            && !isset($searchData['payment'])
+            && !isset($searchData['shipping_mail'])
+            && !isset($searchData['tracking_number'])
+            && !isset($searchData['shipping_delivery_datetime_start'])
+            && !isset($searchData['shipping_delivery_datetime_end'])
+            && !isset($searchData['shipping_delivery_date_start'])
+            && !isset($searchData['shipping_delivery_date_end']);
+
+        if ($useCustomCount) {
+            // カスタムカウントを使用して高速化
+            $count = $this->orderRepository->countBySearchDataForAdmin($searchData);
+            $query = $qb->getQuery();
+            $query->setHint('knp_paginator.count', $count);
+
+            $pagination = $paginator->paginate(
+                $query,
+                $page_no,
+                $page_count,
+                $paginate_options
+            );
+        } else {
+            // JOIN必要な検索条件がある場合は従来通り
+            $pagination = $paginator->paginate(
+                $qb,
+                $page_no,
+                $page_count,
+                $paginate_options
+            );
+        }
 
         return [
             'searchForm' => $searchForm->createView(),

@@ -169,12 +169,30 @@ class CustomerController extends AbstractController
         $this->eventDispatcher->dispatch($event, EccubeEvents::ADMIN_CUSTOMER_INDEX_SEARCH);
         $paginate_options = $event->getArgument('paginate_options');
 
-        $pagination = $paginator->paginate(
-            $qb,
-            $page_no,
-            $pageCount,
-            $paginate_options
-        );
+        // JOIN必要な検索条件がない場合はカスタムカウントを使用
+        $useCustomCount = !isset($searchData['buy_product_name']);
+
+        if ($useCustomCount) {
+            // カスタムカウントを使用して高速化
+            $count = $this->customerRepository->countBySearchData($searchData);
+            $query = $qb->getQuery();
+            $query->setHint('knp_paginator.count', $count);
+
+            $pagination = $paginator->paginate(
+                $query,
+                $page_no,
+                $pageCount,
+                $paginate_options
+            );
+        } else {
+            // JOIN必要な検索条件がある場合は従来通り
+            $pagination = $paginator->paginate(
+                $qb,
+                $page_no,
+                $pageCount,
+                $paginate_options
+            );
+        }
 
         return [
             'searchForm' => $searchForm->createView(),
