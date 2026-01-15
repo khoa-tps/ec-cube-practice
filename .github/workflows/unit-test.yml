@@ -23,7 +23,7 @@ jobs:
             database_server_version: 16
             database_charset: utf8
           - db: sqlite3
-            database_url: sqlite:///:memory:
+            database_url: 'sqlite:///:memory:'
             database_server_version: 3
             database_charset: utf8
 
