@@ -485,7 +485,7 @@ class Generator
                 ->setProduct($Product)
                 ->setSaleType($SaleType)
                 ->setStockUnlimited(false)
-                ->setPrice02((string) $faker->randomNumber(5))
+                ->setPrice02((string) $faker->numberBetween(100, 10000))
                 ->setDeliveryDuration($DeliveryDurations[$faker->numberBetween(0, 8)])
                 ->setCreateDate(new \DateTime()) // FIXME
                 ->setUpdateDate(new \DateTime())
@@ -539,7 +539,7 @@ class Generator
             ->setProductStock($ProductStock)
             ->setProduct($Product)
             ->setSaleType($SaleType)
-            ->setPrice02((string) $faker->randomNumber(5))
+            ->setPrice02((string) $faker->numberBetween(100, 10000))
             ->setDeliveryDuration($DeliveryDurations[$faker->numberBetween(0, 8)])
             ->setStockUnlimited(false)
             ->setCreateDate(new \DateTime()) // FIXME
@@ -615,7 +615,7 @@ class Generator
     public function createOrder(Customer $Customer, array $ProductClasses = [], ?Delivery $Delivery = null, $add_charge = 0, $add_discount = 0, $statusTypeId = null, $flush = true)
     {
         $faker = $this->getFaker();
-        $quantity = $faker->randomNumber(2);
+        $quantity = $faker->numberBetween(1, 10);
         $Pref = $this->entityManager->find(Pref::class, $faker->numberBetween(1, 47));
         $Payments = $this->paymentRepository->findAll();
         if ($statusTypeId === null) {

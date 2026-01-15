@@ -163,8 +163,8 @@ EOF
                 $orderByKey = $faker->numberBetween(0, 1);
                 $Product = $this->productRepository->findOneBy([], ['id' => $orderBy[$orderByKey]]);
             }
-            $charge = $faker->randomNumber(4);
-            $discount = $faker->randomNumber(4);
+            $charge = $faker->numberBetween(0, 1000);
+            $discount = $faker->numberBetween(0, 1000);
             for ($i = 0; $i < $numberOfOrder; $i++) {
                 // @see https://github.com/fzaninotto/Faker/issues/1125#issuecomment-268676186
                 gc_collect_cycles();
