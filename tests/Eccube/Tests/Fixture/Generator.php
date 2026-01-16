@@ -709,8 +709,10 @@ class Generator
             $numOrderItems = min($faker->numberBetween(1, 2), count($visibleProductClasses));
             $selectedProductClasses = $faker->randomElements($visibleProductClasses, $numOrderItems);
         } else {
-            // 通常はすべてのProductClassをOrderItemとして追加（テスト互換性のため）
-            $selectedProductClasses = $ProductClasses;
+            // visible=trueのProductClassのみ使用（デフォルト規格を除外）
+            $selectedProductClasses = array_filter($ProductClasses, function ($pc) {
+                return $pc->isVisible();
+            });
         }
 
         /** @var ProductClass $ProductClass */
