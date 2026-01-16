@@ -138,8 +138,11 @@ jobs:
         if: steps.chromedriver-cache.outputs.cache-hit != 'true'
         uses: nanasess/setup-chromedriver@master
 
-      - name: Install fonts
-        run: sudo apt install fonts-ipafont fonts-ipaexfont
+      - name: Cache apt packages
+        uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: fonts-ipafont fonts-ipaexfont
+          version: 1.0
 
       - name: Run chromedriver
         run: |

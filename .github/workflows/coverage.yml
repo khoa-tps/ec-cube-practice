@@ -79,7 +79,7 @@ jobs:
       matrix:
         php: [ 8.3 ]
         db: [ pgsql ]
-        group: [ admin01, admin02, admin03, front, installer ]
+        group: [ admin01-a, admin01-b, admin02, admin03-a, admin03-b, front-a, front-b, installer ]
         include:
           - db: pgsql
             database_url: postgres://postgres:password@127.0.0.1:5432/eccube_db
@@ -142,8 +142,11 @@ jobs:
           bin/console doctrine:schema:create --env=dev
           bin/console eccube:fixtures:load --env=dev
 
-      - name: Install fonts
-        run: sudo apt install fonts-ipafont fonts-ipaexfont
+      - name: Cache apt packages
+        uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: fonts-ipafont fonts-ipaexfont
+          version: 1.0
 
       - name: setup-chromedriver
         uses: nanasess/setup-chromedriver@master
