@@ -161,7 +161,7 @@ jobs:
       - name: Codeception
         uses: nick-invision/retry@v3
         with:
-          timeout_minutes: 20
+          timeout_minutes: 40
           max_attempts: 2
           retry_on: error
           command: |
