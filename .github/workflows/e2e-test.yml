@@ -183,7 +183,7 @@ jobs:
           retry_on: error
           command: |
             sed -i "s|%GITHUB_WORKSPACE%|${GITHUB_WORKSPACE}|g" codeception/_envs/github_action.yml
-            vendor/bin/codecept -vvv run acceptance --env chrome,github_action -g ${GROUP} --skip-group restrict-file-upload --skip-group change-display-order --html report.html
+            vendor/bin/codecept -vvv run acceptance --env chrome,github_action -g ${GROUP} --skip-group restrict-file-upload --skip-group change-display-order --html report.html --coverage-xml
         env:
           APP_ENV: ${{ matrix.app_env }}
           DATABASE_URL: ${{ matrix.database_url }}
@@ -204,7 +204,7 @@ jobs:
           retry_on: error
           command: |
             sed -i "s|%GITHUB_WORKSPACE%|${GITHUB_WORKSPACE}|g" codeception/_envs/github_action.yml
-            vendor/bin/codecept -vvv run acceptance --env chrome,github_action -g ${GROUP} --html report.html
+            vendor/bin/codecept -vvv run acceptance --env chrome,github_action -g ${GROUP} --html report.html --coverage-xml
         env:
           APP_ENV: ${{ matrix.app_env }}
           DATABASE_URL: ${{ matrix.database_url }}
@@ -246,3 +246,10 @@ jobs:
         with:
           name: codeception-${{ matrix.group }}-logs
           path: var/log/
+
+      - name: Upload coverage
+        if: success()
+        uses: actions/upload-artifact@v6
+        with:
+          name: codeception-${{ matrix.group }}-coverage
+          path: codeception/_output/**/*.coverage.xml

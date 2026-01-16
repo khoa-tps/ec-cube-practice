@@ -26,8 +26,12 @@ jobs:
   e2e-test:
     needs: [ rector, phpstan, php-cs-fixer ]
     uses: ./.github/workflows/e2e-test.yml
+  coverage:
+    needs: [ rector, phpstan, php-cs-fixer ]
+    if: ${{ github.event.pull_request.user.login != 'dependabot[bot]' }}
+    uses: ./.github/workflows/coverage.yml
   plugin-test:
-    needs: [ e2e-test ]
+    needs: [ coverage ]
     uses: ./.github/workflows/plugin-test.yml
   e2e-test-throttling:
     needs: [ plugin-test ]
@@ -41,7 +45,3 @@ jobs:
     steps:
       - name: success
         run: echo "::notice::success!"
-  coverage:
-    needs: [ e2e-test-throttling, deny-test ]
-    if: ${{ github.event.pull_request.user.login != 'dependabot[bot]' }}
-    uses: ./.github/workflows/coverage.yml
