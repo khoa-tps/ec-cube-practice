@@ -47,6 +47,6 @@ jobs:
       - name: success
         run: echo "::notice::success!"
   coverage:
-    needs: [ e2e-test-throttling, deny-test ]
+    needs: [ unit-test, e2e-test ]  # Run in parallel with plugin-test
     if: ${{ github.event.pull_request.user.login != 'dependabot[bot]' }}
     uses: ./.github/workflows/coverage.yml
