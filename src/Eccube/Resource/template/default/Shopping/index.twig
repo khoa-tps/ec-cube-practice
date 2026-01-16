@@ -41,8 +41,14 @@ file that was distributed with this source code.
             $('#customer').click(function() {
                 $(edit).each(function(index) {
                     var name = $(this).text();
-                    var input = $('<input id="edit' + index + '" type="text" />').val(name);
-                    $(form[index]).empty().append(input);
+                    var $select = $(form[index]).children('select');
+                    if ($select.length) {
+                        // 都道府県フィールド: selectを表示
+                        $select.show();
+                    } else {
+                        var input = $('<input id="edit' + index + '" type="text" />').val(name);
+                        $(form[index]).empty().append(input);
+                    }
                 });
 
                 $('.non-customer-display').hide();
@@ -52,7 +58,13 @@ file that was distributed with this source code.
 
             $('#customer-ok').click(function() {
                 $(form).each(function(index) {
-                    $(hidden[index]).val($(form[index]).children('input').val());
+                    var $select = $(form[index]).children('select');
+                    if ($select.length) {
+                        // 都道府県フィールド: selectから値を取得
+                        $(hidden[index]).val($select.val());
+                    } else {
+                        $(hidden[index]).val($(form[index]).children('input').val());
+                    }
                 });
 
                 var postData = {};
@@ -70,8 +82,15 @@ file that was distributed with this source code.
                 }).done(function(data) {
                     if (data.status == 'OK') {
                         $(form).each(function(index) {
-                            $(edit[index]).empty().text($(form[index]).children('input').val());
-                            $(form[index]).empty();
+                            var $select = $(form[index]).children('select');
+                            if ($select.length) {
+                                // 都道府県フィールド: selectから値を取得して表示を更新
+                                $(edit[index]).empty().text($select.val());
+                                $select.hide();
+                            } else {
+                                $(edit[index]).empty().text($(form[index]).children('input').val());
+                                $(form[index]).empty();
+                            }
                         });
 
                         // kana field
@@ -93,6 +112,8 @@ file that was distributed with this source code.
             });
 
             $('#customer-cancel').click(function() {
+                // 都道府県のselectを非表示に戻す
+                $('.customer-address_pref').children('select').hide();
                 $('.non-customer-display').show();
                 $('.non-customer-edit').hide();
                 $('.mod-button').hide();
@@ -233,7 +254,14 @@ file that was distributed with this source code.
                                         </div>
                                     </div>
                                     <div class="ec-select">
-                                        <span class="customer-form customer-address_pref"></span>
+                                        <span class="customer-form customer-address_pref">
+                                            <select style="display:none;">
+                                                <option value="">{{ 'common.select__pref'|trans }}</option>
+                                                {% for pref in Prefs %}
+                                                    <option value="{{ pref.name }}"{% if Order.pref and Order.pref.id == pref.id %} selected{% endif %}>{{ pref.name }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </span>
                                     </div>
                                     <div class="ec-input">
                                         <span class="customer-form customer-address_addr01"></span>
