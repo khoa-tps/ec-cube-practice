@@ -31,7 +31,7 @@ jobs:
     if: ${{ github.event.pull_request.user.login != 'dependabot[bot]' }}
     uses: ./.github/workflows/coverage.yml
   plugin-test:
-    needs: [ coverage ]
+    needs: [ unit-test ]
     uses: ./.github/workflows/plugin-test.yml
   e2e-test-throttling:
     needs: [ plugin-test ]
@@ -40,7 +40,7 @@ jobs:
     needs: [ plugin-test ]
     uses: ./.github/workflows/deny-test.yml
   success:
-    needs: [ e2e-test-throttling, deny-test ]
+    needs: [ e2e-test, e2e-test-throttling, deny-test ]
     runs-on: ubuntu-latest
     steps:
       - name: success
