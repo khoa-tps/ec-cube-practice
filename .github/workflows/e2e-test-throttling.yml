@@ -88,6 +88,31 @@ jobs:
       - name: Initialize Composer
         uses: ./.github/actions/composer
 
+      - name: Cache npm dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
+
+      - name: Cache build artifacts
+        uses: actions/cache@v4
+        id: build-cache
+        with:
+          path: |
+            html/template/**/css
+            html/bundle
+          key: ${{ runner.os }}-build-${{ hashFiles('html/template/**/scss/**/*.scss', 'html/template/**/js/**/*.js', 'package-lock.json', 'gulpfile.js', 'webpack.config.js', 'gulp/**/*.js') }}
+          restore-keys: |
+            ${{ runner.os }}-build-
+
+      - name: Build Sass and JavaScript
+        if: steps.build-cache.outputs.cache-hit != 'true'
+        run: |
+          npm ci
+          npm run build
+
       - name: Setup to EC-CUBE
         env:
           APP_ENV: 'prod'
@@ -100,7 +125,17 @@ jobs:
           bin/console doctrine:schema:create --env=dev
           bin/console eccube:fixtures:load --env=dev
 
+      - name: Cache chromedriver
+        uses: actions/cache@v4
+        id: chromedriver-cache
+        with:
+          path: /usr/local/bin/chromedriver
+          key: ${{ runner.os }}-chromedriver-${{ hashFiles('.github/workflows/e2e-test-throttling.yml') }}
+          restore-keys: |
+            ${{ runner.os }}-chromedriver-
+
       - name: setup-chromedriver
+        if: steps.chromedriver-cache.outputs.cache-hit != 'true'
         uses: nanasess/setup-chromedriver@master
 
       - name: Install fonts
