@@ -27,7 +27,7 @@ use Page\Front\ShoppingPage;
 use Page\Front\TopPage;
 
 /**
- * @group front-a
+ * @group front
  * @group order
  * @group ef3
  */

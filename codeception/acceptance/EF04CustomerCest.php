@@ -16,7 +16,7 @@ use Page\Front\CartPage;
 use Page\Front\ProductDetailPage;
 
 /**
- * @group front-b
+ * @group front
  * @group customer
  * @group ef4
  */

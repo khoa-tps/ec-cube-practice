@@ -22,7 +22,7 @@ use Page\Admin\ShippingEditPage;
 
 /**
  * @group admin
- * @group admin01-b
+ * @group admin01
  * @group shipping
  * @group ea9
  */

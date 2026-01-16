@@ -19,7 +19,7 @@ use Page\Admin\ProductManagePage;
 use Page\Admin\ShopSettingPage;
 
 /**
- * @group front-b
+ * @group front
  * @group other
  * @group ef6
  */

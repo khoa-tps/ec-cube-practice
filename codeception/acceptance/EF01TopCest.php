@@ -16,7 +16,7 @@ use Page\Front\TopPage;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
- * @group front-a
+ * @group front
  * @group toppage
  * @group ef1
  */

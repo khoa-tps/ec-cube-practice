@@ -12,24 +12,18 @@ jobs:
       matrix:
         php: [ 8.3 ]
         db: [ pgsql ]
-        group: [ 'admin01-a', 'admin01-b', 'admin02', 'admin03-a', 'admin03-b', 'front-a', 'front-b', 'restrict-fileupload', 'change-display-order', 'installer' ]
+        group: [ 'admin01', 'admin02', 'admin03', 'front', 'restrict-fileupload', 'change-display-order', 'installer' ]
         include:
           - db: pgsql
             database_url: postgres://postgres:password@127.0.0.1:5432/eccube_db
             database_server_version: 14
-          - group: 'admin01-a'
-            app_env: 'codeception'
-          - group: 'admin01-b'
+          - group: 'admin01'
             app_env: 'codeception'
           - group: 'admin02'
             app_env: 'codeception'
-          - group: 'admin03-a'
+          - group: 'admin03'
             app_env: 'codeception'
-          - group: 'admin03-b'
-            app_env: 'codeception'
-          - group: 'front-a'
-            app_env: 'codeception'
-          - group: 'front-b'
+          - group: 'front'
             app_env: 'codeception'
           - group: 'restrict-fileupload'
             app_env: 'codeception'
@@ -63,15 +57,6 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
 
-      - name: Cache apt packages for pcov
-        uses: awalsh128/cache-apt-pkgs-action@latest
-        with:
-          packages: php8.3-pcov
-          version: 1.0
-
-      - name: Setup pcov
-        run: sudo phpenmod -s cli pcov
-
       - name: Initialize Composer
         uses: ./.github/actions/composer
 
@@ -82,17 +67,6 @@ jobs:
           key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-npm-
-
-      - name: Cache Database Schema
-        uses: actions/cache@v4
-        id: schema-cache
-        with:
-          path: |
-            var/cache/dev/schema.sql
-            var/cache/dev/db_populated
-          key: ${{ runner.os }}-e2e-schema-${{ hashFiles('src/Eccube/Entity/**/*.php', 'app/Customize/Entity/**/*.php') }}
-          restore-keys: |
-            ${{ runner.os }}-e2e-schema-
 
       - name: Cache build artifacts
         uses: actions/cache@v4
@@ -123,17 +97,7 @@ jobs:
           bin/console doctrine:schema:create --env=dev
           bin/console eccube:fixtures:load --env=dev
 
-      - name: Cache chromedriver
-        uses: actions/cache@v4
-        id: chromedriver-cache
-        with:
-          path: /usr/local/bin/chromedriver
-          key: ${{ runner.os }}-chromedriver-${{ hashFiles('.github/workflows/e2e-test.yml') }}
-          restore-keys: |
-            ${{ runner.os }}-chromedriver-
-
       - name: setup-chromedriver
-        if: steps.chromedriver-cache.outputs.cache-hit != 'true'
         uses: nanasess/setup-chromedriver@master
 
       - name: Cache apt packages
@@ -158,12 +122,6 @@ jobs:
           do
             (cd codeception/_data/plugins/$d; tar zcf ../../../../repos/${d}.tgz *)
           done
-
-      - name: Setup codeception for coverage
-        run: |
-          composer config --no-plugins allow-plugins.codeception/c3 true
-          composer require --dev codeception/c3 "2.*"
-          sed -i "7a include __DIR__.'/c3.php';" index.php
 
       - name: Start PHP Development Server restrict-fileupload
         if: ${{ matrix.group == 'restrict-fileupload' }}
@@ -198,7 +156,7 @@ jobs:
           retry_on: error
           command: |
             sed -i "s|%GITHUB_WORKSPACE%|${GITHUB_WORKSPACE}|g" codeception/_envs/github_action.yml
-            php -dpcov.enabled=1 vendor/bin/codecept -vvv run acceptance --env chrome,github_action -g ${GROUP} --skip-group restrict-file-upload --skip-group change-display-order --skip-group excludeCoverage --html report.html --coverage --coverage-xml
+            vendor/bin/codecept -vvv run acceptance --env chrome,github_action -g ${GROUP} --skip-group restrict-file-upload --skip-group change-display-order --html report.html
         env:
           APP_ENV: ${{ matrix.app_env }}
           DATABASE_URL: ${{ matrix.database_url }}
@@ -244,16 +202,16 @@ jobs:
           name: codeception-${{ matrix.group }}-evidence
           path: codeception/_output/
 
-      -   name: List files in current directory
-          run: ls -la
+      - name: List files in current directory
+        run: ls -la
 
-      -   name: Upload ScreenShots
-          uses: actions/upload-artifact@v6
-          with:
-            name: screenshots-${{ matrix.group }}
-            path: |
-              front_top.png
-              admin_top.png
+      - name: Upload ScreenShots
+        uses: actions/upload-artifact@v6
+        with:
+          name: screenshots-${{ matrix.group }}
+          path: |
+            front_top.png
+            admin_top.png
 
       - name: Upload logs
         if: failure()
@@ -261,10 +219,3 @@ jobs:
         with:
           name: codeception-${{ matrix.group }}-logs
           path: var/log/
-
-      - name: Upload coverage
-        if: success()
-        uses: actions/upload-artifact@v6
-        with:
-          name: codeception-${{ matrix.group }}-coverage
-          path: codeception/_output/**/*.coverage.xml

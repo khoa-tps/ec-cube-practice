@@ -17,7 +17,7 @@ use Page\Front\ProductListPage;
 use Page\Front\TopPage;
 
 /**
- * @group front-a
+ * @group front
  * @group product
  * @group ef2
  */

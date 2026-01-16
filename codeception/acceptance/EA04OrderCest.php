@@ -20,7 +20,7 @@ use Page\Admin\OrderManagePage;
 
 /**
  * @group admin
- * @group admin01-b
+ * @group admin01
  * @group order
  * @group ea4
  */

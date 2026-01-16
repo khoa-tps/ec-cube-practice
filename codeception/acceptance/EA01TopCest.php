@@ -19,7 +19,7 @@ use Page\Admin\TopPage;
 
 /**
  * @group admin
- * @group admin01-a
+ * @group admin01
  * @group toppage
  * @group ea1
  */
