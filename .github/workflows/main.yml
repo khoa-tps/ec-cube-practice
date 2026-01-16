@@ -47,6 +47,6 @@ jobs:
       - name: success
         run: echo "::notice::success!"
   coverage:
-    needs: [ unit-test, e2e-test ]  # Run in parallel with plugin-test
+    needs: [ unit-test ]  # PHPUnit coverage only, no need to wait for e2e-test
     if: ${{ github.event.pull_request.user.login != 'dependabot[bot]' }}
     uses: ./.github/workflows/coverage.yml
