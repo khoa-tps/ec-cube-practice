@@ -24,7 +24,7 @@ jobs:
     needs: [ rector, phpstan, php-cs-fixer ]
     uses: ./.github/workflows/unit-test.yml
   e2e-test:
-    needs: [ unit-test ]
+    needs: [ rector, phpstan, php-cs-fixer ]
     uses: ./.github/workflows/e2e-test.yml
   plugin-test:
     needs: [ e2e-test ]
