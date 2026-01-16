@@ -36,10 +36,14 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
 
+      - name: Cache apt packages for pcov
+        uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: php8.3-pcov
+          version: 1.0
+
       - name: Setup pcov
-        run: |
-          sudo apt-get install -y php8.3-pcov
-          sudo phpenmod -s cli pcov
+        run: sudo phpenmod -s cli pcov
 
       - name: Initialize Composer
         uses: ./.github/actions/composer
@@ -168,10 +172,14 @@ jobs:
             (cd codeception/_data/plugins/$d; tar zcf ../../../../repos/${d}.tgz *)
           done
 
+      - name: Cache apt packages for pcov
+        uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: php8.3-pcov
+          version: 1.0
+
       - name: Setup pcov
-        run: |
-          sudo apt-get install -y php8.3-pcov
-          sudo phpenmod -s cli pcov
+        run: sudo phpenmod -s cli pcov
 
       - name: Setup codeception
         run: |
