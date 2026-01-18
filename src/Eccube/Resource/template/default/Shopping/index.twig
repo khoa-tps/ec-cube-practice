@@ -261,12 +261,14 @@ file that was distributed with this source code.
                                     </div>
                                     <div class="ec-select">
                                         <span class="customer-form customer-address_pref">
-                                            <select style="display:none;">
-                                                <option value="">{{ 'common.select__pref'|trans }}</option>
-                                                {% for pref in Prefs %}
-                                                    <option value="{{ pref.name }}"{% if Order.pref and Order.pref.id == pref.id %} selected{% endif %}>{{ pref.name }}</option>
-                                                {% endfor %}
-                                            </select>
+                                            {% if Prefs is defined and Prefs is not empty %}
+                                                <select style="display:none;">
+                                                    <option value="">{{ 'common.select__pref'|trans }}</option>
+                                                    {% for pref in Prefs %}
+                                                        <option value="{{ pref.name }}"{% if Order.pref and Order.pref.id == pref.id %} selected{% endif %}>{{ pref.name }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            {% endif %}
                                         </span>
                                     </div>
                                     <div class="ec-input">
