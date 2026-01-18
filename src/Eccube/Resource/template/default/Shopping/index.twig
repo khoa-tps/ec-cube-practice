@@ -37,13 +37,15 @@ file that was distributed with this source code.
             var edit = $('.customer-edit');
             var hidden = $('.customer-in');
             var form = $('.customer-form');
+            var originalPrefValue = null;
 
             $('#customer').click(function() {
                 $(edit).each(function(index) {
                     var name = $(this).text();
                     var $select = $(form[index]).children('select');
                     if ($select.length) {
-                        // 都道府県フィールド: selectを表示
+                        // 都道府県フィールド: 元の値を保存してselectを表示
+                        originalPrefValue = $select.val();
                         $select.show();
                     } else {
                         var input = $('<input id="edit' + index + '" type="text" />').val(name);
@@ -112,8 +114,12 @@ file that was distributed with this source code.
             });
 
             $('#customer-cancel').click(function() {
-                // 都道府県のselectを非表示に戻す
-                $('.customer-address_pref').children('select').hide();
+                // 都道府県のselectを元の値に戻して非表示にする
+                var $prefSelect = $('.customer-address_pref').children('select');
+                if (originalPrefValue !== null) {
+                    $prefSelect.val(originalPrefValue);
+                }
+                $prefSelect.hide();
                 $('.non-customer-display').show();
                 $('.non-customer-edit').hide();
                 $('.mod-button').hide();
