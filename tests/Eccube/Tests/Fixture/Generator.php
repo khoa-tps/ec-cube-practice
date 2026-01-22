@@ -690,7 +690,7 @@ class Generator
         if (empty($ProductClasses)) {
             // 注文生成時は高速化のためsimple_mode=trueを使用
             $Product = $this->createProduct(null, 3, false, $flush, true);
-            $ProductClasses = $Product->getProductClasses();
+            $ProductClasses = $Product->getProductClasses()->toArray();
         }
         $Taxation = $this->entityManager->find(TaxType::class, TaxType::TAXATION);
         $NonTaxable = $this->entityManager->find(TaxType::class, TaxType::NON_TAXABLE);
