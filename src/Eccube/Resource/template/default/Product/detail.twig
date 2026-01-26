@@ -418,19 +418,26 @@ file that was distributed with this source code.
                         </div>
                     </div>
                     {% if BaseInfo.option_favorite_product %}
-                        <form action="{{ url('product_add_favorite', {id:Product.id}) }}" method="post">
-                            <div class="ec-productRole__btn">
-                                {% if is_favorite == false %}
+                        {% if is_favorite == false %}
+                            <form action="{{ url('product_add_favorite', {id:Product.id}) }}" method="post">
+                                <div class="ec-productRole__btn">
                                     <button type="submit" id="favorite" class="ec-blockBtn--cancel">
                                         {{ 'front.product.add_favorite'|trans }}
                                     </button>
-                                {% else %}
-                                    <button type="submit" id="favorite" class="ec-blockBtn--cancel"
-                                            disabled="disabled">{{ 'front.product.add_favorite_alrady'|trans }}
-                                    </button>
-                                {% endif %}
+                                </div>
+                            </form>
+                        {% else %}
+                            <div class="ec-productRole__btn">
+                                <a href="{{ url('product_delete_favorite', {id:Product.id}) }}"
+                                   id="favorite"
+                                   class="ec-blockBtn--cancel"
+                                   {{ csrf_token_for_anchor() }}
+                                   data-method="delete"
+                                   data-message="{{ 'front.product.delete_favorite_confirm'|trans }}">
+                                    {{ 'front.product.delete_favorite'|trans }}
+                                </a>
                             </div>
-                        </form>
+                        {% endif %}
                     {% endif %}
                     <div class="ec-productRole__description">{{ Product.description_detail|raw|nl2br }}
                     </div>

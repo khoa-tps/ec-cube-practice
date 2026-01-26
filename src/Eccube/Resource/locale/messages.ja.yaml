@@ -291,6 +291,8 @@ front.product.add_cart_complete: カートに追加しました。
 front.product.add_cart_error: カートへの追加に失敗しました。
 front.product.add_favorite: お気に入りに追加
 front.product.add_favorite_alrady: お気に入りに追加済です。
+front.product.delete_favorite: お気に入りから削除
+front.product.delete_favorite_confirm: お気に入りから削除してもよろしいですか？
 front.product.out_of_stock: ただいま品切れ中です。
 front.product.out_of_stock_label: (品切れ中)
 front.product.added_to_favorite: お気に入りに追加済です。
