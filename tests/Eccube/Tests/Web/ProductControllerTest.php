@@ -179,7 +179,7 @@ class ProductControllerTest extends AbstractWebTestCase
         // Case 2: after add favorite check
         $html = $crawler->filter('div.ec-productRole__profile')->html();
         $this->assertStringContainsString('ただいま品切れ中です', $html);
-        $this->assertStringContainsString('お気に入りに追加済です', $html);
+        $this->assertStringContainsString('お気に入りから削除', $html);
     }
 
     /**
@@ -217,7 +217,7 @@ class ProductControllerTest extends AbstractWebTestCase
         // Case 4: after add favorite when 商品在庫>0
         $html = $crawler->filter('div.ec-productRole__profile')->html();
         $this->assertStringContainsString('カートに入れる', $html);
-        $this->assertStringContainsString('お気に入りに追加済です', $html);
+        $this->assertStringContainsString('お気に入りから削除', $html);
     }
 
     /**
@@ -264,7 +264,7 @@ class ProductControllerTest extends AbstractWebTestCase
         $crawler = $client->followRedirect();
 
         $html = $crawler->filter('div.ec-productRole__profile')->html();
-        $this->assertStringContainsString('お気に入りに追加済です', $html);
+        $this->assertStringContainsString('お気に入りから削除', $html);
     }
 
     /**

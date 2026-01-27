@@ -315,8 +315,6 @@ class ProductController extends AbstractController
      */
     public function deleteFavorite(Request $request, Product $Product)
     {
-        $this->isTokenValid();
-
         $event = new EventArgs(
             [
                 'Product' => $Product,
@@ -327,6 +325,7 @@ class ProductController extends AbstractController
 
         if ($this->isGranted('ROLE_USER')) {
             $Customer = $this->getUser();
+            $this->isTokenValid();
 
             log_info('お気に入り商品削除開始', [$Customer->getId(), $Product->getId()]);
 
