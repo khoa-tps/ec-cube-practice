@@ -15,10 +15,12 @@ namespace Eccube\Tests\Web;
 
 use Eccube\Entity\BaseInfo;
 use Eccube\Entity\ClassCategory;
+use Eccube\Entity\CustomerFavoriteProduct;
 use Eccube\Entity\Product;
 use Eccube\Entity\ProductClass;
 use Eccube\Repository\BaseInfoRepository;
 use Eccube\Repository\ClassCategoryRepository;
+use Eccube\Repository\CustomerFavoriteProductRepository;
 use Eccube\Repository\ProductRepository;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpKernel\Client;
@@ -41,12 +43,18 @@ class ProductControllerTest extends AbstractWebTestCase
      */
     private $classCategoryRepository;
 
+    /**
+     * @var CustomerFavoriteProductRepository
+     */
+    private $customerFavoriteProductRepository;
+
     protected function setUp(): void
     {
         parent::setUp();
         $this->baseInfoRepository = $this->entityManager->getRepository(BaseInfo::class);
         $this->productRepository = $this->entityManager->getRepository(Product::class);
         $this->classCategoryRepository = $this->entityManager->getRepository(ClassCategory::class);
+        $this->customerFavoriteProductRepository = $this->entityManager->getRepository(CustomerFavoriteProduct::class);
     }
 
     public function testRoutingList()
@@ -372,5 +380,97 @@ class ProductControllerTest extends AbstractWebTestCase
         $crawler = $this->client->request('GET', $productUrl);
 
         $this->assertSame('noindex', $crawler->filter('meta[name="robots"]')->attr('content'));
+    }
+
+    /**
+     * お気に入り削除テスト（正常系）
+     */
+    public function testProductFavoriteDelete()
+    {
+        // お気に入り商品機能を有効化
+        $BaseInfo = $this->baseInfoRepository->get();
+        $BaseInfo->setOptionFavoriteProduct(true);
+
+        $Product = $this->createProduct('Product favorite delete test', 1);
+        $Customer = $this->createCustomer();
+        $this->loginTo($Customer);
+
+        // お気に入りを追加
+        $this->customerFavoriteProductRepository->addFavorite($Customer, $Product);
+        $this->entityManager->flush();
+
+        // お気に入りが存在することを確認
+        $CustomerFavoriteProduct = $this->customerFavoriteProductRepository->findOneBy([
+            'Customer' => $Customer,
+            'Product' => $Product,
+        ]);
+        $this->assertNotNull($CustomerFavoriteProduct);
+
+        // お気に入り削除を実行
+        $this->client->request(
+            'DELETE',
+            $this->generateUrl('product_delete_favorite', ['id' => $Product->getId()])
+        );
+
+        // 商品詳細ページにリダイレクトされることを確認
+        $this->assertTrue($this->client->getResponse()->isRedirect(
+            $this->generateUrl('product_detail', ['id' => $Product->getId()])
+        ));
+
+        // お気に入りが削除されていることを確認
+        $this->entityManager->clear();
+        $CustomerFavoriteProduct = $this->customerFavoriteProductRepository->findOneBy([
+            'Customer' => $Customer,
+            'Product' => $Product,
+        ]);
+        $this->assertNull($CustomerFavoriteProduct);
+    }
+
+    /**
+     * お気に入り削除テスト（お気に入りが存在しない場合は400エラー）
+     */
+    public function testProductFavoriteDeleteWithNotFavorite()
+    {
+        // お気に入り商品機能を有効化
+        $BaseInfo = $this->baseInfoRepository->get();
+        $BaseInfo->setOptionFavoriteProduct(true);
+
+        $Product = $this->createProduct('Product not favorite', 1);
+        $Customer = $this->createCustomer();
+        $this->loginTo($Customer);
+
+        // お気に入りに追加していない状態で削除を実行
+        $this->client->request(
+            'DELETE',
+            $this->generateUrl('product_delete_favorite', ['id' => $Product->getId()])
+        );
+
+        // 400エラーが返されることを確認
+        $this->expected = 400;
+        $this->actual = $this->client->getResponse()->getStatusCode();
+        $this->verify();
+    }
+
+    /**
+     * お気に入り削除テスト（未ログイン時はログインページにリダイレクト）
+     */
+    public function testProductFavoriteDeleteWithNotLoggedIn()
+    {
+        // お気に入り商品機能を有効化
+        $BaseInfo = $this->baseInfoRepository->get();
+        $BaseInfo->setOptionFavoriteProduct(true);
+
+        $Product = $this->createProduct('Product favorite delete not logged in', 1);
+
+        // 未ログイン状態でお気に入り削除を実行
+        $this->client->request(
+            'DELETE',
+            $this->generateUrl('product_delete_favorite', ['id' => $Product->getId()])
+        );
+
+        // ログインページにリダイレクトされることを確認
+        $this->assertTrue($this->client->getResponse()->isRedirect(
+            $this->generateUrl('mypage_login')
+        ));
     }
 }

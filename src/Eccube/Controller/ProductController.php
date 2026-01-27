@@ -32,6 +32,7 @@ use Knp\Component\Pager\PaginatorInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -335,6 +336,8 @@ class ProductController extends AbstractController
                 $this->customerFavoriteProductRepository->delete($CustomerFavoriteProduct);
 
                 log_info('お気に入り商品削除完了', [$Customer->getId(), $Product->getId()]);
+            } else {
+                throw new BadRequestHttpException();
             }
 
             $event = new EventArgs(
