@@ -78,7 +78,8 @@ class ProductControllerTest extends AbstractWebTestCase
         $BaseInfo->setOptionFavoriteProduct(true);
 
         $client = $this->client;
-        $client->request('POST',
+        $client->request(
+            'POST',
             $this->generateUrl('product_add_favorite', ['id' => '1'])
         );
         $this->assertTrue($client->getResponse()->isRedirect($this->generateUrl('mypage_login')));
@@ -336,7 +337,7 @@ class ProductControllerTest extends AbstractWebTestCase
         $expected_desc = mb_substr($description_list, 0, 120, 'utf-8');
 
         $url = $this->generateUrl('product_detail', ['id' => 2], UrlGeneratorInterface::ABSOLUTE_URL);
-        $imgPath = $this->generateUrl('homepage', [], UrlGeneratorInterface::ABSOLUTE_URL).'html/upload/save_image/'.$product->getMainListImage()->getFileName();
+        $imgPath = $this->generateUrl('homepage', [], UrlGeneratorInterface::ABSOLUTE_URL) . 'html/upload/save_image/' . $product->getMainListImage()->getFileName();
 
         $crawler = $this->client->request('GET', $url);
 
@@ -449,7 +450,6 @@ class ProductControllerTest extends AbstractWebTestCase
         $this->loginTo($Customer);
 
         // 商品詳細ページを取得（お気に入り未登録なので削除リンクはない）
-        $crawler = $this->client->request('GET', $this->generateUrl('product_detail', ['id' => $Product->getId()]));
         $this->assertTrue($this->client->getResponse()->isSuccessful());
 
         // Symfonyのテスト用CSRFトークンを使用
