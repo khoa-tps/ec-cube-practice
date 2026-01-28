@@ -384,6 +384,9 @@ class ProductControllerTest extends AbstractWebTestCase
 
     /**
      * お気に入り削除テスト（正常系）
+     *
+     * フロントエンドでは削除リンクにCSRFトークンが付与され、JavaScriptが
+     * POSTリクエスト + _method: delete で送信する。このテストでは同じフローを再現する。
      */
     public function testProductFavoriteDelete()
     {
@@ -399,17 +402,23 @@ class ProductControllerTest extends AbstractWebTestCase
         $this->customerFavoriteProductRepository->addFavorite($Customer, $Product);
         $this->entityManager->flush();
 
-        // お気に入りが存在することを確認
-        $CustomerFavoriteProduct = $this->customerFavoriteProductRepository->findOneBy([
-            'Customer' => $Customer,
-            'Product' => $Product,
-        ]);
-        $this->assertNotNull($CustomerFavoriteProduct);
+        // 商品詳細ページを取得してCSRFトークンを抽出
+        $crawler = $this->client->request('GET', $this->generateUrl('product_detail', ['id' => $Product->getId()]));
+        $this->assertTrue($this->client->getResponse()->isSuccessful());
 
-        // お気に入り削除を実行
+        // 削除リンクからCSRFトークンを取得
+        $deleteLink = $crawler->filter('a#favorite[data-method="delete"]');
+        $this->assertGreaterThan(0, $deleteLink->count());
+        $token = $deleteLink->attr('token-for-anchor');
+
+        // JavaScriptと同様にPOSTリクエストで送信（_method: deleteを含む）
         $this->client->request(
-            'DELETE',
-            $this->generateUrl('product_delete_favorite', ['id' => $Product->getId()])
+            'POST',
+            $this->generateUrl('product_delete_favorite', ['id' => $Product->getId()]),
+            [
+                '_token' => $token,
+                '_method' => 'delete',
+            ]
         );
 
         // 商品詳細ページにリダイレクトされることを確認
@@ -439,10 +448,22 @@ class ProductControllerTest extends AbstractWebTestCase
         $Customer = $this->createCustomer();
         $this->loginTo($Customer);
 
+        // 商品詳細ページを取得（お気に入り未登録なので削除リンクはない）
+        $crawler = $this->client->request('GET', $this->generateUrl('product_detail', ['id' => $Product->getId()]));
+        $this->assertTrue($this->client->getResponse()->isSuccessful());
+
+        // Symfonyのテスト用CSRFトークンを使用
+        $csrfToken = $this->client->getContainer()->get('security.csrf.token_manager')
+            ->getToken(\Eccube\Common\Constant::TOKEN_NAME)->getValue();
+
         // お気に入りに追加していない状態で削除を実行
         $this->client->request(
-            'DELETE',
-            $this->generateUrl('product_delete_favorite', ['id' => $Product->getId()])
+            'POST',
+            $this->generateUrl('product_delete_favorite', ['id' => $Product->getId()]),
+            [
+                '_token' => $csrfToken,
+                '_method' => 'delete',
+            ]
         );
 
         // 400エラーが返されることを確認
@@ -453,6 +474,9 @@ class ProductControllerTest extends AbstractWebTestCase
 
     /**
      * お気に入り削除テスト（未ログイン時はログインページにリダイレクト）
+     *
+     * Note: 未ログイン時はCSRFチェックより先にログインリダイレクトが発生するため、
+     * CSRFトークンを含めずにテストしています。
      */
     public function testProductFavoriteDeleteWithNotLoggedIn()
     {
@@ -464,8 +488,11 @@ class ProductControllerTest extends AbstractWebTestCase
 
         // 未ログイン状態でお気に入り削除を実行
         $this->client->request(
-            'DELETE',
-            $this->generateUrl('product_delete_favorite', ['id' => $Product->getId()])
+            'POST',
+            $this->generateUrl('product_delete_favorite', ['id' => $Product->getId()]),
+            [
+                '_method' => 'delete',
+            ]
         );
 
         // ログインページにリダイレクトされることを確認
