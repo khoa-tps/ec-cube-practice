@@ -450,6 +450,7 @@ class ProductControllerTest extends AbstractWebTestCase
         $this->loginTo($Customer);
 
         // 商品詳細ページを取得（お気に入り未登録なので削除リンクはない）
+        $this->client->request('GET', $this->generateUrl('product_detail', ['id' => $Product->getId()]));
         $this->assertTrue($this->client->getResponse()->isSuccessful());
 
         // Symfonyのテスト用CSRFトークンを使用
