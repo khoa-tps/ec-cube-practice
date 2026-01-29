@@ -358,7 +358,15 @@ file that was distributed with this source code.
                             <div>{{ 'front.product.related_category'|trans }}</div>
                             <ul>
                                 {% for ProductCategory in Product.ProductCategories %}
-                                    {% if ProductCategory.Category.Children is empty %}
+                                    {# 同じルートカテゴリを持つカテゴリの中で最深かどうかをチェック #}
+                                    {% set is_deepest = true %}
+                                    {% set current_root_id = ProductCategory.Category.path|first.id %}
+                                    {% for OtherCategory in Product.ProductCategories %}
+                                        {% if OtherCategory.Category.path|first.id == current_root_id and OtherCategory.Category.hierarchy > ProductCategory.Category.hierarchy %}
+                                            {% set is_deepest = false %}
+                                        {% endif %}
+                                    {% endfor %}
+                                    {% if is_deepest %}
                                         <li>
                                             {% for ParentCategory in ProductCategory.Category.path %}
                                                 <a href="{{ url('product_list') }}?category_id={{ ParentCategory.id }}">{{ ParentCategory.name }}</a>{% if not loop.last %} &gt; {% endif %}
