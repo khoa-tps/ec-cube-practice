@@ -314,8 +314,7 @@ front.cart.nav__order: ご注文手続き
 front.cart.nav__confirm: ご注文内容確認
 front.cart.nav__complete: 完了
 front.cart.total_price: "商品の合計金額は「<strong>%price%</strong>」です。"
-front.cart.divide_cart: 同時購入できない商品のカートを分けました。お手数ですが別々で注文して
-  ください。
+front.cart.divide_cart: 同時購入できない商品のカートを分けました。お手数ですが別々で注文してください。
 front.cart.delete: 削除
 front.cart.delete__confirm: カートから商品を削除してよろしいですか？
 front.cart.product: 商品内容
