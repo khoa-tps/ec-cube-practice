@@ -75,6 +75,10 @@ class SystemController
      */
     public function phpinfo(Request $request)
     {
+        if (!$this->eccubeConfig->get('eccube_phpinfo_enabled')) {
+            throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException();
+        }
+
         ob_start();
         phpinfo();
         $phpinfo = ob_get_contents();
