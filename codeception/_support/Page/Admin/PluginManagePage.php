@@ -13,15 +13,9 @@
 
 namespace Page\Admin;
 
-use Facebook\WebDriver\WebDriverBy;
-use Facebook\WebDriver\WebDriverExpectedCondition;
-
 class PluginManagePage extends AbstractAdminPageStyleGuide
 {
     public const 完了メッセージ = '#page_admin_store_plugin > div.c-container > div.c-contentsArea > div.alert:not(.alert-primary).alert-dismissible.fade.show.m-3 > span';
-
-    /** @var \Facebook\WebDriver\WebDriverElement|null ページ遷移検出用の要素参照 */
-    private $htmlElement;
 
     public function __construct(\AcceptanceTester $I)
     {
@@ -169,34 +163,40 @@ class PluginManagePage extends AbstractAdminPageStyleGuide
     }
 
     /**
-     * ページ遷移を引き起こす click の前に呼び出し、現在の html 要素への参照を保持する。
-     * ページ再読み込み後にこの参照が stale になることで遷移を検出する。
+     * ページ遷移を引き起こす click の前に呼び出す。
+     * 現在のページに JavaScript マーカーを設定する。
      */
     private function ページ遷移準備()
     {
-        $this->tester->executeInSelenium(function ($webDriver) {
-            $this->htmlElement = $webDriver->findElement(WebDriverBy::tagName('html'));
-        });
+        $this->tester->executeJS('window.__eccubeNavMarker = true');
     }
 
     /**
      * ページ遷移の完了を待機する。
      *
-     * 1. ページ遷移準備() で保持した html 要素が stale になるまで待機
-     *    → 同じ URL へのリダイレクトでも、ページ再読み込みで DOM は新規作成されるため確実に検出できる
-     * 2. ページタイトルの表示を確認して新しいページの読み込み完了を待機
+     * ページ遷移準備() で設定した JS マーカーが消えるまでポーリングする。
+     * ページ再読み込みで window オブジェクトがリセットされるため、
+     * 同じ URL へのリダイレクトでも確実に遷移を検出できる。
+     *
+     * ポーリング中のページ遷移による JS 実行エラーはキャッチして
+     * 「遷移中」と判断する。
      */
     private function ページ遷移を待機()
     {
-        if ($this->htmlElement) {
-            $htmlElement = $this->htmlElement;
-            $this->htmlElement = null;
-            $this->tester->executeInSelenium(function ($webDriver) use ($htmlElement) {
-                $webDriver->wait(30)->until(
-                    WebDriverExpectedCondition::stalenessOf($htmlElement)
-                );
-            });
-        }
+        $this->tester->executeInSelenium(function ($webDriver) {
+            $deadline = microtime(true) + 30;
+            while (microtime(true) < $deadline) {
+                try {
+                    $result = $webDriver->executeScript('return window.__eccubeNavMarker === true');
+                    if (!$result) {
+                        break; // マーカーが消えた = ページが再読み込みされた
+                    }
+                } catch (\Exception $e) {
+                    break; // JS 実行エラー = ページ遷移中
+                }
+                usleep(500000); // 500ms
+            }
+        });
         $this->atPage('インストールプラグイン一覧オーナーズストア');
 
         return $this;
