@@ -33,7 +33,7 @@ class PluginLocalInstallPage extends AbstractAdminPageStyleGuide
         $this->tester->attachFile(['id' => 'plugin_local_install_plugin_archive'], 'plugins/'.$pluginDirName.'.tgz');
         $this->tester->click(['css' => '#upload-form > div > div > div > div > div.card-body > div > div > button']);
         // プラグインインストールはcomposer操作を含むため長時間かかる場合がある
-        $this->tester->waitForText('インストールプラグイン一覧', 120, '.c-pageTitle');
+        $this->tester->waitForText('プラグインをインストールしました。', 120, PluginManagePage::完了メッセージ);
 
         return PluginManagePage::at($this->tester);
     }

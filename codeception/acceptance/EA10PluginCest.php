@@ -783,8 +783,6 @@ class Local_Plugin extends Abstract_Plugin
 
         $this->initialized = true;
 
-        $this->I->waitForText('プラグインをインストールしました。', 30, PluginManagePage::完了メッセージ);
-
         $this->検証();
 
         $this->Plugin = $this->pluginRepository->findByCode($this->code);
