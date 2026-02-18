@@ -172,8 +172,10 @@ class PluginManagePage extends AbstractAdminPageStyleGuide
      * 3. マーカーが消えるのを待機（= ページ再読み込み検出）
      * 4. マーカーが消えない場合はクリックをリトライ
      *
-     * WebDriver の click がフラッシュメッセージ等に遮られて
-     * ナビゲーションをトリガーしないケースに対応する。
+     * リトライが必要になるケース:
+     * - ページの JavaScript（function.js の data-method="post" ハンドラ）が
+     *   まだ初期化されていない状態でクリックした場合
+     * - フラッシュメッセージ等に遮られてクリックが届かなかった場合
      */
     private function ページ遷移を伴うクリック(callable $clickAction)
     {
@@ -185,6 +187,15 @@ class PluginManagePage extends AbstractAdminPageStyleGuide
                 // マーカー設定失敗 = 前回のクリックでページ遷移中
                 break;
             }
+
+            // function.js の click ハンドラが DOMContentLoaded 後にバインドされるため、
+            // ページの全リソース読み込み完了を待ってからクリックする
+            $this->tester->executeInSelenium(function ($webDriver) {
+                $webDriver->wait(10)->until(function ($driver) {
+                    return $driver->executeScript('return document.readyState') === 'complete';
+                });
+            });
+
             $clickAction();
 
             $navigated = false;
