@@ -32,9 +32,8 @@ class PluginLocalInstallPage extends AbstractAdminPageStyleGuide
         $this->tester->compressPlugin($pluginDirName, codecept_data_dir('plugins'));
         $this->tester->attachFile(['id' => 'plugin_local_install_plugin_archive'], 'plugins/'.$pluginDirName.'.tgz');
         $this->tester->click(['css' => '#upload-form > div > div > div > div > div.card-body > div > div > button']);
-        // プラグインインストールはcomposer操作を含むため長時間かかる場合がある
-        $this->tester->waitForText('プラグインをインストールしました。', 120, PluginManagePage::完了メッセージ);
 
+        // ページ遷移完了の検出は PluginManagePage::at() に任せ、フラッシュメッセージの確認は呼び出し元で行う
         return PluginManagePage::at($this->tester);
     }
 }
