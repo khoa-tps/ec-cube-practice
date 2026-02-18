@@ -37,9 +37,9 @@ class PluginManagePage extends AbstractAdminPageStyleGuide
      */
     public function ストアプラグイン_有効化($pluginCode, $message = '有効にしました。')
     {
-        $this->ページ遷移準備();
-        $this->ストアプラグイン_ボタンクリック($pluginCode, '有効化');
-        $this->ページ遷移を待機();
+        $this->ページ遷移を伴うクリック(function () use ($pluginCode) {
+            $this->ストアプラグイン_ボタンクリック($pluginCode, '有効化');
+        });
         $this->tester->waitForText($message, 30, self::完了メッセージ);
 
         return $this;
@@ -53,9 +53,9 @@ class PluginManagePage extends AbstractAdminPageStyleGuide
      */
     public function ストアプラグイン_無効化($pluginCode, $message = '無効にしました。')
     {
-        $this->ページ遷移準備();
-        $this->ストアプラグイン_ボタンクリック($pluginCode, '無効化');
-        $this->ページ遷移を待機();
+        $this->ページ遷移を伴うクリック(function () use ($pluginCode) {
+            $this->ストアプラグイン_ボタンクリック($pluginCode, '無効化');
+        });
         $this->tester->waitForText($message, 30, self::完了メッセージ);
 
         return $this;
@@ -96,6 +96,7 @@ class PluginManagePage extends AbstractAdminPageStyleGuide
     private function ストアプラグイン_ボタンクリック($pluginCode, $label)
     {
         $xpath = ['xpath' => $this->ストアプラグイン_セレクタ($pluginCode).'/../../td[6]//i[@data-bs-original-title="'.$label.'"]/parent::node()'];
+        $this->tester->scrollTo($xpath);
         $this->tester->click($xpath);
 
         return $this;
@@ -108,9 +109,9 @@ class PluginManagePage extends AbstractAdminPageStyleGuide
 
     public function 独自プラグイン_有効化($pluginCode)
     {
-        $this->ページ遷移準備();
-        $this->独自プラグイン_ボタンクリック($pluginCode, '有効化');
-        $this->ページ遷移を待機();
+        $this->ページ遷移を伴うクリック(function () use ($pluginCode) {
+            $this->独自プラグイン_ボタンクリック($pluginCode, '有効化');
+        });
         $this->tester->waitForText('有効にしました。', 30, self::完了メッセージ);
 
         return $this;
@@ -118,9 +119,9 @@ class PluginManagePage extends AbstractAdminPageStyleGuide
 
     public function 独自プラグイン_無効化($pluginCode)
     {
-        $this->ページ遷移準備();
-        $this->独自プラグイン_ボタンクリック($pluginCode, '無効化');
-        $this->ページ遷移を待機();
+        $this->ページ遷移を伴うクリック(function () use ($pluginCode) {
+            $this->独自プラグイン_ボタンクリック($pluginCode, '無効化');
+        });
         $this->tester->waitForText('無効にしました。', 30, self::完了メッセージ);
 
         return $this;
@@ -130,9 +131,9 @@ class PluginManagePage extends AbstractAdminPageStyleGuide
     {
         $this->独自プラグイン_ボタンクリック($pluginCode, '削除');
         $this->tester->waitForElementVisible(['css' => '#localPluginDeleteModal .modal-footer a']);
-        $this->ページ遷移準備();
-        $this->tester->click(['css' => '#localPluginDeleteModal .modal-footer a']);
-        $this->ページ遷移を待機();
+        $this->ページ遷移を伴うクリック(function () {
+            $this->tester->click(['css' => '#localPluginDeleteModal .modal-footer a']);
+        });
 
         return $this;
     }
@@ -141,9 +142,9 @@ class PluginManagePage extends AbstractAdminPageStyleGuide
     {
         $this->tester->compressPlugin($pluginDirName, codecept_data_dir('plugins'));
         $this->tester->attachFile(['xpath' => $this->独自プラグイン_セレクタ($pluginCode).'/../td[5]//input[@type="file"]'], 'plugins/'.$pluginDirName.'.tgz');
-        $this->ページ遷移準備();
-        $this->tester->click(['xpath' => $this->独自プラグイン_セレクタ($pluginCode).'/../td[5]//button']);
-        $this->ページ遷移を待機();
+        $this->ページ遷移を伴うクリック(function () use ($pluginCode) {
+            $this->tester->click(['xpath' => $this->独自プラグイン_セレクタ($pluginCode).'/../td[5]//button']);
+        });
         $this->tester->waitForText('アップデートしました。', 30, self::完了メッセージ);
 
         return $this;
@@ -152,6 +153,7 @@ class PluginManagePage extends AbstractAdminPageStyleGuide
     private function 独自プラグイン_ボタンクリック($pluginCode, $label)
     {
         $xpath = ['xpath' => $this->独自プラグイン_セレクタ($pluginCode).'/../td[6]//i[@data-bs-original-title="'.$label.'"]/parent::node()'];
+        $this->tester->scrollTo($xpath);
         $this->tester->click($xpath);
 
         return $this;
@@ -163,40 +165,53 @@ class PluginManagePage extends AbstractAdminPageStyleGuide
     }
 
     /**
-     * ページ遷移を引き起こす click の前に呼び出す。
-     * 現在のページに JavaScript マーカーを設定する。
-     */
-    private function ページ遷移準備()
-    {
-        $this->tester->executeJS('window.__eccubeNavMarker = true');
-    }
-
-    /**
-     * ページ遷移の完了を待機する。
+     * ページ遷移を伴うクリック操作を実行する。
      *
-     * ページ遷移準備() で設定した JS マーカーが消えるまでポーリングする。
-     * ページ再読み込みで window オブジェクトがリセットされるため、
-     * 同じ URL へのリダイレクトでも確実に遷移を検出できる。
+     * 1. JS マーカーを設定
+     * 2. クリック操作を実行
+     * 3. マーカーが消えるのを待機（= ページ再読み込み検出）
+     * 4. マーカーが消えない場合はクリックをリトライ
      *
-     * ポーリング中のページ遷移による JS 実行エラーはキャッチして
-     * 「遷移中」と判断する。
+     * WebDriver の click がフラッシュメッセージ等に遮られて
+     * ナビゲーションをトリガーしないケースに対応する。
      */
-    private function ページ遷移を待機()
+    private function ページ遷移を伴うクリック(callable $clickAction)
     {
-        $this->tester->executeInSelenium(function ($webDriver) {
-            $deadline = microtime(true) + 30;
-            while (microtime(true) < $deadline) {
-                try {
-                    $result = $webDriver->executeScript('return window.__eccubeNavMarker === true');
-                    if (!$result) {
-                        break; // マーカーが消えた = ページが再読み込みされた
-                    }
-                } catch (\Exception $e) {
-                    break; // JS 実行エラー = ページ遷移中
-                }
-                usleep(500000); // 500ms
+        $maxRetries = 3;
+        for ($attempt = 1; $attempt <= $maxRetries; $attempt++) {
+            try {
+                $this->tester->executeJS('window.__eccubeNavMarker = true');
+            } catch (\Exception $e) {
+                // マーカー設定失敗 = 前回のクリックでページ遷移中
+                break;
             }
-        });
+            $clickAction();
+
+            $navigated = false;
+            $timeout = ($attempt < $maxRetries) ? 10 : 30;
+
+            $this->tester->executeInSelenium(function ($webDriver) use (&$navigated, $timeout) {
+                $deadline = microtime(true) + $timeout;
+                while (microtime(true) < $deadline) {
+                    try {
+                        $result = $webDriver->executeScript('return window.__eccubeNavMarker === true');
+                        if (!$result) {
+                            $navigated = true;
+                            break;
+                        }
+                    } catch (\Exception $e) {
+                        $navigated = true; // JS 実行エラー = ページ遷移中
+                        break;
+                    }
+                    usleep(500000); // 500ms
+                }
+            });
+
+            if ($navigated) {
+                break;
+            }
+        }
+
         $this->atPage('インストールプラグイン一覧オーナーズストア');
 
         return $this;
