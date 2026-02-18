@@ -38,6 +38,7 @@ class PluginManagePage extends AbstractAdminPageStyleGuide
     public function ストアプラグイン_有効化($pluginCode, $message = '有効にしました。')
     {
         $this->ストアプラグイン_ボタンクリック($pluginCode, '有効化');
+        $this->ページ遷移を待機();
         $this->tester->waitForText($message, 30, self::完了メッセージ);
 
         return $this;
@@ -52,6 +53,7 @@ class PluginManagePage extends AbstractAdminPageStyleGuide
     public function ストアプラグイン_無効化($pluginCode, $message = '無効にしました。')
     {
         $this->ストアプラグイン_ボタンクリック($pluginCode, '無効化');
+        $this->ページ遷移を待機();
         $this->tester->waitForText($message, 30, self::完了メッセージ);
 
         return $this;
@@ -105,6 +107,7 @@ class PluginManagePage extends AbstractAdminPageStyleGuide
     public function 独自プラグイン_有効化($pluginCode)
     {
         $this->独自プラグイン_ボタンクリック($pluginCode, '有効化');
+        $this->ページ遷移を待機();
         $this->tester->waitForText('有効にしました。', 30, self::完了メッセージ);
 
         return $this;
@@ -113,6 +116,7 @@ class PluginManagePage extends AbstractAdminPageStyleGuide
     public function 独自プラグイン_無効化($pluginCode)
     {
         $this->独自プラグイン_ボタンクリック($pluginCode, '無効化');
+        $this->ページ遷移を待機();
         $this->tester->waitForText('無効にしました。', 30, self::完了メッセージ);
 
         return $this;
@@ -123,6 +127,7 @@ class PluginManagePage extends AbstractAdminPageStyleGuide
         $this->独自プラグイン_ボタンクリック($pluginCode, '削除');
         $this->tester->waitForElementVisible(['css' => '#localPluginDeleteModal .modal-footer a']);
         $this->tester->click(['css' => '#localPluginDeleteModal .modal-footer a']);
+        $this->ページ遷移を待機();
 
         return $this;
     }
@@ -132,6 +137,7 @@ class PluginManagePage extends AbstractAdminPageStyleGuide
         $this->tester->compressPlugin($pluginDirName, codecept_data_dir('plugins'));
         $this->tester->attachFile(['xpath' => $this->独自プラグイン_セレクタ($pluginCode).'/../td[5]//input[@type="file"]'], 'plugins/'.$pluginDirName.'.tgz');
         $this->tester->click(['xpath' => $this->独自プラグイン_セレクタ($pluginCode).'/../td[5]//button']);
+        $this->ページ遷移を待機();
         $this->tester->waitForText('アップデートしました。', 30, self::完了メッセージ);
 
         return $this;
@@ -148,5 +154,21 @@ class PluginManagePage extends AbstractAdminPageStyleGuide
     private function 独自プラグイン_セレクタ($pluginCode)
     {
         return '//*[@id="page_admin_store_plugin"]//div/h5[contains(text(), "ユーザー独自プラグイン")]/../..//table/tbody//td[3][contains(text(), "'.$pluginCode.'")]/';
+    }
+
+    /**
+     * ボタンクリック後のフルページナビゲーション完了を待機する。
+     *
+     * 有効化/無効化/削除ボタンは data-method="post" により JS が隠しフォームを
+     * 生成して submit するため、click() 後にページ遷移が発生する。
+     * waitForText() をページ遷移中に呼ぶと ChromeDriver が DOM を正しく
+     * クエリできずタイムアウトすることがあるため、先にページタイトルの表示で
+     * 遷移完了を確認する。
+     */
+    private function ページ遷移を待機()
+    {
+        $this->atPage('インストールプラグイン一覧オーナーズストア');
+
+        return $this;
     }
 }
