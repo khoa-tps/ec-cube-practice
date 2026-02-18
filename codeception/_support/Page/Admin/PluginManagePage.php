@@ -15,7 +15,7 @@ namespace Page\Admin;
 
 class PluginManagePage extends AbstractAdminPageStyleGuide
 {
-    public const 完了メッセージ = '#page_admin_store_plugin > div.c-container > div.c-contentsArea > div.alert.alert-success.alert-dismissible.fade.show.m-3 > span';
+    public const 完了メッセージ = '#page_admin_store_plugin > div.c-container > div.c-contentsArea > div.alert:not(.alert-primary).alert-dismissible.fade.show.m-3 > span';
 
     public function __construct(\AcceptanceTester $I)
     {
