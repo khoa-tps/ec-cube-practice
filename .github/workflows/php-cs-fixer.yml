@@ -21,7 +21,7 @@ jobs:
         uses: ./.github/actions/composer
 
       - name: Restore PHP CS Fixer cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: .php-cs-fixer.cache
           key: ${{ runner.os }}-php-cs-fixer-${{ hashFiles('.php-cs-fixer.dist.php', 'composer.lock') }}
@@ -35,7 +35,7 @@ jobs:
 
       - name: Save PHP CS Fixer cache
         if: always()
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v5
         with:
           path: .php-cs-fixer.cache
           key: ${{ runner.os }}-php-cs-fixer-${{ hashFiles('.php-cs-fixer.dist.php', 'composer.lock') }}
