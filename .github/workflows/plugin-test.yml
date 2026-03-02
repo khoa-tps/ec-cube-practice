@@ -3,6 +3,9 @@ name: Plugin test for EC-CUBE
 on:
   workflow_call:
 
+permissions:
+  contents: read
+
 jobs:
   plugin-install:
     name: Plugin install
