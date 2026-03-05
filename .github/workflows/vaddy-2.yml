@@ -198,7 +198,7 @@ jobs:
           vendor/bin/codecept -vvv run acceptance --env chrome,local,vaddy VaddyCest:commit
 
       - name: Upload report
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: crawl-reports
           path: codeception/_output/**/*
@@ -266,7 +266,7 @@ jobs:
 
       - name: Upload report
         if: ${{ matrix.command2 != '' && success() }}
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: crawl-reports
           path: codeception/_output/**/*
@@ -335,7 +335,7 @@ jobs:
 
       - name: Upload report
         if: ${{ matrix.command3 != '' && success() }}
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: crawl-reports
           path: codeception/_output/**/*
@@ -404,7 +404,7 @@ jobs:
 
       - name: Upload report
         if: ${{ matrix.command4 != '' && success() }}
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: crawl-reports
           path: codeception/_output/**/*
@@ -473,7 +473,7 @@ jobs:
 
       - name: Upload report
         if: ${{ matrix.command5 != '' && success() }}
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: crawl-reports
           path: codeception/_output/**/*
