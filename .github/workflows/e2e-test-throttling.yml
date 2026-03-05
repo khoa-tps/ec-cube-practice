@@ -3,6 +3,9 @@ name: E2E test(Throttoling) for EC-CUBE
 on:
   workflow_call:
 
+permissions:
+  contents: read
+
 jobs:
   codeception:
     name: Codeception
@@ -89,7 +92,7 @@ jobs:
         uses: ./.github/actions/composer
 
       - name: Cache npm dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.npm
           key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
@@ -97,7 +100,7 @@ jobs:
             ${{ runner.os }}-npm-
 
       - name: Cache build artifacts
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         id: build-cache
         with:
           path: |
@@ -126,7 +129,7 @@ jobs:
           bin/console eccube:fixtures:load --env=dev
 
       - name: Cache chromedriver
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         id: chromedriver-cache
         with:
           path: /usr/local/bin/chromedriver
@@ -181,13 +184,13 @@ jobs:
 
       - name: Upload evidence
         if: failure()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: codeception-${{ matrix.method }}-evidence
           path: codeception/_output/
       - name: Upload logs
         if: failure()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: codeception-${{ matrix.method }}-logs
           path: var/log/
