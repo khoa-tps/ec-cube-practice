@@ -9,6 +9,9 @@ name: OWASP ZAP
 on:
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   prune:
     name: Prune Docker images
