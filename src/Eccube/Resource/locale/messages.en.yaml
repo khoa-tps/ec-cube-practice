@@ -291,6 +291,8 @@ front.product.add_cart_complete: The item has been added to the cart.
 front.product.add_cart_error: You have failed to add the item to the cart.
 front.product.add_favorite: Add to Favorites
 front.product.add_favorite_alrady: The item is already in the Favorites.
+front.product.delete_favorite: Remove from Favorites
+front.product.delete_favorite_confirm: Are you sure you want to remove this from Favorites?
 front.product.out_of_stock: The item is out of stock.
 front.product.out_of_stock_label: (Out of stock)
 front.product.added_to_favorite: The item is already in the Favorites.
