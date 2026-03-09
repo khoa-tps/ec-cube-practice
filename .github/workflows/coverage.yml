@@ -248,7 +248,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
-      - uses: actions/download-artifact@v7
+      - uses: actions/download-artifact@v8
         with:
           path: reports
       # Codeception coverage artifacts are not available while codeception job is disabled
