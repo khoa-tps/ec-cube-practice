@@ -161,6 +161,10 @@ jobs:
           max_attempts: 2
           retry_on: error
           command: |
+            bin/console doctrine:schema:drop --force --env=dev
+            bin/console doctrine:schema:create --env=dev
+            bin/console eccube:fixtures:load --env=dev
+            bin/console cache:clear --no-warmup --env=dev
             sed -i "s|%GITHUB_WORKSPACE%|${GITHUB_WORKSPACE}|g" codeception/_envs/github_action.yml
             vendor/bin/codecept -vvv run acceptance --env chrome,github_action -g ${GROUP} --skip-group restrict-file-upload --skip-group change-display-order --html report.html
         env:
@@ -182,6 +186,10 @@ jobs:
           max_attempts: 2
           retry_on: error
           command: |
+            bin/console doctrine:schema:drop --force --env=dev
+            bin/console doctrine:schema:create --env=dev
+            bin/console eccube:fixtures:load --env=dev
+            bin/console cache:clear --no-warmup --env=dev
             sed -i "s|%GITHUB_WORKSPACE%|${GITHUB_WORKSPACE}|g" codeception/_envs/github_action.yml
             vendor/bin/codecept -vvv run acceptance --env chrome,github_action -g ${GROUP} --html report.html
         env:
