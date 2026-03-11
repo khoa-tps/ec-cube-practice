@@ -324,7 +324,7 @@ class Generator
             $Customer->addCustomerAddress($CustomerAddress);
             // TODO 外部でやった方がいい？
             $sessionCustomerAddressKey = 'eccube.front.shopping.nonmember.customeraddress';
-            $customerAddresses = unserialize($this->requestStack->getSession()->get($sessionCustomerAddressKey));
+            $customerAddresses = unserialize($this->requestStack->getSession()->get($sessionCustomerAddressKey), ['allowed_classes' => [CustomerAddress::class, Customer::class, Pref::class, \Eccube\Entity\Master\Country::class]]);
             if (!is_array($customerAddresses)) {
                 $customerAddresses = [];
             }
