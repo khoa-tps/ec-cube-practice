@@ -101,7 +101,7 @@ class PluginManagePage extends AbstractAdminPageStyleGuide
         // WebDriver のマウス移動による tooltip 再出現を回避する
         $this->tester->executeJS(
             "document.querySelectorAll('.tooltip, .alert-dismissible').forEach(e => e.remove());"
-            ."document.evaluate(arguments[0], document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.click()",
+            .'document.evaluate(arguments[0], document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.click()',
             [$xpathStr]
         );
 
@@ -162,7 +162,7 @@ class PluginManagePage extends AbstractAdminPageStyleGuide
         $this->tester->scrollTo(['xpath' => $xpathStr]);
         $this->tester->executeJS(
             "document.querySelectorAll('.tooltip, .alert-dismissible').forEach(e => e.remove());"
-            ."document.evaluate(arguments[0], document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.click()",
+            .'document.evaluate(arguments[0], document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.click()',
             [$xpathStr]
         );
 
