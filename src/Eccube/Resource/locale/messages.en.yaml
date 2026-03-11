@@ -362,6 +362,7 @@ front.shopping.shipping_send_selected_shipping: Deliver to the selected address
 front.shopping.shipping_multiple_title: Deliver to Multiple Addresses
 front.shopping.shipping_multiple_message: Please select a delivery address for each item.
 front.shppping.shipping_multiple_add_shipping: Please select a delivery address for each item.
+front.shopping.customer_update_failed: Update failed. Please check your input.
 front.shopping.confirm_title: Review Your Order
 front.shopping.checkout: Place an Order
 front.shopping.back_to_order: Go back to Checkout
