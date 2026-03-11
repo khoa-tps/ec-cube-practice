@@ -49,6 +49,7 @@ class EF02ProductCest
 
         // TOPページ>商品一覧（ヘッダーのいずれかのカテゴリを選択）へ遷移
         $topPage->カテゴリ選択(['新入荷']);
+        $I->waitForElement(['css' => '.ec-shelfGrid__item']);
 
         // 各商品のサムネイルが表示される デフォルトは価格順
         $products = $I->grabMultiple(['xpath' => "//*[@class='ec-shelfGrid__item']/a/p[2]"]);
@@ -91,7 +92,7 @@ class EF02ProductCest
 
         // TOPページ>商品一覧（ヘッダーのいずれかのカテゴリを選択）へ遷移
         $topPage->カテゴリ選択(['新入荷']);
-        $listPage = new ProductListPage($I);
+        $listPage = ProductListPage::at($I);
 
         // 各商品のサムネイルが表示される
         $config = Fixtures::get('test_config');
@@ -114,6 +115,7 @@ class EF02ProductCest
 
         // TOPページ>商品一覧（ヘッダーのいずれかのカテゴリを選択）へ遷移
         $topPage->カテゴリ選択(['新入荷']);
+        $I->waitForElement(['css' => '.ec-shelfGrid__item']);
 
         // 絞込検索条件では、検索数が多い場合、「次へ」「前へ」「ページ番号」が表示される
         $I->scrollTo(['css' => 'li.ec-pager__item--active']);
