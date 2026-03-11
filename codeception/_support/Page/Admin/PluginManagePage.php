@@ -97,7 +97,7 @@ class PluginManagePage extends AbstractAdminPageStyleGuide
     {
         $xpath = ['xpath' => $this->ストアプラグイン_セレクタ($pluginCode).'/../../td[6]//i[@data-bs-original-title="'.$label.'"]/parent::node()'];
         $this->tester->scrollTo($xpath);
-        $this->tester->executeJS("document.querySelectorAll('.tooltip').forEach(e => e.remove())");
+        $this->tester->executeJS("document.querySelectorAll('.tooltip, .alert-dismissible').forEach(e => e.remove())");
         $this->tester->click($xpath);
 
         return $this;
@@ -155,7 +155,7 @@ class PluginManagePage extends AbstractAdminPageStyleGuide
     {
         $xpath = ['xpath' => $this->独自プラグイン_セレクタ($pluginCode).'/../td[6]//i[@data-bs-original-title="'.$label.'"]/parent::node()'];
         $this->tester->scrollTo($xpath);
-        $this->tester->executeJS("document.querySelectorAll('.tooltip').forEach(e => e.remove())");
+        $this->tester->executeJS("document.querySelectorAll('.tooltip, .alert-dismissible').forEach(e => e.remove())");
         $this->tester->click($xpath);
 
         return $this;
