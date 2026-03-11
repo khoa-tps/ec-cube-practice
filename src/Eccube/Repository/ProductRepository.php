@@ -417,16 +417,17 @@ class ProductRepository extends AbstractRepository
     public function countBySearchDataForAdmin($searchData)
     {
         $qb = $this->createQueryBuilder('p')
-            ->select('COUNT(DISTINCT p.id)');
+            ->select('COUNT(p.id)')
+            ->andWhere('EXISTS (SELECT pcv.id FROM \Eccube\Entity\ProductClass pcv WHERE pcv.Product = p AND pcv.visible = true)');
 
-        // id（名前検索のみ、pc.codeは含まない）
+        // id
         if (isset($searchData['id']) && StringUtil::isNotBlank($searchData['id'])) {
             $id = preg_match('/^\d{0,10}$/', $searchData['id']) ? $searchData['id'] : null;
             if ($id && $id > '2147483647' && $this->isPostgreSQL()) {
                 $id = null;
             }
             $qb
-                ->andWhere('p.id = :id OR p.name LIKE :likeid')
+                ->andWhere('p.id = :id OR p.name LIKE :likeid OR EXISTS (SELECT pcc.id FROM \Eccube\Entity\ProductClass pcc WHERE pcc.Product = p AND pcc.code LIKE :likeid)')
                 ->setParameter('id', $id)
                 ->setParameter('likeid', '%'.str_replace(['%', '_'], ['\\%', '\\_'], $searchData['id']).'%');
         }
@@ -502,6 +503,8 @@ class ProductRepository extends AbstractRepository
                 ->andWhere('p.update_date < :update_date_end')
                 ->setParameter('update_date_end', $date);
         }
+
+        $qb = $this->queries->customize(QueryKey::PRODUCT_SEARCH_ADMIN, $qb, $searchData);
 
         return (int) $qb->getQuery()->getSingleScalarResult();
     }

@@ -21,6 +21,7 @@ use Eccube\Entity\Master\CsvType;
 use Eccube\Event\EccubeEvents;
 use Eccube\Event\EventArgs;
 use Eccube\Form\Type\Admin\SearchCustomerType;
+use Eccube\Util\StringUtil;
 use Eccube\Repository\CustomerRepository;
 use Eccube\Repository\Master\PageMaxRepository;
 use Eccube\Repository\Master\PrefRepository;
@@ -170,7 +171,7 @@ class CustomerController extends AbstractController
         $paginate_options = $event->getArgument('paginate_options');
 
         // JOIN必要な検索条件がない場合はカスタムカウントを使用
-        $useCustomCount = !isset($searchData['buy_product_name']);
+        $useCustomCount = !(isset($searchData['buy_product_name']) && StringUtil::isNotBlank($searchData['buy_product_name']));
 
         if ($useCustomCount) {
             // カスタムカウントを使用して高速化

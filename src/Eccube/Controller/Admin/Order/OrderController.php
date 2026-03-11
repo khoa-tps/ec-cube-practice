@@ -39,6 +39,7 @@ use Eccube\Service\OrderPdfService;
 use Eccube\Service\OrderStateMachine;
 use Eccube\Service\PurchaseFlow\PurchaseFlow;
 use Eccube\Util\FormUtil;
+use Eccube\Util\StringUtil;
 use Knp\Component\Pager\PaginatorInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\Form\FormBuilder;
@@ -311,14 +312,14 @@ class OrderController extends AbstractController
         $paginate_options = $event->getArgument('paginate_options');
 
         // JOIN必要な検索条件がない場合はカスタムカウントを使用
-        $useCustomCount = !isset($searchData['buy_product_name'])
-            && !isset($searchData['payment'])
-            && !isset($searchData['shipping_mail'])
-            && !isset($searchData['tracking_number'])
-            && !isset($searchData['shipping_delivery_datetime_start'])
-            && !isset($searchData['shipping_delivery_datetime_end'])
-            && !isset($searchData['shipping_delivery_date_start'])
-            && !isset($searchData['shipping_delivery_date_end']);
+        $useCustomCount = !(isset($searchData['buy_product_name']) && StringUtil::isNotBlank($searchData['buy_product_name']))
+            && empty($searchData['payment'])
+            && !(isset($searchData['shipping_mail']) && StringUtil::isNotBlank($searchData['shipping_mail']))
+            && !(isset($searchData['tracking_number']) && StringUtil::isNotBlank($searchData['tracking_number']))
+            && empty($searchData['shipping_delivery_datetime_start'])
+            && empty($searchData['shipping_delivery_datetime_end'])
+            && empty($searchData['shipping_delivery_date_start'])
+            && empty($searchData['shipping_delivery_date_end']);
 
         if ($useCustomCount) {
             // カスタムカウントを使用して高速化

@@ -266,10 +266,10 @@ class ProductController extends AbstractController
         $paginate_options = $event->getArgument('paginate_options');
 
         // JOIN必要な検索条件がない場合はカスタムカウントを使用
-        $useCustomCount = !isset($searchData['category_id'])
-            && !isset($searchData['stock_status'])
-            && !isset($searchData['stock'])
-            && !isset($searchData['tag_id']);
+        $useCustomCount = empty($searchData['category_id'])
+            && empty($searchData['stock_status'])
+            && empty($searchData['stock'])
+            && empty($searchData['tag_id']);
 
         if ($useCustomCount) {
             // カスタムカウントを使用して高速化

@@ -689,6 +689,8 @@ class OrderRepository extends AbstractRepository
                 ->setParameter('payment_total_end', $searchData['payment_total_end']);
         }
 
+        $qb = $this->queries->customize(QueryKey::ORDER_SEARCH_ADMIN, $qb, $searchData);
+
         return (int) $qb->getQuery()->getSingleScalarResult();
     }
 }

@@ -618,6 +618,8 @@ class CustomerRepository extends AbstractRepository
 
         // buy_product_name (注: Orders, OrderItemsとのJOINが必要なのでカウントには含めない)
 
+        $qb = $this->queries->customize(QueryKey::CUSTOMER_SEARCH, $qb, $searchData);
+
         return (int) $qb->getQuery()->getSingleScalarResult();
     }
 }
