@@ -199,6 +199,14 @@ $(function() {
         {% endif %}
 
         FilePond.create(inputFileElement, {
+            server: {
+                load: {
+                    url: '{{ path('admin_product_image_load') }}?source=',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                }
+            },
             allowFileTypeValidation: true,
             acceptedFileTypes: ['image/gif', 'image/png', 'image/jpeg', 'image/webp'],
             allowFileSizeValidation: true,
@@ -211,6 +219,16 @@ $(function() {
             allowProcess: false,
             labelIdle: '<i class="fa fa-cloud-upload fa-3x text-ec-lightGray mx-3 align-middle" aria-hidden="true" style="font-size: 40px"></i>{{ 'admin.common.drag_and_drop_image_description'|trans }}<span class="filepond--label-action">{{ 'admin.common.file_select'|trans }}</span>',
             styleItemPanelAspectRatio: 0.5625,
+            {% if thumbnailSource %}
+            files: [
+                {
+                    source: '{{ thumbnailSource }}',
+                    options: {
+                        type: 'local'
+                    }
+                }
+            ]
+			{% endif %}
         });
     }
 

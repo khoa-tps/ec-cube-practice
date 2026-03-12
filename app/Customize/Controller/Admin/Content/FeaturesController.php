@@ -55,6 +55,7 @@ class FeaturesController extends AbstractController
      */
     public function create(Request $request, $id = null)
     {
+        $thumbnailSource = null;
         if (is_null($id)) {
             $Feature = new Features();
         } else {
@@ -62,11 +63,14 @@ class FeaturesController extends AbstractController
             if (!$Feature) {
                 throw new NotFoundHttpException();
             }
+            $thumbnail = $Feature->getThumbnail();
+            if ($thumbnail) {
+                $thumbnailSource = 'features/'.$thumbnail;
+            }
         }
         $topCategories = $this->categoryRepository->findAll();
         $choicedCategoryIds = is_array($Feature->getRelatedCategoryIds()) ? $Feature->getRelatedCategoryIds() : [];
         $keywords = is_array($Feature->getKeywords()) ? $Feature->getKeywords() : [];
-
         $form = $this->formFactory->createBuilder(FormType::class, $Feature)
             ->add('title', TextType::class, [
                 'label' => 'タイトル',
@@ -168,6 +172,7 @@ class FeaturesController extends AbstractController
             'form' => $form->createView(),
             'TopCategories' => $topCategories,
             'ChoicedCategoryIds' => $choicedCategoryIds,
+            'thumbnailSource' => $thumbnailSource,
         ];
     }   
 
