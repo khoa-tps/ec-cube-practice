@@ -28,7 +28,9 @@ services:
       - 4430:443
     volumes:
       ### 同期対象からコストの重いフォルダを除外 #####################
+      - .:/var/www/html
       - "var:/var/www/html/var"
+      - ./var/log:/var/www/html/var/log
       - "vendor:/var/www/html/vendor"
       - "node_modules:/var/www/html/node_modules"
     environment:
@@ -54,8 +56,8 @@ services:
       # ECCUBE_COOKIE_PATH: "/"
       # ECCUBE_COOKIE_LIFETIME: 0
       # ECCUBE_GC_MAXLIFETIME: 1440
-      # ECCUBE_ADMIN_USER: "admin"
-      # ECCUBE_ADMIN_PASS: "password"
+      ECCUBE_ADMIN_USER: "admin"
+      ECCUBE_ADMIN_PASS: "password"
     networks:
       - backend
 

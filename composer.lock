@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "bc4229713e6f177f19b04ef4187e858e",
+    "content-hash": "5257ae62af6431b11b32951761fdafa4",
     "packages": [
         {
             "name": "carbonphp/carbon-doctrine-types",
@@ -2323,6 +2323,80 @@
             "time": "2022-05-23T21:33:49+00:00"
         },
         {
+            "name": "ec-cube/chatgpt",
+            "version": "4.3.1",
+            "dist": {
+                "type": "tar",
+                "url": "https://package-api-c2.ec-cube.net/v43/ec-cube/chatgpt/4.3.1/ChatGpt-4.3.1.tgz"
+            },
+            "require": {
+                "ec-cube/plugin-installer": "~0.0.7 || ^2.0",
+                "orhanerday/open-ai": "*"
+            },
+            "type": "eccube-plugin",
+            "extra": {
+                "code": "ChatGpt",
+                "id": 2786
+            },
+            "description": "ChatGPT for EC-CUBE",
+            "transport-options": {
+                "http": {
+                    "header": [
+                        "X-ECCUBE-KEY: XdLD4xsa7gY616FBdxZW8afMrqIlsdWr1HOgaRo6"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "ec-cube/coupon42",
+            "version": "4.3.0",
+            "dist": {
+                "type": "tar",
+                "url": "https://package-api-c2.ec-cube.net/v43/ec-cube/coupon42/4.3.0/Coupon42-4.3.0.tgz"
+            },
+            "require": {
+                "ec-cube/plugin-installer": "^2.0"
+            },
+            "type": "eccube-plugin",
+            "extra": {
+                "code": "Coupon42",
+                "id": 2401
+            },
+            "description": "Coupon Plugin for EC-CUBE42",
+            "transport-options": {
+                "http": {
+                    "header": [
+                        "X-ECCUBE-KEY: XdLD4xsa7gY616FBdxZW8afMrqIlsdWr1HOgaRo6"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "ec-cube/oauth2login",
+            "version": "1.0.3",
+            "dist": {
+                "type": "tar",
+                "url": "https://package-api-c2.ec-cube.net/v43/ec-cube/oauth2login/1.0.3/Oauth2Login-1.0.3.tgz"
+            },
+            "require": {
+                "ec-cube/plugin-installer": "~0.0.7 || ^2.0",
+                "overtrue/socialite": "^4.12.0"
+            },
+            "type": "eccube-plugin",
+            "extra": {
+                "code": "Oauth2Login",
+                "id": 3272
+            },
+            "description": "ソーシャルログイン",
+            "transport-options": {
+                "http": {
+                    "header": [
+                        "X-ECCUBE-KEY: QlLfZmxEA5Yb6sFvH3PCq1dkVapYS0yURp7QekHw"
+                    ]
+                }
+            }
+        },
+        {
             "name": "ec-cube/plugin-installer",
             "version": "2.0.1",
             "source": {
@@ -2357,6 +2431,54 @@
                 "source": "https://github.com/EC-CUBE/eccube-plugin-installer/tree/2.0.1"
             },
             "time": "2021-07-20T01:13:11+00:00"
+        },
+        {
+            "name": "ec-cube/productreview42",
+            "version": "4.3.0",
+            "dist": {
+                "type": "tar",
+                "url": "https://package-api-c2.ec-cube.net/v43/ec-cube/productreview42/4.3.0/ProductReview42-4.3.0.tgz"
+            },
+            "require": {
+                "ec-cube/plugin-installer": "^2.0"
+            },
+            "type": "eccube-plugin",
+            "extra": {
+                "code": "ProductReview42",
+                "id": 2405
+            },
+            "description": "商品レビュー管理プラグイン",
+            "transport-options": {
+                "http": {
+                    "header": [
+                        "X-ECCUBE-KEY: QlLfZmxEA5Yb6sFvH3PCq1dkVapYS0yURp7QekHw"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "ec-cube/yamatopayment42",
+            "version": "4.2.8",
+            "dist": {
+                "type": "tar",
+                "url": "https://package-api-c2.ec-cube.net/v43/ec-cube/yamatopayment42/4.2.8/YamatoPayment42-4.2.8.tgz"
+            },
+            "require": {
+                "ec-cube/plugin-installer": "~0.0.6 || ^2.0"
+            },
+            "type": "eccube-plugin",
+            "extra": {
+                "code": "YamatoPayment42",
+                "id": 2739
+            },
+            "description": "ヤマト運輸決済プラグイン(4.2系/4.3系)",
+            "transport-options": {
+                "http": {
+                    "header": [
+                        "X-ECCUBE-KEY: XdLD4xsa7gY616FBdxZW8afMrqIlsdWr1HOgaRo6"
+                    ]
+                }
+            }
         },
         {
             "name": "egulias/email-validator",
@@ -3982,6 +4104,136 @@
                 "source": "https://github.com/nikic/PHP-Parser/tree/v5.7.0"
             },
             "time": "2025-12-06T11:56:16+00:00"
+        },
+        {
+            "name": "orhanerday/open-ai",
+            "version": "5.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/orhanerday/open-ai.git",
+                "reference": "4ba9c704197b91260c89a1dc147cf46f81824f02"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/orhanerday/open-ai/zipball/4ba9c704197b91260c89a1dc147cf46f81824f02",
+                "reference": "4ba9c704197b91260c89a1dc147cf46f81824f02",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "ext-json": "*",
+                "php": ">=7.4"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^3.0",
+                "pestphp/pest": "^1.20",
+                "spatie/ray": "^1.28"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Orhanerday\\OpenAi\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Orhan Erday",
+                    "email": "orhanerday@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "OpenAI GPT-3 Api Client in PHP",
+            "homepage": "https://github.com/orhanerday/open-ai",
+            "keywords": [
+                "open-ai",
+                "orhanerday"
+            ],
+            "support": {
+                "issues": "https://github.com/orhanerday/open-ai/issues",
+                "source": "https://github.com/orhanerday/open-ai/tree/5.3"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/orhanerday",
+                    "type": "github"
+                }
+            ],
+            "time": "2025-03-12T12:04:33+00:00"
+        },
+        {
+            "name": "overtrue/socialite",
+            "version": "4.13.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/overtrue/socialite.git",
+                "reference": "2ec64721dfd69ac970e0a2090424061814aff47a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/overtrue/socialite/zipball/2ec64721dfd69ac970e0a2090424061814aff47a",
+                "reference": "2ec64721dfd69ac970e0a2090424061814aff47a",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "ext-openssl": "*",
+                "guzzlehttp/guzzle": "^7.0",
+                "php": ">=8.0.2"
+            },
+            "require-dev": {
+                "jetbrains/phpstorm-attributes": "^1.0",
+                "laravel/pint": "^1.2",
+                "mockery/mockery": "^1.3",
+                "phpstan/phpstan": "^2.1",
+                "phpunit/phpunit": "^11.3"
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "src/Contracts/FactoryInterface.php",
+                    "src/Contracts/UserInterface.php",
+                    "src/Contracts/ProviderInterface.php"
+                ],
+                "psr-4": {
+                    "Overtrue\\Socialite\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "overtrue",
+                    "email": "anzhengchao@gmail.com"
+                }
+            ],
+            "description": "A collection of OAuth 2 packages.",
+            "keywords": [
+                "Feishu",
+                "login",
+                "oauth",
+                "qcloud",
+                "qq",
+                "social",
+                "wechat",
+                "weibo"
+            ],
+            "support": {
+                "issues": "https://github.com/overtrue/socialite/issues",
+                "source": "https://github.com/overtrue/socialite/tree/4.13.0"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/overtrue",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-02-27T07:52:24+00:00"
         },
         {
             "name": "paragonie/constant_time_encoding",
@@ -15128,7 +15380,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {},
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
@@ -15140,9 +15392,9 @@
         "ext-openssl": "*",
         "ext-zip": "*"
     },
-    "platform-dev": {},
+    "platform-dev": [],
     "platform-overrides": {
-        "php": "8.1.0"
+        "php": "8.1.34"
     },
     "plugin-api-version": "2.6.0"
 }

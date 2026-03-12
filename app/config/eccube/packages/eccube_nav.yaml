@@ -67,6 +67,12 @@ parameters:
                 layout:
                     name: admin.content.layout_management
                     url: admin_content_layout
+                mall_custom:
+                    name: admin.content.mall_custom_management
+                    url: admin_content_mall
+                features:
+                    name: admin.content.features_management
+                    url: admin_content_features
                 page:
                     name: admin.content.page_management
                     url: admin_content_page
