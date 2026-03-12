@@ -35,73 +35,83 @@ file that was distributed with this source code.
 					</div>
 					<div class="card-body">
 						<div class="row mb-3">
-							<label class="col-sm-3 col-form-label">公開日<i class="fa fa-question-circle fa-lg ms-1"></i>
+							<label class="col-sm-4 col-form-label">公開日<i class="fa fa-question-circle fa-lg ms-1"></i>
 							</label>
-							<div class="col-sm-9">
-								{{ form_widget(form.publish_date_from) }}
-								~
-								{{ form_widget(form.publish_date_to) }}
+							<div class="col-sm-8">
+								<div class="row">
+									<div class="col-sm-4">
+										{{ form_widget(form.publish_date_from) }}
+									</div>
+									~
+									<div class="col-sm-4">
+										{{ form_widget(form.publish_date_to) }}
+									</div>
+								</div>
 								{{ form_errors(form.publish_date_from) }}
 								{{ form_errors(form.publish_date_to) }}
 							</div>
 						</div>
 						<div class="row mb-3">
-							<label class="col-sm-3 col-form-label">タイトル<i class="fa fa-question-circle fa-lg ms-1"></i>
+							<label class="col-sm-4 col-form-label">タイトル<i class="fa fa-question-circle fa-lg ms-1"></i>
 							</label>
-							<div class="col-sm-9">
+							<div class="col-sm-8">
 								{{ form_widget(form.title) }}
 								{{ form_errors(form.title) }}
 							</div>
 						</div>
 						<div class="row mb-3">
-							  <div class="card-body">
-                                <div class="mb-3">
-                                    <div class="row">
-                                        <div class="col">
-                                            <div class="input-group">
-                                                <div class="input-group-text">
-                                                    <span id="basic-addon1">
-                                                            <i class="fa fa-search"></i>
-                                                    </span>
-                                                </div>
-                                                <input id="search-category" class="form-control" type="search"
-                                                       placeholder="{{ 'admin.product.search_category'|trans }}"
-                                                       aria-label="Search">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+							<label class="col-sm-4 col-form-label">関連カテゴリ<i class="fa fa-question-circle fa-lg ms-1"></i>
+							</label>
+							<div class="col-sm-8">
+								<div class="mb-3">
+									<div class="input-group">
+										<div class="input-group-text">
+											<span id="basic-addon1">
+												<i class="fa fa-search"></i>
+											</span>
+										</div>
+										<input id="search-category" class="form-control" type="search"
+											placeholder="{{ 'admin.product.search_category'|trans }}"
+											aria-label="Search">
+									</div>
+								</div>
 
-                                {% macro tree(ChoicedIds, Category, form) %}
-                                    {% import _self as selfMacro %}
-                                    <li class="c-directoryTree--registerItem category-li">
-                                        <input type="checkbox" id="admin_product_category_{{ Category.id }}" name="admin_product[Category][]" value="{{ Category.id }}" {% if Category.id in ChoicedIds %}checked{% endif %}>
-                                        <label for="admin_product_category_{{ Category.id }}">{{ Category.name }}</label>
-                                        <ul class="list-unstyled">
-                                            {% for child,ChildCategory in Category.children %}
-                                                {{ selfMacro.tree(ChoicedIds, ChildCategory, form) }}
-                                            {% endfor %}
-                                        </ul>
-                                    </li>
-                                {% endmacro %}
+								{% macro tree(ChoicedIds, Category, form) %}
+									{% import _self as selfMacro %}
+									<li class="c-directoryTree--registerItem category-li">
+										<input type="checkbox" id="feature_category_{{ Category.id }}" class="related-category-checkbox" value="{{ Category.id }}" {% if Category.id in ChoicedIds %}checked{% endif %}>
+										<label for="feature_category_{{ Category.id }}">{{ Category.name }}</label>
+										<ul class="list-unstyled">
+											{% for child,ChildCategory in Category.children %}
+												{{ selfMacro.tree(ChoicedIds, ChildCategory, form) }}
+											{% endfor %}
+										</ul>
+									</li>
+								{% endmacro %}
 
-                                <div class="c-directoryTree--register rounded border mb-3 p-3">
-                                    {% import _self as renderMacro %}
-                                    {% for TopCategory in TopCategories %}
-                                        <ul class="list-unstyled">
-                                            {{ renderMacro.tree(ChoicedCategoryIds, TopCategory, form.related_category_ids) }}
-                                        </ul>
-                                    {% endfor %}
-                                    {{ form_errors(form.related_category_ids) }}
-                                </div>
-                            </div>
+								<div class="c-directoryTree--register rounded border mb-3 p-3">
+									{% import _self as renderMacro %}
+									{% for TopCategory in TopCategories %}
+										<ul class="list-unstyled">
+											{{ renderMacro.tree(ChoicedCategoryIds, TopCategory, form.related_category_ids) }}
+										</ul>
+									{% endfor %}
+									<div style="display:none;">
+										{{ form_widget(form.related_category_ids) }}
+									</div>
+									{{ form_errors(form.related_category_ids) }}
+								</div>
+							</div>
 						</div>
-						{% do form.related_category_ids.setRendered() %}
 						<div class="row mb-3">
 							<label class="col-sm-3 col-form-label">キーワード<i class="fa fa-question-circle fa-lg ms-1"></i>
 							</label>
 							<div class="col-sm-9">
-								{{ form_widget(form.keywords) }}
+								<div id="keyword-tags" class="mb-2"></div>
+								<input id="keyword-input" type="text" class="form-control" placeholder="キーワードをカンマで区切って入力してください">
+								<div style="display:none;">
+									{{ form_widget(form.keywords) }}
+								</div>
 								{{ form_errors(form.keywords) }}
 							</div>
 						</div>
@@ -179,23 +189,23 @@ file that was distributed with this source code.
 <script>
 $(function() {
     var inputFileElement = document.querySelector('input[type=file]');
-    if (!inputFileElement) return;
+    if (inputFileElement) {
+        {% if eccube_config.locale == 'ja' or eccube_config.locale == 'en' %}
+        FilePond.setOptions(FilePondLocale_{{ eccube_config.locale }});
+        {% endif %}
 
-    {% if eccube_config.locale == 'ja' or eccube_config.locale == 'en' %}
-    FilePond.setOptions(FilePondLocale_{{ eccube_config.locale }});
-    {% endif %}
-
-    FilePond.create(inputFileElement, {
-        allowFileTypeValidation: true,
-        acceptedFileTypes: ['image/gif', 'image/png', 'image/jpeg', 'image/webp'],
-        allowFileSizeValidation: true,
-        maxFileSize: 10000000,
-        maxFiles: 1,
-        allowBrowse: true,
-        allowDrop: true,
-        labelIdle: '<i class="fa fa-cloud-upload fa-3x text-ec-lightGray mx-3 align-middle" aria-hidden="true" style="font-size: 40px"></i>{{ 'admin.common.drag_and_drop_image_description'|trans }}<span class="filepond--label-action">{{ 'admin.common.file_select'|trans }}</span>',
-        styleItemPanelAspectRatio: 0.5625,
-    });
+        FilePond.create(inputFileElement, {
+            allowFileTypeValidation: true,
+            acceptedFileTypes: ['image/gif', 'image/png', 'image/jpeg', 'image/webp'],
+            allowFileSizeValidation: true,
+            maxFileSize: 10000000,
+            maxFiles: 1,
+            allowBrowse: true,
+            allowDrop: true,
+            labelIdle: '<i class="fa fa-cloud-upload fa-3x text-ec-lightGray mx-3 align-middle" aria-hidden="true" style="font-size: 40px"></i>{{ 'admin.common.drag_and_drop_image_description'|trans }}<span class="filepond--label-action">{{ 'admin.common.file_select'|trans }}</span>',
+            styleItemPanelAspectRatio: 0.5625,
+        });
+    }
 
 	$('#search-category').on('input', function () {
 		searchWord($(this).val(), $('.category-li'));
@@ -216,25 +226,69 @@ $(function() {
             }
         });
 
-		var editorCatchphrase = ace.edit('catchphrase');
-        editorCatchphrase.session.setMode('ace/mode/text');
-        editorCatchphrase.setTheme('ace/theme/tomorrow');
-        editorCatchphrase.setValue('{{ form.catchphrase.vars.value|default('')|escape('js') }}');
-        editorCatchphrase.setOptions({
-            showInvisibles: true
-        });
+        var editorCatchphrase = null;
+        if (document.getElementById('catchphrase')) {
+            editorCatchphrase = ace.edit('catchphrase');
+            editorCatchphrase.session.setMode('ace/mode/text');
+            editorCatchphrase.setTheme('ace/theme/tomorrow');
+            editorCatchphrase.setValue('{{ form.catchphrase.vars.value|default('')|escape('js') }}');
+            editorCatchphrase.setOptions({
+                showInvisibles: true
+            });
 
-        $("#catchphrase").resizable({
-            resize: function () {
-                editorCatchphrase.resize();
+            $("#catchphrase").resizable({
+                resize: function () {
+                    editorCatchphrase.resize();
+                }
+            });
+        }
+
+        $('#content_features_form').on('submit', function() {
+			const ids = $('.related-category-checkbox:checked')
+				.map(function () { return $(this).val(); })
+				.get();
+
+            $('#form_description').val(editor.getValue());
+			$('#form_related_category_ids').val(ids.join(','));
+			if (editorCatchphrase !== null) {
+                $('#form_catchphrase').val(editorCatchphrase.getValue());
             }
         });
 
-        $('#content_features_form').on('submit', function() {
-            $('#form_description').val(editor.getValue());
-			$('#form_related_category_ids').val(editor.getValue());
-			$('#form_catchphrase').val(editorCatchphrase.getValue());
-        });
+
+		const tags = [];
+		const $input = $('#keyword-input');
+		const $tags = $('#keyword-tags');
+		const $hidden = $('#form_keywords');
+
+		function renderTags() {
+		$tags.empty();
+		tags.forEach((tag, idx) => {
+			$tags.append(`<span class="badge bg-secondary me-1">${tag} <a href="#" data-idx="${idx}" class="text-white ms-1">x</a></span>`);
+		});
+		$hidden.val(tags.join(','));
+		}
+
+		function addTag(value) {
+		const v = value.trim();
+		if (!v || tags.includes(v)) return;
+		tags.push(v);
+		renderTags();
+		}
+
+		$input.on('keydown', function (e) {
+		if (e.key === 'Tab' || e.key === 'Enter' || e.key === ',') {
+			e.preventDefault();
+			addTag($input.val());
+			$input.val('');
+		}
+		});
+
+		$tags.on('click', 'a[data-idx]', function (e) {
+		e.preventDefault();
+		tags.splice(Number($(this).data('idx')), 1);
+		renderTags();
+		});
 });
 </script>
 {% endblock %}

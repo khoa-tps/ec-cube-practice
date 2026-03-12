@@ -85,20 +85,21 @@ class FeaturesController extends AbstractController
                     'placeholder' => 'カテゴリIDをカンマで区切って入力してください',
                 ],
             ])
-            ->add('keywords', TextType::class, [
-                'label' => 'キーワード',
-                'required' => false,
-                'mapped' => false,
-                'attr' => [
-                    'placeholder' => 'キーワードをカンマで区切って入力してください',
-                ],
-            ])
+                ->add('keywords', TextType::class, [
+                    'label' => 'キーワード',
+                    'required' => false,
+                    'mapped' => false,
+                    'attr' => [
+                        'placeholder' => 'キーワードをカンマで区切って入力してください',
+                    ],
+                ])
             ->add('thumbnail', FileType::class, [
                 'label' => 'サムネイル',
                 'required' => false,
                 'mapped' => false,
             ])
             ->getForm();  
+
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $relatedCategoryIds = array_values(array_filter(array_map('trim', explode(',', (string) $form->get('related_category_ids')->getData())), static function ($value) {
