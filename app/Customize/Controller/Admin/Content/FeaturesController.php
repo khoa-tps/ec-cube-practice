@@ -13,14 +13,16 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Eccube\Repository\CategoryRepository;
 
 class FeaturesController extends AbstractController
 {
     private FeaturesRepository $featuresRepository;
 
-    public function __construct(FeaturesRepository $featuresRepository)
+    public function __construct(FeaturesRepository $featuresRepository, CategoryRepository $categoryRepository)
     {
         $this->featuresRepository = $featuresRepository;
+        $this->categoryRepository = $categoryRepository;
     }
     /**
      * @Route("/%eccube_admin_route%/content/features", name="admin_content_features", methods={"GET", "POST"})
@@ -118,9 +120,12 @@ class FeaturesController extends AbstractController
         } elseif ($form->isSubmitted()) {
             $this->addError('admin.common.save_error', 'admin');
         }
-
+        $topCategories = $this->categoryRepository->findAll();
+        $choicedCategoryIds = [];
         return [
             'form' => $form->createView(),
+            'TopCategories' => $topCategories,
+            'ChoicedCategoryIds' => $choicedCategoryIds
         ];
     }   
 
@@ -142,6 +147,7 @@ class FeaturesController extends AbstractController
             ])
             ->getForm();
         $form->handleRequest($request);
+        $topCategories = $this->categoryRepository->findAll();
         if ($form->isSubmitted() && $form->isValid()) {
             $this->entityManager->persist($Feature);
             $this->entityManager->flush();
@@ -153,6 +159,7 @@ class FeaturesController extends AbstractController
         return [
             'form' => $form->createView(),
             'Feature' => $Feature,
+            'TopCategories' => $topCategories
         ];
     }
 }

@@ -54,12 +54,47 @@ file that was distributed with this source code.
 							</div>
 						</div>
 						<div class="row mb-3">
-							<label class="col-sm-3 col-form-label">関連カテゴリ<i class="fa fa-question-circle fa-lg ms-1"></i>
-							</label>
-							<div class="col-sm-9">
-								{{ form_widget(form.related_category_ids) }}
-								{{ form_errors(form.related_category_ids) }}
-							</div>
+							  <div class="card-body">
+                                <div class="mb-3">
+                                    <div class="row">
+                                        <div class="col">
+                                            <div class="input-group">
+                                                <div class="input-group-text">
+                                                    <span id="basic-addon1">
+                                                            <i class="fa fa-search"></i>
+                                                    </span>
+                                                </div>
+                                                <input id="search-category" class="form-control" type="search"
+                                                       placeholder="{{ 'admin.product.search_category'|trans }}"
+                                                       aria-label="Search">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {% macro tree(ChoicedIds, Category, form) %}
+                                    {% import _self as selfMacro %}
+                                    <li class="c-directoryTree--registerItem category-li">
+                                        <input type="checkbox" id="admin_product_category_{{ Category.id }}" name="admin_product[Category][]" value="{{ Category.id }}" {% if Category.id in ChoicedIds %}checked{% endif %}>
+                                        <label for="admin_product_category_{{ Category.id }}">{{ Category.name }}</label>
+                                        <ul class="list-unstyled">
+                                            {% for child,ChildCategory in Category.children %}
+                                                {{ selfMacro.tree(ChoicedIds, ChildCategory, form) }}
+                                            {% endfor %}
+                                        </ul>
+                                    </li>
+                                {% endmacro %}
+
+                                <div class="c-directoryTree--register rounded border mb-3 p-3">
+                                    {% import _self as renderMacro %}
+                                    {% for TopCategory in TopCategories %}
+                                        <ul class="list-unstyled">
+                                            {{ renderMacro.tree(ChoicedCategoryIds, TopCategory, form.related_category_ids) }}
+                                        </ul>
+                                    {% endfor %}
+                                    {{ form_errors(form.related_category_ids) }}
+                                </div>
+                            </div>
 						</div>
 						<div class="row mb-3">
 							<label class="col-sm-3 col-form-label">キーワード<i class="fa fa-question-circle fa-lg ms-1"></i>
@@ -89,6 +124,14 @@ file that was distributed with this source code.
 										<span class="form-error-message"></span>
 									</span>
 								</span>
+							</div>
+						</div>
+						<div class="row mb-3">
+							<label class="col-sm-3 col-form-label">説明<i class="fa fa-question-circle fa-lg ms-1"></i></label>
+							<div class="col-sm-9">
+								<div id="description" style="height: 360px" class="form-control{{ has_errors(form.description) ? ' is-invalid' }}"></div>
+								<div style="display: none">{{ form_widget(form.description) }}</div>
+								{{ form_errors(form.description) }}
 							</div>
 						</div>
 						{{ form_rest(form) }}
@@ -145,6 +188,29 @@ $(function() {
         labelIdle: '<i class="fa fa-cloud-upload fa-3x text-ec-lightGray mx-3 align-middle" aria-hidden="true" style="font-size: 40px"></i>{{ 'admin.common.drag_and_drop_image_description'|trans }}<span class="filepond--label-action">{{ 'admin.common.file_select'|trans }}</span>',
         styleItemPanelAspectRatio: 0.5625,
     });
+
+	$('#search-category').on('input', function () {
+		searchWord($(this).val(), $('.category-li'));
+	});
+
+	 ace.require('ace/ext/language_tools');
+        var editor = ace.edit('description');
+        editor.session.setMode('ace/mode/text');
+        editor.setTheme('ace/theme/tomorrow');
+        editor.setValue('{{ form.description.vars.value|default('')|escape('js') }}');
+        editor.setOptions({
+            showInvisibles: true
+        });
+
+        $("#description").resizable({
+            resize: function () {
+                editor.resize();
+            }
+        });
+
+        $('#content_features_form').on('submit', function() {
+            $('#form_description').val(editor.getValue());
+        });
 });
 </script>
 {% endblock %}
