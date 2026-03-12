@@ -51,9 +51,13 @@ file that was distributed with this source code.
                                             <a href="{{ url('admin_content_features_edit', {id: item.id}) }}">
                                                 <i class="fa fa-eye fa-lg text-secondary"></i>
                                             </a>
-                                            <a href="#">
-                                                <i class="fa fa-close fa-lg text-secondary"></i>
-                                            </a>
+                                            <form action="{{ url('admin_content_features_delete', {id: item.id}) }}" method="post" id="delete-form-{{ item.id }}" style="display: inline;">
+                                                <input type="hidden" name="_method" value="DELETE">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('_token') }}">
+                                                <button type="submit" class="btn btn-link p-0" onclick="return confirm('削除してもよろしいですか?')">
+                                                    <i class="fa fa-close fa-lg text-secondary"></i>
+                                                </button>
+                                            </form>
                                         </td>
                                     </tr>
                                 {% else %}

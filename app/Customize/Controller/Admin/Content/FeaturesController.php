@@ -14,21 +14,19 @@ use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Eccube\Repository\CategoryRepository;
-use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use RuntimeException;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
 class FeaturesController extends AbstractController
 {
     private FeaturesRepository $featuresRepository;
     private CategoryRepository $categoryRepository;
-    private SluggerInterface $slugger;
 
-    public function __construct(FeaturesRepository $featuresRepository, CategoryRepository $categoryRepository, SluggerInterface $slugger)
+    public function __construct(FeaturesRepository $featuresRepository, CategoryRepository $categoryRepository)
     {
         $this->featuresRepository = $featuresRepository;
         $this->categoryRepository = $categoryRepository;
-        $this->slugger = $slugger;
     }
     /**
      * @Route("/%eccube_admin_route%/content/features", name="admin_content_features", methods={"GET", "POST"})
@@ -49,6 +47,7 @@ class FeaturesController extends AbstractController
      * Create a new feature.
      *
      * @Route("/%eccube_admin_route%/content/features/create", name="admin_content_features_create", methods={"GET", "POST"})
+     * @Route("/%eccube_admin_route%/content/features/{id}/edit", name="admin_content_features_edit", methods={"GET", "POST"})
      * @Template("@admin/Content/Features/create.twig")
      * @param Request $request
      * @return array
@@ -107,6 +106,14 @@ class FeaturesController extends AbstractController
                 'required' => false,
                 'mapped' => false,
             ])
+            ->add('status', ChoiceType::class, [
+                'label' => 'ステータス',
+                'required' => true,
+                'choices' => [
+                    '公開' => 1,
+                    '非公開' => 0,
+                ],
+            ])
             ->getForm();  
             
         $form->handleRequest($request);
@@ -132,7 +139,6 @@ class FeaturesController extends AbstractController
                 }
             }
 
-            $Feature->setStatus(1);
             $Feature->setRelatedCategoryIds($relatedCategoryIds);
             $Feature->setKeywords($keywords);
             $this->entityManager->persist($Feature);
@@ -151,6 +157,12 @@ class FeaturesController extends AbstractController
         ];
     }   
 
+    /**
+     * Upload an image.
+     *
+     * @param UploadedFile $imageFile
+     * @return string
+     */
     private function uploadImage(UploadedFile $imageFile): string
     {
         $extension = $imageFile->guessExtension();
@@ -183,36 +195,47 @@ class FeaturesController extends AbstractController
     }
 
     /**
-     * Edit a feature.
-     *
-     * @Route("/%eccube_admin_route%/content/features/{id}/edit", name="admin_content_features_edit", methods={"GET", "POST"})
-     * @Template("@admin/Content/Features/edit.twig")
+     * Delete a feature.
+     * @Route("/%eccube_admin_route%/content/features/{id}/delete", name="admin_content_features_delete", methods={"DELETE"})
      * @param Request $request
      * @return array
      */
-    public function edit(Request $request)
+    public function delete(Request $request, $id)
     {
-        $Feature = $this->featuresRepository->find($request->get('id'));
-        $form = $this->formFactory->createBuilder(FormType::class, $Feature)
-            ->add('title', TextType::class, [
-                'label' => 'タイトル',
-                'required' => true,
-            ])
-            ->getForm();
-        $form->handleRequest($request);
-        $topCategories = $this->categoryRepository->findAll();
-        if ($form->isSubmitted() && $form->isValid()) {
-            $this->entityManager->persist($Feature);
-            $this->entityManager->flush();
-            $this->addSuccess('admin.common.save_complete', 'admin');
-            return $this->redirectToRoute('admin_content_features');
-        } elseif ($form->isSubmitted()) {
-            $this->addError('admin.common.save_error', 'admin');
+        $this->isTokenValid();
+        $Feature = $this->featuresRepository->find($id);
+        $success = $Feature ? true : false;
+        if ($request->isXmlHttpRequest()) {
+            return $this->json([
+                'success' => $success,
+                'message' => $success ? 'admin.common.delete_complete' : 'admin.common.delete_error',
+            ]);
         }
-        return [
-            'form' => $form->createView(),
-            'Feature' => $Feature,
-            'TopCategories' => $topCategories
-        ];
+        if (!$Feature) {
+            $this->deleteMessage();
+            return [
+                'success' => false,
+                'message' => 'admin.common.delete_error',
+            ];
+        }
+        $this->entityManager->remove($Feature);
+        $this->entityManager->flush();
+        //Delete image
+        $this->deleteImage($Feature->getThumbnail());
+        $this->addSuccess('admin.common.delete_complete', 'admin');
+        return $this->redirectToRoute('admin_content_features');
+    }
+
+    /**
+     * Delete an image.
+     *
+     * @param string $imageName
+     * @return void
+     */
+    private function deleteImage(string $imageName): void
+    {
+        if (file_exists($this->getParameter('eccube_save_image_dir').'/features/'.$imageName)) {
+            unlink($this->getParameter('eccube_save_image_dir').'/features/'.$imageName);
+        }
     }
 }
