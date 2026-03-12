@@ -21,7 +21,7 @@ file that was distributed with this source code.
 {% endblock %}
 
 {% block main %}
-	{{ form_start(form, { attr: { id: 'content_mall_form' } }) }}
+	{{ form_start(form, { attr: { id: 'content_features_form' } }) }}
 	<div class="c-contentsArea__cols">
 		<div class="c-contentsArea__primaryCol">
 			<div class="c-primaryCol">
@@ -96,6 +96,7 @@ file that was distributed with this source code.
                                 </div>
                             </div>
 						</div>
+						{% do form.related_category_ids.setRendered() %}
 						<div class="row mb-3">
 							<label class="col-sm-3 col-form-label">キーワード<i class="fa fa-question-circle fa-lg ms-1"></i>
 							</label>
@@ -134,7 +135,14 @@ file that was distributed with this source code.
 								{{ form_errors(form.description) }}
 							</div>
 						</div>
-						{{ form_rest(form) }}
+						<div class="row mb-3">
+							<label class="col-sm-3 col-form-label">キャッチフレーズ<i class="fa fa-question-circle fa-lg ms-1"></i></label>
+							<div class="col-sm-9">
+								<div id="catchphrase" style="height: 360px" class="form-control{{ has_errors(form.catchphrase) ? ' is-invalid' }}"></div>
+								<div style="display: none">{{ form_widget(form.catchphrase) }}</div>
+								{{ form_errors(form.catchphrase) }}
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -208,8 +216,24 @@ $(function() {
             }
         });
 
+		var editorCatchphrase = ace.edit('catchphrase');
+        editorCatchphrase.session.setMode('ace/mode/text');
+        editorCatchphrase.setTheme('ace/theme/tomorrow');
+        editorCatchphrase.setValue('{{ form.catchphrase.vars.value|default('')|escape('js') }}');
+        editorCatchphrase.setOptions({
+            showInvisibles: true
+        });
+
+        $("#catchphrase").resizable({
+            resize: function () {
+                editorCatchphrase.resize();
+            }
+        });
+
         $('#content_features_form').on('submit', function() {
             $('#form_description').val(editor.getValue());
+			$('#form_related_category_ids').val(editor.getValue());
+			$('#form_catchphrase').val(editorCatchphrase.getValue());
         });
 });
 </script>
