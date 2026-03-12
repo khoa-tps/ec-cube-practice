@@ -14,15 +14,21 @@ use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Eccube\Repository\CategoryRepository;
+use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use RuntimeException;
 
 class FeaturesController extends AbstractController
 {
     private FeaturesRepository $featuresRepository;
+    private CategoryRepository $categoryRepository;
+    private SluggerInterface $slugger;
 
-    public function __construct(FeaturesRepository $featuresRepository, CategoryRepository $categoryRepository)
+    public function __construct(FeaturesRepository $featuresRepository, CategoryRepository $categoryRepository, SluggerInterface $slugger)
     {
         $this->featuresRepository = $featuresRepository;
         $this->categoryRepository = $categoryRepository;
+        $this->slugger = $slugger;
     }
     /**
      * @Route("/%eccube_admin_route%/content/features", name="admin_content_features", methods={"GET", "POST"})
@@ -51,6 +57,9 @@ class FeaturesController extends AbstractController
     {
         $Feature = new Features();
         $Feature->setStatus(1);
+        $topCategories = $this->categoryRepository->findAll();
+        $choicedCategoryIds = [];
+
         $form = $this->formFactory->createBuilder(FormType::class, $Feature)
             ->add('title', TextType::class, [
                 'label' => 'タイトル',
@@ -85,21 +94,21 @@ class FeaturesController extends AbstractController
                     'placeholder' => 'カテゴリIDをカンマで区切って入力してください',
                 ],
             ])
-                ->add('keywords', TextType::class, [
-                    'label' => 'キーワード',
-                    'required' => false,
-                    'mapped' => false,
-                    'attr' => [
-                        'placeholder' => 'キーワードをカンマで区切って入力してください',
-                    ],
-                ])
+            ->add('keywords', TextType::class, [
+                'label' => 'キーワード',
+                'required' => false,
+                'mapped' => false,
+                'attr' => [
+                    'placeholder' => 'キーワードをカンマで区切って入力してください',
+                ],
+            ])
             ->add('thumbnail', FileType::class, [
                 'label' => 'サムネイル',
                 'required' => false,
                 'mapped' => false,
             ])
             ->getForm();  
-
+            
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $relatedCategoryIds = array_values(array_filter(array_map('trim', explode(',', (string) $form->get('related_category_ids')->getData())), static function ($value) {
@@ -109,10 +118,23 @@ class FeaturesController extends AbstractController
                 return $value !== '';
             }));
 
+            $imageFile = $form->get('thumbnail')->getData();
+            if ($imageFile instanceof UploadedFile) {
+                try {
+                    $Feature->setThumbnail($this->uploadImage($imageFile));
+                } catch (RuntimeException $e) {
+                    $this->addError('admin.common.save_error', 'admin');
+                    return [
+                        'form' => $form->createView(),
+                        'TopCategories' => $topCategories,
+                        'ChoicedCategoryIds' => $choicedCategoryIds,
+                    ];
+                }
+            }
+
             $Feature->setStatus(1);
             $Feature->setRelatedCategoryIds($relatedCategoryIds);
             $Feature->setKeywords($keywords);
-            $Feature->setThumbnail('1234567890.jpg');
             $this->entityManager->persist($Feature);
             $this->entityManager->flush();
 
@@ -121,14 +143,44 @@ class FeaturesController extends AbstractController
         } elseif ($form->isSubmitted()) {
             $this->addError('admin.common.save_error', 'admin');
         }
-        $topCategories = $this->categoryRepository->findAll();
-        $choicedCategoryIds = [];
+
         return [
             'form' => $form->createView(),
             'TopCategories' => $topCategories,
-            'ChoicedCategoryIds' => $choicedCategoryIds
+            'ChoicedCategoryIds' => $choicedCategoryIds,
         ];
     }   
+
+    private function uploadImage(UploadedFile $imageFile): string
+    {
+        $extension = $imageFile->guessExtension();
+        if (!$extension) {
+            $extension = strtolower((string) $imageFile->getClientOriginalExtension());
+        }
+        if ($extension === '') {
+            $extension = 'bin';
+        }
+        $targetDir = (string) $this->getParameter('eccube_save_image_dir').'/features';
+        if (!is_dir($targetDir)) {
+            mkdir($targetDir, 0775, true);
+        }
+
+        $baseFilename = 'feature-'.date('Y-m-d');
+        $newFilename = sprintf('%s.%s', $baseFilename, $extension);
+        $sequence = 1;
+        while (file_exists($targetDir.'/'.$newFilename)) {
+            $newFilename = sprintf('%s-%d.%s', $baseFilename, $sequence, $extension);
+            ++$sequence;
+        }
+
+        try {
+            $imageFile->move($targetDir, $newFilename);
+        } catch (\Throwable $e) {
+            throw new RuntimeException('Failed to upload thumbnail image.', 0, $e);
+        }
+
+        return $newFilename;
+    }
 
     /**
      * Edit a feature.

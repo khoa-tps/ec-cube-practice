@@ -188,7 +188,7 @@ file that was distributed with this source code.
 {% block javascript %}
 <script>
 $(function() {
-    var inputFileElement = document.querySelector('input[type=file]');
+    var inputFileElement = document.getElementById('{{ form.thumbnail.vars.id }}');
     if (inputFileElement) {
         {% if eccube_config.locale == 'ja' or eccube_config.locale == 'en' %}
         FilePond.setOptions(FilePondLocale_{{ eccube_config.locale }});
@@ -202,6 +202,9 @@ $(function() {
             maxFiles: 1,
             allowBrowse: true,
             allowDrop: true,
+            storeAsFile: true,
+            instantUpload: false,
+            allowProcess: false,
             labelIdle: '<i class="fa fa-cloud-upload fa-3x text-ec-lightGray mx-3 align-middle" aria-hidden="true" style="font-size: 40px"></i>{{ 'admin.common.drag_and_drop_image_description'|trans }}<span class="filepond--label-action">{{ 'admin.common.file_select'|trans }}</span>',
             styleItemPanelAspectRatio: 0.5625,
         });
@@ -247,7 +250,6 @@ $(function() {
 			const ids = $('.related-category-checkbox:checked')
 				.map(function () { return $(this).val(); })
 				.get();
-
             $('#form_description').val(editor.getValue());
 			$('#form_related_category_ids').val(ids.join(','));
 			if (editorCatchphrase !== null) {
