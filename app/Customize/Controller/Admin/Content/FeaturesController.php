@@ -17,6 +17,7 @@ use Eccube\Repository\CategoryRepository;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use RuntimeException;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class FeaturesController extends AbstractController
 {
@@ -47,17 +48,24 @@ class FeaturesController extends AbstractController
      * Create a new feature.
      *
      * @Route("/%eccube_admin_route%/content/features/create", name="admin_content_features_create", methods={"GET", "POST"})
-     * @Route("/%eccube_admin_route%/content/features/{id}/edit", name="admin_content_features_edit", methods={"GET", "POST"})
+     * @Route("/%eccube_admin_route%/content/features/{id}/edit", requirements={"id" = "\d+"}, name="admin_content_features_edit", methods={"GET", "POST"})
      * @Template("@admin/Content/Features/create.twig")
      * @param Request $request
      * @return array
      */
-    public function create(Request $request)
+    public function create(Request $request, $id = null)
     {
-        $Feature = new Features();
-        $Feature->setStatus(1);
+        if (is_null($id)) {
+            $Feature = new Features();
+        } else {
+            $Feature = $this->featuresRepository->find($id);
+            if (!$Feature) {
+                throw new NotFoundHttpException();
+            }
+        }
         $topCategories = $this->categoryRepository->findAll();
-        $choicedCategoryIds = [];
+        $choicedCategoryIds = is_array($Feature->getRelatedCategoryIds()) ? $Feature->getRelatedCategoryIds() : [];
+        $keywords = is_array($Feature->getKeywords()) ? $Feature->getKeywords() : [];
 
         $form = $this->formFactory->createBuilder(FormType::class, $Feature)
             ->add('title', TextType::class, [
@@ -89,6 +97,7 @@ class FeaturesController extends AbstractController
                 'label' => '関連カテゴリ',
                 'required' => false,
                 'mapped' => false,
+                'data' => implode(',', $choicedCategoryIds),
                 'attr' => [
                     'placeholder' => 'カテゴリIDをカンマで区切って入力してください',
                 ],
@@ -97,6 +106,7 @@ class FeaturesController extends AbstractController
                 'label' => 'キーワード',
                 'required' => false,
                 'mapped' => false,
+                'data' => implode(',', $keywords),
                 'attr' => [
                     'placeholder' => 'キーワードをカンマで区切って入力してください',
                 ],
@@ -121,6 +131,7 @@ class FeaturesController extends AbstractController
             $relatedCategoryIds = array_values(array_filter(array_map('trim', explode(',', (string) $form->get('related_category_ids')->getData())), static function ($value) {
                 return $value !== '';
             }));
+            $choicedCategoryIds = $relatedCategoryIds;
             $keywords = array_values(array_filter(array_map('trim', explode(',', (string) $form->get('keywords')->getData())), static function ($value) {
                 return $value !== '';
             }));
@@ -147,6 +158,9 @@ class FeaturesController extends AbstractController
             $this->addSuccess('admin.common.save_complete', 'admin');
             return $this->redirectToRoute('admin_content_features');
         } elseif ($form->isSubmitted()) {
+            $choicedCategoryIds = array_values(array_filter(array_map('trim', explode(',', (string) $form->get('related_category_ids')->getData())), static function ($value) {
+                return $value !== '';
+            }));
             $this->addError('admin.common.save_error', 'admin');
         }
 

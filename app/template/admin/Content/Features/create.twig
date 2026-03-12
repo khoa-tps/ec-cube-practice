@@ -282,6 +282,14 @@ $(function() {
 		renderTags();
 		}
 
+		const initialKeywords = ($hidden.val() || '')
+			.split(',')
+			.map(function (value) { return value.trim(); })
+			.filter(function (value) { return value !== ''; });
+		initialKeywords.forEach(function (keyword) {
+			addTag(keyword);
+		});
+
 		$input.on('keydown', function (e) {
 		if (e.key === 'Tab' || e.key === 'Enter' || e.key === ',') {
 			e.preventDefault();
