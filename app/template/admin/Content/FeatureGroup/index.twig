@@ -1,0 +1,55 @@
+{#
+This file is part of EC-CUBE
+
+Copyright(c) EC-CUBE CO.,LTD. All Rights Reserved.
+
+http://www.ec-cube.co.jp/
+
+For the full copyright and license information, please view the LICENSE
+file that was distributed with this source code.
+#}
+{% extends '@admin/default_frame.twig' %}
+
+{% set menus = ['content', 'features_group'] %}
+
+{% block title %}{{ 'admin.content.features_group_management'|trans }}{% endblock %}
+{% block sub_title %}{{ 'admin.content.contents_management'|trans }}{% endblock %}
+
+{% block main %}
+    <div class="c-contentsArea__cols">
+        <div class="c-contentsArea__primaryCol">
+            <div class="c-primaryCol">
+                <div class="d-block mb-3">
+                    <a class="btn btn-ec-regular" href="{{ url('admin_content_features_group_create') }}">
+                        {{ 'admin.common.create__new'|trans }}
+                    </a>
+                </div>
+                <div class="card rounded border-0 mb-4">
+                    <div class="card-header">
+                        <span class="card-title">{{ 'admin.content.features_management'|trans }}</span>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-striped mb-0">
+                                <thead>
+                                <tr>
+                                    <th class="ps-3">ID</th>
+                                    <th>公開日時</th>
+                                    <th>公開状態</th>
+                                    <th>タイトル</th>
+                                    <th>特集カウント</th>
+                                    <th></th>
+                                    <th></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                            
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

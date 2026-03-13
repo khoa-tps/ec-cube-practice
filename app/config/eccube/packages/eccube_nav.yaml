@@ -73,6 +73,9 @@ parameters:
                 features:
                     name: admin.content.features_management
                     url: admin_content_features
+                features_group:
+                    name: admin.content.features_group_management
+                    url: admin_content_features_group_list
                 page:
                     name: admin.content.page_management
                     url: admin_content_page
