@@ -35,7 +35,6 @@ file that was distributed with this source code.
                                 <tr>
                                     <th class="ps-3">ID</th>
                                     <th>公開日時</th>
-                                    <th>公開状態</th>
                                     <th>タイトル</th>
                                     <th>特集カウント</th>
                                     <th></th>
@@ -43,7 +42,24 @@ file that was distributed with this source code.
                                 </tr>
                                 </thead>
                                 <tbody>
-                            
+                                {% for featureGroup in featureGroups %}
+                                    <tr>
+                                        <td class="ps-3">{{ featureGroup.id }}</td>
+                                        <td>{{ featureGroup.publish_date_from|date('Y-m-d H:i:s') }} ~ {{ featureGroup.publish_date_to|date('Y-m-d H:i:s') }}</td>
+                                        <td>{{ featureGroup.name }}</td>
+                                        <td></td>
+                                        <td>
+                                            <a class="btn btn-ec-regular" href="{{ url('admin_content_features_group_edit', { id: featureGroup.id }) }}">
+                                                <i class="fa fa-pencil"></i>
+                                            </a>
+                                        </td>
+                                        <td>
+                                            {# <a href="{{ url('admin_content_features_group_delete', { id: featureGroup.id }) }}">
+                                                {{ 'admin.common.delete'|trans }}
+                                            </a> #}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
                                 </tbody>
                             </table>
                         </div>

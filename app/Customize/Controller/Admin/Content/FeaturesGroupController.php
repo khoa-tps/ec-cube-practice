@@ -12,6 +12,8 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Customize\Repository\FeaturesRepository;
 use Customize\Repository\FeaturesGroupRepository;
 use Customize\Entity\FeaturesGroup;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Customize\Entity\FeaturesGroupLink;
 
 class FeaturesGroupController extends AbstractController
 {
@@ -29,7 +31,10 @@ class FeaturesGroupController extends AbstractController
      */
     public function index(Request $request)
     {
-        return [];
+        $featureGroups = $this->featuresGroupRepository->findAll();
+        return [
+            'featureGroups' => $featureGroups,
+        ];
     }
 
     /**
@@ -67,13 +72,39 @@ class FeaturesGroupController extends AbstractController
             'required' => true,
             'widget' => 'single_text',
             'html5' => true,
-        ])  ;
+        ])
+        ->add('related_category_ids', HiddenType::class, [
+            'mapped' => false,
+        ]);
         $form->handleRequest($request);
         $Features = $this->featuresRepository->findAll();
         
         if($form->isSubmitted() && $form->isValid()){
             $this->entityManager->persist($featureGroup);
             $this->entityManager->flush();
+
+            // Clear old links for edit case
+            $oldLinks = $this->entityManager->getRepository(FeaturesGroupLink::class)->findBy(['features_group' => $featureGroup]);
+            foreach ($oldLinks as $link) {
+                $this->entityManager->remove($link);
+            }
+            $this->entityManager->flush();
+
+            // Insert new links
+            $relatedCategoryIds = $form->get('related_category_ids')->getData();
+            if(!empty($relatedCategoryIds)) {
+                $featureIds = explode(',', $relatedCategoryIds);
+                foreach ($featureIds as $featureId) {
+                    $feature = $this->featuresRepository->find($featureId);
+                    if ($feature) {
+                        $link = new FeaturesGroupLink();
+                        $link->setFeaturesGroup($featureGroup);
+                        $link->setFeatures($feature);
+                        $this->entityManager->persist($link);
+                    }
+                }
+                $this->entityManager->flush();
+            }
 
             $this->addSuccess('admin.common.save_complete', 'admin');
             return $this->redirectToRoute('admin_content_features_group_list');
