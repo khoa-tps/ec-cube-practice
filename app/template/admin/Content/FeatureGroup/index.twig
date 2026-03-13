@@ -21,15 +21,16 @@ file that was distributed with this source code.
 
 {% block javascript %}
     <script>
+        $(function() {
         var oldSortNos = [];
         // 画面の中のsortNo一覧を保持
-        $('.sortable-item').each(function() {
-            oldSortNos.push(this.dataset.sortNo);
+        $('.sortable-container > .sortable-item').each(function() {
+            oldSortNos.push(parseInt(this.dataset.sortNo, 10));
         });
-        // rsort
+        // Keep ascending order so display order matches persisted sort_no.
         oldSortNos.sort(function(a, b) {
             return a - b;
-        }).reverse();
+        });
 
         $('.sortable-container').sortable({
             items: '> .sortable-item',
@@ -44,7 +45,7 @@ file that was distributed with this source code.
             // 並び替え後にsortNoを更新
             var newSortNos = {};
             var i = 0;
-            $('.sortable-item').each(function() {
+            $('.sortable-container > .sortable-item').each(function() {
                 newSortNos[this.dataset.id] = oldSortNos[i];
                 i++;
             });
@@ -74,6 +75,9 @@ file that was distributed with this source code.
 
         $('.sortable-item a.up').click(function(e) {
             e.preventDefault();
+            if ($(this).hasClass('disabled')) {
+                return;
+            }
             var current = $(this).closest('.sortable-item');
             current.prev().before(current);
             $('body').append($('<div class="modal-backdrop show"></div>'));
@@ -82,6 +86,9 @@ file that was distributed with this source code.
 
         $('.sortable-item a.down').click(function(e) {
             e.preventDefault();
+            if ($(this).hasClass('disabled')) {
+                return;
+            }
             var current = $(this).closest('.sortable-item');
             current.next().after(current);
             $('body').append($('<div class="modal-backdrop show"></div>'));
@@ -97,7 +104,7 @@ file that was distributed with this source code.
         });
         // 編集キャンセル
         $('.sortable-item').on('click', 'button.action-edit-cancel', function(e) {
-            location.href = '{{ url('admin_product_class_name') }}';
+            location.href = '{{ url('admin_content_features_group_list') }}';
         });
 
         // 編集時, エラーがあれば入力欄を表示.
@@ -105,6 +112,8 @@ file that was distributed with this source code.
             var current = $(this).parents('li');
             current.find('.mode-view').addClass('d-none');
             current.find('.mode-edit').removeClass('d-none');
+        });
+        redrawDisableAllows();
         });
     </script>
 {% endblock %}
@@ -159,18 +168,18 @@ file that was distributed with this source code.
 												<a class="btn btn-ec-regular" href="{{ url('admin_content_features_group_edit', { id: featureGroup.id }) }}">
 													<i class="fa fa-pencil"></i>
 												</a>
-                                                <a class="btn btn-ec-regular" href="{{ url('admin_content_features_group_delete', { id: featureGroup.id }) }}">
+                                                <a class="btn btn-ec-regular" href="{{ url('admin_content_features_group_delete', { id: featureGroup.id }) }}" onclick="return confirm('削除してもよろしいですか?')">
 													<i class="fa fa-trash"></i>
 												</a>
 											</td>
 										</tr>
 									{% endfor %}
 								</tbody>
-							</tr>
-						</tbody>
-					</tbody>
-				</table>
+							</table>
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
-</div></div></div>{% endblock %}
+{% endblock %}
