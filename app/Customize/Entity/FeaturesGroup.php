@@ -18,6 +18,15 @@ if(!class_exists(FeaturesGroup::class)){
      */
     class FeaturesGroup extends AbstractEntity
     {
+        
+        /**
+         * Constructor
+         */
+        public function __construct()
+        {
+            $this->features_group_links = new \Doctrine\Common\Collections\ArrayCollection();
+        }
+
         /**
          * @ORM\Column(type="integer", options={"unsigned":true})
          * @ORM\Id
@@ -44,6 +53,11 @@ if(!class_exists(FeaturesGroup::class)){
          * @ORM\Column(type="datetime", nullable=true)
          */
         private $publish_date_to;
+
+        /**
+         * @ORM\Column(type="smallint", nullable=true, options={"unsigned":true})
+         */
+        private $sort_no;
 
         /**
          * Get id.
@@ -144,17 +158,31 @@ if(!class_exists(FeaturesGroup::class)){
         }
 
         /**
+         * Get sort no.
+         *
+         * @return int|null
+         */
+        public function getSortNo(): ?int
+        {
+            return $this->sort_no;
+        }
+
+        /**
+         * Set sort no.
+         *
+         * @param int|null $sort_no
+         * @return FeaturesGroup
+         */
+        public function setSortNo(?int $sort_no): FeaturesGroup
+        {
+            $this->sort_no = $sort_no;
+            return $this;
+        }
+
+        /**
          * @ORM\OneToMany(targetEntity="Customize\Entity\FeaturesGroupLink", mappedBy="features_group", cascade={"persist"})
          */
         private $features_group_links;
-
-        /**
-         * Constructor
-         */
-        public function __construct()
-        {
-            $this->features_group_links = new \Doctrine\Common\Collections\ArrayCollection();
-        }
 
         /**
          * Get features_group_links.

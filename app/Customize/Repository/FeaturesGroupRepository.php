@@ -16,4 +16,14 @@ class FeaturesGroupRepository extends AbstractRepository
     {
         return FeaturesGroup::class;
     }
+
+    /**
+     * Get list of features group
+     * 
+     * @return array
+     */
+    public function getList()
+    {
+        return $this->findBy([], ['sort_no' => 'ASC']);
+    }
 }

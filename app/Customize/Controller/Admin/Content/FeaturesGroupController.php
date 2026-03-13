@@ -31,7 +31,7 @@ class FeaturesGroupController extends AbstractController
      */
     public function index(Request $request)
     {
-        $featureGroups = $this->featuresGroupRepository->findAll();
+        $featureGroups = $this->featuresGroupRepository->getList();
         return [
             'featureGroups' => $featureGroups,
         ];
@@ -80,6 +80,10 @@ class FeaturesGroupController extends AbstractController
         $Features = $this->featuresRepository->findAll();
         
         if($form->isSubmitted() && $form->isValid()){
+            if (is_null($id)) {
+                $maxSortNo = $this->entityManager->createQuery('SELECT MAX(f.sort_no) FROM Customize\Entity\FeaturesGroup f')->getSingleScalarResult();
+                $featureGroup->setSortNo($maxSortNo ? $maxSortNo + 1 : 1);
+            }
             $this->entityManager->persist($featureGroup);
             $this->entityManager->flush();
 

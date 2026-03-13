@@ -37,17 +37,22 @@ file that was distributed with this source code.
 							<table class="table table-striped mb-0">
 								<thead>
 									<tr>
+										<th></th>
 										<th class="ps-3">ID</th>
 										<th>公開日時</th>
 										<th>タイトル</th>
 										<th>特集カウント</th>
-										<th></th>
 										<th></th>
 									</tr>
 								</thead>
 								<tbody>
 									{% for featureGroup in featureGroups %}
 										<tr>
+											<td>
+												<div class="col-auto d-flex align-items-center">
+													<i class="fa fa-bars text-ec-gray"></i>
+												</div>
+											</td>
 											<td class="ps-3">{{ featureGroup.id }}</td>
 											<td>{{ featureGroup.publish_date_from|date('Y-m-d H:i:s') }}
 												~
@@ -55,31 +60,27 @@ file that was distributed with this source code.
 											<td>{{ featureGroup.name }}</td>
 											<td></td>
 											<td>
-												<a class="btn btn-ec-actionIcon action-down me-2 " href="" data-bs-toggle="tooltip" data-bs-placement="top" aria-label="下へ" data-bs-original-title="下へ">
-													<i class="fa fa-arrow-down fa-lg text-secondary">
-														<i></a>
-														<a class="btn btn-ec-actionIcon action-up me-2 " href="" data-bs-toggle="tooltip" data-bs-placement="top" aria-label="上へ" data-bs-original-title="上へ">
-															<i class="fa fa-arrow-up fa-lg text-secondary"></i>
-														</a>
-														<a class="btn btn-ec-regular" href="{{ url('admin_content_features_group_edit', { id: featureGroup.id }) }}">
-															<i class="fa fa-pencil"></i>
-														</a>
-													</td>
-													<td>
-														<a class="btn btn-ec-regular" href="{{ url('admin_content_features_group_delete', { id: featureGroup.id }) }}">
-															<i class="fa fa-trash"></i>
-														</a>
-													</td>
-												</tr>
-											{% endfor %}
+												<a class="btn btn-ec-actionIcon me-2 up {% if loop.first %}disabled{% endif %}" href="" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ 'admin.common.up'|trans }}">
+													<i class="fa fa-arrow-up fa-lg text-secondary"></i>
+												</a>
+												<a class="btn btn-ec-actionIcon me-2 down {% if loop.last %}disabled{% endif %}" href="" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ 'admin.common.down'|trans }}">
+													<i class="fa fa-arrow-down fa-lg text-secondary"></i>
+												</a>
+												<a class="btn btn-ec-regular" href="{{ url('admin_content_features_group_edit', { id: featureGroup.id }) }}">
+													<i class="fa fa-pencil"></i>
+												</a>
+                                                <a class="btn btn-ec-regular" href="{{ url('admin_content_features_group_delete', { id: featureGroup.id }) }}">
+													<i class="fa fa-trash"></i>
+												</a>
+											</td>
 										</tr>
-									</tbody>
+									{% endfor %}
 								</tbody>
-							</table>
-						</div>
-					</div>
-				</div>
+							</tr>
+						</tbody>
+					</tbody>
+				</table>
 			</div>
 		</div>
 	</div>
-{% endblock %}
+</div></div></div>{% endblock %}
