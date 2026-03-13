@@ -14,6 +14,7 @@ use Customize\Repository\FeaturesGroupRepository;
 use Customize\Entity\FeaturesGroup;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Customize\Entity\FeaturesGroupLink;
+use Symfony\Component\HttpFoundation\Response;
 
 class FeaturesGroupController extends AbstractController
 {
@@ -149,5 +150,27 @@ class FeaturesGroupController extends AbstractController
         $this->entityManager->flush();
         $this->addSuccess('admin.common.delete_complete', 'admin');
         return $this->redirectToRoute('admin_content_features_group_list');
+    }
+
+    /**
+     * @Route("/%eccube_admin_route%/content/features_group/sort_no/move", name="admin_content_features_group_sort_no_move", methods={"POST"})
+     * @param Request $request
+     * @return Response
+     */
+    public function sortNoMove(Request $request)
+    {
+        if ($request->isXmlHttpRequest()) {
+            foreach ($request->request->all() as $id => $sortNo) {
+                $featureGroup = $this->featuresGroupRepository->find($id);
+                if ($featureGroup) {
+                    $featureGroup->setSortNo($sortNo);
+                    $this->entityManager->persist($featureGroup);
+                }
+            }
+            $this->entityManager->flush();
+            return new Response();
+        }
+
+        return new Response('Bad Request', 400);
     }
 }
