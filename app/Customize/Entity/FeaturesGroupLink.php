@@ -89,7 +89,7 @@ if(!class_exists(FeaturesGroupLink::class)){
 
         /**
          * @ORM\ManyToOne(targetEntity="Customize\Entity\FeaturesGroup")
-         * @ORM\JoinColumn(name="features_group_id", referencedColumnName="id")
+         * @ORM\JoinColumn(name="features_group_id", referencedColumnName="id", onDelete="CASCADE")
          */
         private $features_group;
 

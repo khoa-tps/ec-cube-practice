@@ -109,10 +109,41 @@ class FeaturesGroupController extends AbstractController
             $this->addSuccess('admin.common.save_complete', 'admin');
             return $this->redirectToRoute('admin_content_features_group_list');
         }
-        
+        // Get existing links to pass to template for pre-checking
+        $ChoicedIds = [];
+        if (!is_null($featureGroup->getId())) {
+            $existingLinks = $featureGroup->getFeaturesGroupLinks();
+            foreach ($existingLinks as $link) {
+                if ($link->getFeatures()) {
+                    $ChoicedIds[] = $link->getFeatures()->getId();
+                }
+            }
+            // Pre-fill the hidden field so it has the right value when the form is submitted without changes
+            $form->get('related_category_ids')->setData(implode(',', $ChoicedIds));
+        }
+
         return [
             'form' => $form->createView(),
-            'features' => $Features
+            'features' => $Features,
+            'ChoicedIds' => $ChoicedIds,
         ];
+    }
+
+    /**
+     * @Route("/%eccube_admin_route%/content/features_group_delete/{id}", name="admin_content_features_group_delete", methods={"GET", "POST"})
+     * @Template("@admin/Content/FeatureGroup/delete.twig")
+     * @param Request $request
+     * @return array
+     */
+    public function delete(Request $request, $id)
+    {
+        $featureGroup = $this->featuresGroupRepository->find($id);
+        if (!$featureGroup) {
+            throw $this->createNotFoundException('FeaturesGroup not found');
+        }
+        $this->entityManager->remove($featureGroup);
+        $this->entityManager->flush();
+        $this->addSuccess('admin.common.delete_complete', 'admin');
+        return $this->redirectToRoute('admin_content_features_group_list');
     }
 }

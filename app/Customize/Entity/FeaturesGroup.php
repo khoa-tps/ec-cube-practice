@@ -3,6 +3,9 @@ namespace Customize\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Eccube\Entity\AbstractEntity;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+
 if(!class_exists(FeaturesGroup::class)){
    /**
      * Features
@@ -138,6 +141,29 @@ if(!class_exists(FeaturesGroup::class)){
         {
             $this->publish_date_to = $publish_date_to;
             return $this;
+        }
+
+        /**
+         * @ORM\OneToMany(targetEntity="Customize\Entity\FeaturesGroupLink", mappedBy="features_group", cascade={"persist"})
+         */
+        private $features_group_links;
+
+        /**
+         * Constructor
+         */
+        public function __construct()
+        {
+            $this->features_group_links = new \Doctrine\Common\Collections\ArrayCollection();
+        }
+
+        /**
+         * Get features_group_links.
+         *
+         * @return \Doctrine\Common\Collections\Collection
+         */
+        public function getFeaturesGroupLinks(): \Doctrine\Common\Collections\Collection
+        {
+            return $this->features_group_links;
         }
     }
 }
