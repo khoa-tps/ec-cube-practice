@@ -38,6 +38,7 @@ file that was distributed with this source code.
                                     <th>公開状態</th>
                                     <th>タイトル</th>
                                     <th></th>
+                                    <th></th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -49,8 +50,10 @@ file that was distributed with this source code.
                                         <td>{{ item.title }}</td>
                                         <td class="col px-0 text-center">
                                             <a href="{{ url('admin_content_features_edit', {id: item.id}) }}">
-                                                <i class="fa fa-eye fa-lg text-secondary"></i>
+                                                <i class="fa fa-pencil fa-lg text-secondary"></i>
                                             </a>
+                                        </td>
+                                        <td>
                                             <form action="{{ url('admin_content_features_delete', {id: item.id}) }}" method="post" id="delete-form-{{ item.id }}" style="display: inline;">
                                                 <input type="hidden" name="_method" value="DELETE">
                                                 <input type="hidden" name="_token" value="{{ csrf_token('_token') }}">

@@ -68,7 +68,8 @@ class FeaturesController extends AbstractController
                 $thumbnailSource = 'features/'.$thumbnail;
             }
         }
-        $topCategories = $this->categoryRepository->findAll();
+        $topCategories = $this->categoryRepository->getList();
+
         $choicedCategoryIds = is_array($Feature->getRelatedCategoryIds()) ? $Feature->getRelatedCategoryIds() : [];
         $keywords = is_array($Feature->getKeywords()) ? $Feature->getKeywords() : [];
         $form = $this->formFactory->createBuilder(FormType::class, $Feature)
@@ -129,7 +130,7 @@ class FeaturesController extends AbstractController
                 ],
             ])
             ->getForm();  
-            
+
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $relatedCategoryIds = array_values(array_filter(array_map('trim', explode(',', (string) $form->get('related_category_ids')->getData())), static function ($value) {

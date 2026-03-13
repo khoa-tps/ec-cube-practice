@@ -82,7 +82,7 @@ file that was distributed with this source code.
 										<input type="checkbox" id="feature_category_{{ Category.id }}" class="related-category-checkbox" value="{{ Category.id }}" {% if Category.id in ChoicedIds %}checked{% endif %}>
 										<label for="feature_category_{{ Category.id }}">{{ Category.name }}</label>
 										<ul class="list-unstyled">
-											{% for child,ChildCategory in Category.children %}
+											{% for ChildCategory in Category.children %}
 												{{ selfMacro.tree(ChoicedIds, ChildCategory, form) }}
 											{% endfor %}
 										</ul>
