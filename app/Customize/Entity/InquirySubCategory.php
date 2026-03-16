@@ -56,10 +56,10 @@ class InquirySubCategory
      */
     private $deleted_at;
 
-    /**
+        /**
+     * Get id
+     *
      * @return int
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
      */
     public function getId()
     {
@@ -78,7 +78,6 @@ class InquirySubCategory
 
     /**
      * @return int
-     * @ORM\Column(name="category_id", type="integer", nullable=false)
      */
     public function getCategoryId()
     {
@@ -97,7 +96,6 @@ class InquirySubCategory
 
     /**
      * @return string
-     * @ORM\Column(name="name", type="string", length=255, nullable=false)
      */
     public function getName()
     {
@@ -117,7 +115,6 @@ class InquirySubCategory
 
     /**
      * @return int
-     * @ORM\Column(name="sort_no", type="integer", nullable=false)
      */
     public function getSortNo()
     {
@@ -136,7 +133,6 @@ class InquirySubCategory
 
     /**
      * @return \DateTime
-     * @ORM\Column(name="created_at", type="datetime", nullable=false)
      */
     public function getCreatedAt()
     {
@@ -155,7 +151,6 @@ class InquirySubCategory
 
     /**
      * @return \DateTime
-     * @ORM\Column(name="updated_at", type="datetime", nullable=true)
      */
     public function getUpdatedAt()
     {
@@ -174,7 +169,6 @@ class InquirySubCategory
 
     /**
      * @return \DateTime
-     * @ORM\Column(name="deleted_at", type="datetime", nullable=true)
      */
     public function getDeletedAt()
     {

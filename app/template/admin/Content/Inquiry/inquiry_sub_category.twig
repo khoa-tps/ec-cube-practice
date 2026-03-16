@@ -140,20 +140,22 @@ file that was distributed with this source code.
 										<th class="ps-3">ID</th>
 										<th>作成日</th>
 										<th>名前</th>
+                                        <th>お問い合わせカテゴリー</th>
 										<th></th>
 									</tr>
 								</thead>
 								<tbody class="sortable-container">
 									{% for item in inquirySubCategory %}
-										<tr class="sortable-item" data-id="{{ item.category.id }}" data-sort-no="{{ item.category.sortNo }}">
+										<tr class="sortable-item" data-id="{{ item.subCategory.id }}" data-sort-no="{{ item.subCategory.sortNo }}">
 											<td>
 												<div class="col-auto d-flex align-items-center">
 													<i class="fa fa-bars text-ec-gray"></i>
 												</div>
 											</td>
-											<td class="ps-3">{{ item.category.id }}</td>
-											<td>{{ item.category.createdAt|date('Y-m-d H:i:s') }}</td>
-											<td>{{ item.category.name }}</td>
+											<td class="ps-3">{{ item.subCategory.id }}</td>
+											<td>{{ item.subCategory.createdAt|date('Y-m-d H:i:s') }}</td>
+											<td>{{ item.subCategory.name }}</td>
+											<td>{{ item.parentName }}</td>
 											<td>
 												<a class="btn btn-ec-actionIcon me-2 up {% if loop.first %}disabled{% endif %}" href="" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ 'admin.common.up'|trans }}">
 													<i class="fa fa-arrow-up fa-lg text-secondary"></i>
@@ -161,19 +163,19 @@ file that was distributed with this source code.
 												<a class="btn btn-ec-actionIcon me-2 down {% if loop.last %}disabled{% endif %}" href="" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ 'admin.common.down'|trans }}">
 													<i class="fa fa-arrow-down fa-lg text-secondary"></i>
 												</a>
-												<a class="btn btn-ec-regular" href="{{ url('admin_content_inquiry_category_edit', { id: item.category.id }) }}">
+												<a class="btn btn-ec-regular" href="{{ url('admin_content_inquiry_sub_category_edit', { id: item.subCategory.id }) }}">
 													<i class="fa fa-pencil"></i>
 												</a>
-                                                <form action="{{ url('admin_content_inquiry_category_delete', {id: item.category.id}) }}" method="post" id="delete-form-{{ item.category.id }}" style="display: inline;">
+                                                {# <form action="{{ url('admin_content_inquiry_sub_category_delete', {id: item.subCategory.id}) }}" method="post" id="delete-form-{{ item.subCategory.id }}" style="display: inline;">
                                                     <input type="hidden" name="_method" value="DELETE">
                                                     <input type="hidden" name="_token" value="{{ csrf_token('_token') }}">
                                                     <button type="submit" class="btn btn-link p-0" onclick="return confirm('削除してもよろしいですか?')">
 
-                                                        <a class="btn btn-ec-regular" href="{{ url('admin_content_inquiry_category_edit', { id: item.category.id }) }}">
+                                                        <a class="btn btn-ec-regular" href="{{ url('admin_content_inquiry_sub_category_edit', { id: item.subCategory.id }) }}">
                                                             <i class="fa fa-trash"></i>
                                                         </a>
                                                     </button>
-                                                </form>
+                                                </form> #}
 											</td>
 										</tr>
 									{% endfor %}

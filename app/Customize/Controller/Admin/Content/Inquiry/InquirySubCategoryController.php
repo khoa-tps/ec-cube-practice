@@ -31,21 +31,32 @@ class InquirySubCategoryController extends AbstractController
     
     /**
      * @Route("/%eccube_admin_route%/content/inquiry_sub_category", name="admin_content_inquiry_sub_category")
-     * @Route("/%eccube_admin_route%/content/inquiry_sub_category/{id}", name="admin_content_inquiry_sub_category_edit", requirements={"id" = "\d+"})
      * @Template("@admin/Content/Inquiry/inquiry_sub_category.twig")
      */
     public function index()
     {
         $inquirySubCategory = $this->inquirySubCategoryRepository->findAll();
-
+        
+        // Prepare parent names for each category
+        $categoriesWithParentNames = [];
+        foreach ($inquirySubCategory as $category) {
+            $parentName = '';
+            if ($category->getCategoryId()) {
+                $parentName = $this->inquiryCategoryRepository->find($category->getCategoryId())->getName();
+            }
+            $categoriesWithParentNames[] = [
+                'subCategory' => $category,
+                'parentName' => $parentName
+            ];
+        }
         return [
-            'inquirySubCategory' => $inquirySubCategory
+            'inquirySubCategory' => $categoriesWithParentNames
         ];   
     }
 
     /**
      * @Route("/%eccube_admin_route%/content/inquiry_sub_category/create", name="admin_content_inquiry_sub_category_create")
-     * @Route("/%eccube_admin_route%/content/inquiry_sub_category/create/{id}", name="admin_content_inquiry_sub_category_create_edit", requirements={"id" = "\d+"})
+     * @Route("/%eccube_admin_route%/content/inquiry_sub_category/edit/{id}", name="admin_content_inquiry_sub_category_edit", requirements={"id" = "\d+"})
      * @Template("@admin/Content/Inquiry/inquiry_sub_category_create.twig")
      */
     public function create(Request $request, $id = null)
@@ -64,6 +75,11 @@ class InquirySubCategoryController extends AbstractController
             'class' => InquiryCategory::class,
             'choice_label' => 'name',
             'required' => false,
+            'query_builder' => function($repository) {
+                return $repository->createQueryBuilder('ic')
+                    ->where('ic.parent_id > 0')
+                    ->orderBy('ic.name', 'ASC');
+            },
         ])
         ->add('sort_no', IntegerType::class)
            ->add('created_at', HiddenType::class, [
