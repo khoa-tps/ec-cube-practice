@@ -10,13 +10,13 @@ file that was distributed with this source code.
 #}
 {% extends '@admin/default_frame.twig' %}
 
-{% set menus = ['content', 'inquiry_category'] %}
+{% set menus = ['content', 'inquiry_sub_category'] %}
 
 {% block title %}
-	{{ 'admin.content.inquiry_category_management'|trans }}
+	{{ 'admin.content.inquiry_sub_category'|trans }}
 {% endblock %}
 {% block sub_title %}
-	{{ 'admin.content.inquiry'|trans }}
+	{{ 'admin.content.inquiry_sub_category'|trans }}
 {% endblock %}
 
 {% block javascript %}
@@ -51,7 +51,7 @@ file that was distributed with this source code.
             });
             
             $.ajax({
-                url: '{{ url('admin_content_inquiry_category_sort_no_move') }}',
+                url: '{{ url('admin_content_features_group_sort_no_move') }}',
                 type: 'POST',
                 data: newSortNos
             }).done(function() {
@@ -104,7 +104,7 @@ file that was distributed with this source code.
         });
         // 編集キャンセル
         $('.sortable-item').on('click', 'button.action-edit-cancel', function(e) {
-            location.href = '{{ url('admin_content_inquiry_category_sort_no_move') }}';
+            location.href = '{{ url('admin_content_features_group_list') }}';
         });
 
         // 編集時, エラーがあれば入力欄を表示.
@@ -140,12 +140,11 @@ file that was distributed with this source code.
 										<th class="ps-3">ID</th>
 										<th>作成日</th>
 										<th>名前</th>
-                                        <th>親カテゴリ</th>
 										<th></th>
 									</tr>
 								</thead>
 								<tbody class="sortable-container">
-									{% for item in inquiryCategories %}
+									{% for item in inquirySubCategory %}
 										<tr class="sortable-item" data-id="{{ item.category.id }}" data-sort-no="{{ item.category.sortNo }}">
 											<td>
 												<div class="col-auto d-flex align-items-center">
@@ -155,7 +154,6 @@ file that was distributed with this source code.
 											<td class="ps-3">{{ item.category.id }}</td>
 											<td>{{ item.category.createdAt|date('Y-m-d H:i:s') }}</td>
 											<td>{{ item.category.name }}</td>
-                                            <td>{{ item.parentName }}</td>
 											<td>
 												<a class="btn btn-ec-actionIcon me-2 up {% if loop.first %}disabled{% endif %}" href="" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ 'admin.common.up'|trans }}">
 													<i class="fa fa-arrow-up fa-lg text-secondary"></i>

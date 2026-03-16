@@ -3,3 +3,5 @@ admin.content.features_management: 特集一覧
 admin.content.features_group_management: 特集グループ一覧
 admin.content.inquiry_category_management: 問い合わせカテゴリ管理
 admin.content.inquiry_category: 問い合わせカテゴリ
+admin.content.inquiry_sub_category_management: 問い合わせサブカテゴリ管理
+admin.content.inquiry_sub_category: 問い合わせサブカテゴリ

@@ -11,13 +11,13 @@ file that was distributed with this source code.
 {% extends '@admin/default_frame.twig' %}
 {% form_theme form '@admin/Form/bootstrap_4_horizontal_layout.html.twig' %}
 
-{% set menus = ['content', 'features'] %}
+{% set menus = ['content', 'inquiry_category'] %}
 
 {% block title %}
-	{{ 'admin.content.features_management'|trans }}
+	{{ 'admin.content.inquiry_category'|trans }}
 {% endblock %}
 {% block sub_title %}
-	{{ 'admin.content.contents_management'|trans }}
+	{{ 'admin.content.inquiry_category'|trans }}
 {% endblock %}
 
 {% block main %}
@@ -29,7 +29,7 @@ file that was distributed with this source code.
 					<div class="card-header">
 						<div class="row">
 							<div class="col-8">
-								<span class="card-title">特集登録</span>
+								<span class="card-title">{{ 'admin.content.inquiry_category'|trans }}</span>
 							</div>
 						</div>
 					</div>

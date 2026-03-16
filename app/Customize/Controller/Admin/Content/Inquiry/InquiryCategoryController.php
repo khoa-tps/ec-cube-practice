@@ -140,7 +140,7 @@ class InquiryCategoryController extends AbstractController
     }
 
     /**
-     * @Route("/%eccube_admin_route%/content/inquiry_category/sort_no_move", name="admin_content_features_group_sort_no_move", methods={"POST"})
+     * @Route("/%eccube_admin_route%/content/inquiry_category/sort_no_move", name="admin_content_inquiry_category_sort_no_move", methods={"POST"})
      */
     public function sortNoMove(Request $request)
     {
