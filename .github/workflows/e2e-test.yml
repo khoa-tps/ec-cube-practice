@@ -153,20 +153,22 @@ jobs:
 
       - name: Codeception
         if: |
-           matrix.group != 'restrict-fileupload' &&
-           matrix.group != 'change-display-order'
+           matrix.group != 'restrict-fileupload'
         uses: nick-invision/retry@v3
         with:
           timeout_minutes: 40
           max_attempts: 2
           retry_on: error
           command: |
+            # DBはdoctrineがdev環境のカーネルで操作するため--env=devで統一
+            # (接続先DBはDATABASE_URL環境変数で決まるため環境に依存しない)
             bin/console doctrine:schema:drop --force --env=dev
             bin/console doctrine:schema:create --env=dev
             bin/console eccube:fixtures:load --env=dev
-            bin/console cache:clear --no-warmup --env=dev
+            # キャッシュはAPP_ENV=codeceptionで動作するHTTPサーバ側のものをクリアする必要があるため${APP_ENV}を使用
+            bin/console cache:clear --no-warmup --env=${APP_ENV}
             sed -i "s|%GITHUB_WORKSPACE%|${GITHUB_WORKSPACE}|g" codeception/_envs/github_action.yml
-            vendor/bin/codecept -vvv run acceptance --env chrome,github_action -g ${GROUP} --skip-group restrict-file-upload --skip-group change-display-order --html report.html
+            vendor/bin/codecept -vvv run acceptance --env chrome,github_action -g ${GROUP} --skip-group restrict-file-upload --html report.html
         env:
           APP_ENV: ${{ matrix.app_env }}
           DATABASE_URL: ${{ matrix.database_url }}
@@ -176,20 +178,21 @@ jobs:
           GROUP: ${{ matrix.group }}
           SYMFONY_DEPRECATIONS_HELPER: weak
 
-      - name: Codeception with ${{ matrix.group }}
-        if: |
-          matrix.group == 'restrict-fileupload' ||
-          matrix.group == 'change-display-order'
+      - name: Codeception with restrict-fileupload
+        if: ${{ matrix.group == 'restrict-fileupload' }}
         uses: nick-invision/retry@v3
         with:
           timeout_minutes: 40
           max_attempts: 2
           retry_on: error
           command: |
+            # DBはdoctrineがdev環境のカーネルで操作するため--env=devで統一
+            # (接続先DBはDATABASE_URL環境変数で決まるため環境に依存しない)
             bin/console doctrine:schema:drop --force --env=dev
             bin/console doctrine:schema:create --env=dev
             bin/console eccube:fixtures:load --env=dev
-            bin/console cache:clear --no-warmup --env=dev
+            # キャッシュはAPP_ENV=codeceptionで動作するHTTPサーバ側のものをクリアする必要があるため${APP_ENV}を使用
+            bin/console cache:clear --no-warmup --env=${APP_ENV}
             sed -i "s|%GITHUB_WORKSPACE%|${GITHUB_WORKSPACE}|g" codeception/_envs/github_action.yml
             vendor/bin/codecept -vvv run acceptance --env chrome,github_action -g ${GROUP} --html report.html
         env:
