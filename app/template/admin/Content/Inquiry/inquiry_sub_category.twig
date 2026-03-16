@@ -51,7 +51,7 @@ file that was distributed with this source code.
             });
             
             $.ajax({
-                url: '{{ url('admin_content_features_group_sort_no_move') }}',
+                url: '{{ url('admin_content_inquiry_sub_category_sort_no_move') }}',
                 type: 'POST',
                 data: newSortNos
             }).done(function() {
@@ -104,7 +104,7 @@ file that was distributed with this source code.
         });
         // 編集キャンセル
         $('.sortable-item').on('click', 'button.action-edit-cancel', function(e) {
-            location.href = '{{ url('admin_content_features_group_list') }}';
+            location.href = '{{ url('admin_content_inquiry_sub_category') }}';
         });
 
         // 編集時, エラーがあれば入力欄を表示.
@@ -166,16 +166,16 @@ file that was distributed with this source code.
 												<a class="btn btn-ec-regular" href="{{ url('admin_content_inquiry_sub_category_edit', { id: item.subCategory.id }) }}">
 													<i class="fa fa-pencil"></i>
 												</a>
-                                                {# <form action="{{ url('admin_content_inquiry_sub_category_delete', {id: item.subCategory.id}) }}" method="post" id="delete-form-{{ item.subCategory.id }}" style="display: inline;">
+                                                <form action="{{ url('admin_content_inquiry_sub_category_delete', {id: item.subCategory.id}) }}" method="post" id="delete-form-{{ item.subCategory.id }}" style="display: inline;">
                                                     <input type="hidden" name="_method" value="DELETE">
                                                     <input type="hidden" name="_token" value="{{ csrf_token('_token') }}">
                                                     <button type="submit" class="btn btn-link p-0" onclick="return confirm('削除してもよろしいですか?')">
 
-                                                        <a class="btn btn-ec-regular" href="{{ url('admin_content_inquiry_sub_category_edit', { id: item.subCategory.id }) }}">
+                                                        <a class="btn btn-ec-regular">
                                                             <i class="fa fa-trash"></i>
                                                         </a>
                                                     </button>
-                                                </form> #}
+                                                </form>
 											</td>
 										</tr>
 									{% endfor %}

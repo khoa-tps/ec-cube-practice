@@ -35,7 +35,7 @@ class InquirySubCategoryController extends AbstractController
      */
     public function index()
     {
-        $inquirySubCategory = $this->inquirySubCategoryRepository->findAll();
+        $inquirySubCategory = $this->inquirySubCategoryRepository->findBy([], ['sort_no' => 'ASC']);
         
         // Prepare parent names for each category
         $categoriesWithParentNames = [];
@@ -52,6 +52,17 @@ class InquirySubCategoryController extends AbstractController
         return [
             'inquirySubCategory' => $categoriesWithParentNames
         ];   
+    }
+
+    /**
+     * @Route("/%eccube_admin_route%/content/inquiry_sub_category/delete/{id}", name="admin_content_inquiry_sub_category_delete", requirements={"id" = "\d+"})
+     */
+    public function delete(Request $request, $id)
+    {
+        $inquirySubCategory = $this->inquirySubCategoryRepository->find($id);
+        $this->entityManager->remove($inquirySubCategory);
+        $this->entityManager->flush();
+        return $this->redirectToRoute('admin_content_inquiry_sub_category');
     }
 
     /**
@@ -111,4 +122,20 @@ class InquirySubCategoryController extends AbstractController
             'form' => $form->createView()
         ];
     }
+
+    /**
+     * @Route("/%eccube_admin_route%/content/inquiry_sub_category/sort_no_move", name="admin_content_inquiry_sub_category_sort_no_move", methods={"POST"})
+     */
+    public function sortNoMove(Request $request)
+    {
+        $sortNos = $request->request->all();
+        foreach ($sortNos as $id => $sortNo) {
+            $inquirySubCategory = $this->inquirySubCategoryRepository->find($id);
+            $inquirySubCategory->setSortNo($sortNo);
+            $this->entityManager->persist($inquirySubCategory);
+        }
+        $this->entityManager->flush();
+        return $this->json(['status' => 'success']);
+    }
 }
+
