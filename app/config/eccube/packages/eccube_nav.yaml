@@ -76,15 +76,6 @@ parameters:
                 features_group:
                     name: admin.content.features_group_management
                     url: admin_content_features_group_list
-                inquiry_category:
-                    name: admin.content.inquiry_category_management
-                    url: admin_content_inquiry_category
-                inquiry_sub_category:
-                    name: admin.content.inquiry_sub_category_management
-                    url: admin_content_inquiry_sub_category
-                inquiry:
-                    name: admin.content.inquiry_management
-                    url: admin_content_inquiry_list
                 page:
                     name: admin.content.page_management
                     url: admin_content_page
@@ -103,6 +94,20 @@ parameters:
                 maintenance:
                     name: admin.content.maintenance_management
                     url: admin_content_maintenance
+        inquiry_management:
+            name: admin.content.inquiry_management
+            icon: fa-question-circle
+            url: admin_content_inquiry_list
+            children:
+                inquiry_category:
+                    name: admin.content.inquiry_category_management
+                    url: admin_content_inquiry_category
+                inquiry_sub_category:
+                    name: admin.content.inquiry_sub_category_management
+                    url: admin_content_inquiry_sub_category
+                inquiry:
+                    name: admin.content.inquiry_list_management
+                    url: admin_content_inquiry_list
         setting:
             name: admin.setting
             icon: fa-cog

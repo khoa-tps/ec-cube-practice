@@ -11,4 +11,16 @@ class InquiryRepository extends AbstractRepository
     {
         parent::__construct($registry, Inquiry::class);
     }
+    
+    /**
+     * @param int $id
+     * @param int $status
+     * @return void
+     */
+    public function updateStatus($id, $status)
+    {
+        $inquiry = $this->find($id);
+        $inquiry->setStatus($status);
+        $this->getEntityManager()->flush();
+    }
 }
