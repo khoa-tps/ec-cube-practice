@@ -36,8 +36,21 @@ class InquiryCategoryController extends AbstractController
     {
         $inquiryCategories = $this->inquiryCategoryRepository->getList();
         
+        // Prepare parent names for each category
+        $categoriesWithParentNames = [];
+        foreach ($inquiryCategories as $category) {
+            $parentName = '';
+            if ($category->getParentId()) {
+                $parentName = $this->inquiryCategoryRepository->getParentName($category->getParentId());
+            }
+            $categoriesWithParentNames[] = [
+                'category' => $category,
+                'parentName' => $parentName
+            ];
+        }
+        
         return [
-            'inquiryCategories' => $inquiryCategories,
+            'inquiryCategories' => $categoriesWithParentNames
         ];
     }
 
@@ -80,7 +93,7 @@ class InquiryCategoryController extends AbstractController
             $parentId = $form->get('parent_id')->getData() ?? 0;
             if($parentId){
                 $parentInquiryCategory = $this->inquiryCategoryRepository->find($parentId);
-                $inquiryCategory->setParent($parentInquiryCategory);
+                $inquiryCategory->setParentId($parentInquiryCategory->getId());
             }
             $inquiryCategory->setCreatedAt(new \DateTime());
             $inquiryCategory->setUpdatedAt(new \DateTime());
@@ -90,7 +103,7 @@ class InquiryCategoryController extends AbstractController
         }
         
         return [
-            'form' => $form->createView(),
+            'form' => $form->createView()
         ];
     }
 

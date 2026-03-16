@@ -27,4 +27,20 @@ class InquiryCategoryRepository extends AbstractRepository
     {
         return $this->findBy([], ['sort_no' => 'ASC']);
     }
+
+    /**
+     * Get parent name by parent ID
+     *
+     * @param int $id
+     * @return string
+     */
+    public function getParentName($id)
+    {
+        $category = $this->createQueryBuilder('ic')
+            ->where('ic.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getOneOrNullResult();
+        return $category ? $category->getName() : '';
+    }
 }
