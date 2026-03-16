@@ -70,27 +70,24 @@ class Inquiry
     }
     
     /**
-     * @ORM\Column(name="user_id", type="integer", nullable=false)
      * @return int
      */
-    public function getUser_id()
+    public function getUserId()
     {
         return $this->user_id;
     }
     
     /**
-     * @ORM\Column(name="user_id", type="integer", nullable=false)
      * @param int $user_id
      * @return Inquiry
      */
-    public function setUser_id($user_id)
+    public function setUserId($user_id)
     {
         $this->user_id = $user_id;
         return $this;
     }
     
     /**
-     * @ORM\Column(name="email", type="string", length=255, nullable=false)
      * @return string
      */
     public function getEmail()
@@ -99,7 +96,6 @@ class Inquiry
     }
     
     /**
-     * @ORM\Column(name="email", type="string", length=255, nullable=false)
      * @param string $email
      * @return Inquiry
      */
@@ -110,7 +106,6 @@ class Inquiry
     }
     
     /**
-     * @ORM\Column(name="title", type="string", length=255, nullable=false)
      * @return string
      */
     public function getTitle()
@@ -119,7 +114,6 @@ class Inquiry
     }
     
     /**
-     * @ORM\Column(name="title", type="string", length=255, nullable=false)
      * @param string $title
      * @return Inquiry
      */
@@ -130,7 +124,6 @@ class Inquiry
     }
     
     /**
-     * @ORM\Column(name="detail", type="text", nullable=false)
      * @return string
      */
     public function getDetail()
@@ -139,7 +132,6 @@ class Inquiry
     }
     
     /**
-     * @ORM\Column(name="detail", type="text", nullable=false)
      * @param string $detail
      * @return Inquiry
      */
@@ -150,7 +142,6 @@ class Inquiry
     }
     
     /**
-     * @ORM\Column(name="status", type="integer", nullable=false)
      * @return int
      */
     public function getStatus()
@@ -159,7 +150,6 @@ class Inquiry
     }
     
     /**
-     * @ORM\Column(name="status", type="integer", nullable=false)
      * @param int $status
      * @return Inquiry
      */
@@ -170,20 +160,18 @@ class Inquiry
     }
     
     /**
-     * @ORM\Column(name="created_at", type="datetime", nullable=false)
      * @return \DateTime
      */
-    public function getCreated_at()
+    public function getCreatedAt()
     {
         return $this->created_at;
     }
     
     /**
-     * @ORM\Column(name="created_at", type="datetime", nullable=false)
      * @param \DateTime $created_at
      * @return Inquiry
      */
-    public function setCreated_at($created_at)
+    public function setCreatedAt($created_at)
     {
         $this->created_at = $created_at;
         return $this;
