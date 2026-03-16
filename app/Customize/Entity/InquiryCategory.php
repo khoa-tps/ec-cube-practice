@@ -24,7 +24,7 @@ class InquiryCategory
     /**
      * @var int
      *
-     * @ORM\Column(name="parent_id", type="integer", nullable=false)
+     * @ORM\Column(name="parent_id", type="integer", nullable=true)
      */
     private $parent_id;
 

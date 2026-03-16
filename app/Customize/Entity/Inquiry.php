@@ -50,10 +50,12 @@ class Inquiry
      */
     private $status;
     
-    private static $statusLabels = [
-        0 => '処理を待っています',
-        1 => '処理が終わりました',
-    ];
+    /**
+     * @var \Customize\Entity\InquirySubCategory
+     * @ORM\ManyToOne(targetEntity="Customize\Entity\InquirySubCategory")
+     * @ORM\JoinColumn(name="inquiry_sub_category_id", referencedColumnName="id", nullable=true)
+     */
+    private $inquiry_sub_category;
     
     /**
      * @var \DateTime
@@ -142,6 +144,24 @@ class Inquiry
     }
     
     /**
+     * @return \Customize\Entity\InquirySubCategory|null
+     */
+    public function getInquirySubCategory()
+    {
+        return $this->inquiry_sub_category;
+    }
+    
+    /**
+     * @param \Customize\Entity\InquirySubCategory|null $inquiry_sub_category
+     * @return Inquiry
+     */
+    public function setInquirySubCategory($inquiry_sub_category = null)
+    {
+        $this->inquiry_sub_category = $inquiry_sub_category;
+        return $this;
+    }
+    
+    /**
      * @return int
      */
     public function getStatus()
@@ -174,6 +194,25 @@ class Inquiry
     public function setCreatedAt($created_at)
     {
         $this->created_at = $created_at;
+        return $this;
+    }
+
+
+    /**
+     * @return int
+     */
+    public function getInquirySubCategoryId()
+    {
+        return $this->inquiry_sub_category?->getId();
+    }
+    
+    /**
+     * @param int|null $inquiry_sub_category_id
+     * @return Inquiry
+     */
+    public function setInquirySubCategoryId($inquiry_sub_category_id)
+    {
+        $this->inquiry_sub_category = $inquiry_sub_category_id;
         return $this;
     }
 }
