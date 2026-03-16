@@ -17,4 +17,20 @@ class InquirySubCategoryRepository extends AbstractRepository
     {
         return InquirySubCategory::class;
     }
+
+    /**
+     * Get sub categories by category ID
+     *
+     * @param int $categoryId
+     * @return array
+     */
+    public function getSubCategories($categoryId)
+    {
+        $category = $this->createQueryBuilder('isc')
+            ->where('isc.category_id = :category_id')
+            ->setParameter('category_id', $categoryId)
+            ->getQuery()
+            ->getResult();
+        return $category ? $category : null;
+    }
 }

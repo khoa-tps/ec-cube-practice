@@ -8,6 +8,7 @@ use Eccube\Controller\AbstractController;
 use Customize\Repository\InquiryRepository;
 use Customize\Entity\Inquiry;
 use Customize\Repository\InquiryCategoryRepository;
+use Customize\Repository\InquirySubCategoryRepository;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -17,11 +18,13 @@ class InquiryManagementController extends AbstractController
 {
     private $inquiryRepository;
     private $inquiryCategoryRepository;
+    private $inquirySubCategoryRepository;
 
-    public function __construct(InquiryRepository $inquiryRepository, InquiryCategoryRepository $inquiryCategoryRepository)
+    public function __construct(InquiryRepository $inquiryRepository, InquiryCategoryRepository $inquiryCategoryRepository, InquirySubCategoryRepository $inquirySubCategoryRepository)
     {
         $this->inquiryRepository = $inquiryRepository;
         $this->inquiryCategoryRepository = $inquiryCategoryRepository;
+        $this->inquirySubCategoryRepository = $inquirySubCategoryRepository;
     }
     /**
      * @Route("/mypage/inquiry", name="mypage_inquiry")
@@ -58,10 +61,18 @@ class InquiryManagementController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $Inquiry = $form->getData(); // ← Get data from form
+            $Inquiry = $form->getData();
             $Inquiry->setUserId($this->getUser()->getId());
             $Inquiry->setStatus(0);
             $Inquiry->setCreatedAt(new \DateTime());
+            
+            // Convert sub_category_id string to entity object
+            $subCategoryId = $request->request->get('sub_inquiry_category');
+            if ($subCategoryId) {
+                $subCategory = $this->inquirySubCategoryRepository->find($subCategoryId);
+                $Inquiry->setInquirySubCategory($subCategory);
+            }
+            
             $this->entityManager->persist($Inquiry);
             $this->entityManager->flush();
             
@@ -91,7 +102,7 @@ class InquiryManagementController extends AbstractController
     public function getSubCategories(Request $request)
     {
         $categoryId = $request->request->get('category_id');
-        $subCategories = $this->inquiryCategoryRepository->getSubCategories($categoryId);
+        $subCategories = $this->inquirySubCategoryRepository->getSubCategories($categoryId);
         return $this->json([
             'sub_categories' => $subCategories,
         ]);

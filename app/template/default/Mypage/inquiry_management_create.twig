@@ -48,12 +48,12 @@ file that was distributed with this source code.
                     category_id: categoryId
                 },
                 success: function(response) {
-                    var childCategories = response.child_categories;
-                    var childCategorySelect = $('#sub_inquiry_category');
-                    childCategorySelect.empty();
-                    childCategorySelect.append('<option value="">Select Category</option>');
-                    $.each(childCategories, function(index, category) {
-                        childCategorySelect.append('<option value="' + category.id + '">' + category.name + '</option>');
+                    var subCategories = response.sub_categories;
+                    var subCategorySelect = $('#sub_inquiry_category');
+                    subCategorySelect.empty();
+                    subCategorySelect.append('<option value="">Select Sub Category</option>');
+                    $.each(subCategories, function(index, category) {
+                        subCategorySelect.append('<option value="' + category.id + '">' + category.name + '</option>');
                     });
                 }
             });

@@ -58,16 +58,6 @@ class InquiryCategoryRepository extends AbstractRepository
         return $category ? $category : null;
     }
 
-    public function getSubCategories($parentId)
-    {
-        $category = $this->createQueryBuilder('ic')
-            ->where('ic.parent_id = :parent_id')
-            ->setParameter('parent_id', $parentId)
-            ->getQuery()
-            ->getResult();
-        return $category ? $category : null;
-    }
-
     /**
      * Get parent name by parent ID
      *
