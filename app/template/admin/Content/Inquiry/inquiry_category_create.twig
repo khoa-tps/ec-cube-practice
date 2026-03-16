@@ -1,0 +1,191 @@
+{#
+This file is part of EC-CUBE
+
+Copyright(c) EC-CUBE CO.,LTD. All Rights Reserved.
+
+http://www.ec-cube.co.jp/
+
+For the full copyright and license information, please view the LICENSE
+file that was distributed with this source code.
+#}
+{% extends '@admin/default_frame.twig' %}
+{% form_theme form '@admin/Form/bootstrap_4_horizontal_layout.html.twig' %}
+
+{% set menus = ['content', 'features'] %}
+
+{% block title %}
+	{{ 'admin.content.features_management'|trans }}
+{% endblock %}
+{% block sub_title %}
+	{{ 'admin.content.contents_management'|trans }}
+{% endblock %}
+
+{% block main %}
+	{{ form_start(form, { attr: { id: 'content_features_form' } }) }}
+	<div class="c-contentsArea__cols">
+		<div class="c-contentsArea__primaryCol">
+			<div class="c-primaryCol">
+				<div class="card rounded border-0 mb-4">
+					<div class="card-header">
+						<div class="row">
+							<div class="col-8">
+								<span class="card-title">特集登録</span>
+							</div>
+						</div>
+					</div>
+					<div class="card-body">
+						<div class="row mb-3">
+							<label class="col-sm-4 col-form-label">	問い合わせ区分<i class="fa fa-question-circle fa-lg ms-1"></i>
+							</label>
+							<div class="col-sm-8">
+								<div class="row">
+									<div class="col-sm-4">
+										{{ form_widget(form.parent_id) }}
+									</div>
+								</div>
+								{{ form_errors(form.parent_id) }}
+							</div>
+						</div>
+						<div class="row mb-3">
+							<label class="col-sm-4 col-form-label">名前<i class="fa fa-question-circle fa-lg ms-1"></i>
+							</label>
+							<div class="col-sm-8">
+								{{ form_widget(form.name) }}
+								{{ form_errors(form.name) }}
+							</div>
+						</div>
+						<div class="row mb-3">
+							<label class="col-sm-4 col-form-label">ソート順<i class="fa fa-question-circle fa-lg ms-1"></i>
+							</label>
+							<div class="col-sm-8">
+								{{ form_widget(form.sort_no) }}
+								{{ form_errors(form.sort_no) }}
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="c-conversionArea">
+		<div class="c-conversionArea__container">
+			<div class="row justify-content-between align-items-center">
+				<div class="col-6">
+					<div class="c-conversionArea__leftBlockItem">
+						<a class="c-baseLink" href="{{ url('admin_content_features') }}">
+							<i class="fa fa-backward" aria-hidden="true"></i>
+							<span>{{ 'admin.content.features_management'|trans }}</span>
+						</a>
+					</div>
+				</div>
+				<div class="col-6">
+					<div class="row align-items-center justify-content-end">
+						<div class="col-6">
+                        <div id="ex-conversion-action" class="row align-items-center justify-content-end">
+                            <div class="col-auto">
+                                {# {{ form_widget(form.status) }}
+                                {{ form_errors(form.status) }} #}
+                            </div>
+                            <div class="col-auto">
+                                <button class="btn btn-ec-conversion px-5" type="submit">{{ 'admin.common.registration'|trans }}</button>
+                            </div>
+                        </div>
+                    </div>
+				</div>
+			</div>
+		</div>
+	</div>
+	{{ form_end(form) }}
+{% endblock %}
+
+{% block javascript %}
+<script>
+$(function() {
+   
+        var editor = ace.edit('description');
+        editor.session.setMode('ace/mode/text');
+        editor.setTheme('ace/theme/tomorrow');
+        editor.setValue('{{ form.description.vars.value|default('')|escape('js') }}');
+        editor.setOptions({
+            showInvisibles: true
+        });
+
+        $("#description").resizable({
+            resize: function () {
+                editor.resize();
+            }
+        });
+
+        var editorCatchphrase = null;
+        if (document.getElementById('catchphrase')) {
+            editorCatchphrase = ace.edit('catchphrase');
+            editorCatchphrase.session.setMode('ace/mode/text');
+            editorCatchphrase.setTheme('ace/theme/tomorrow');
+            editorCatchphrase.setValue('{{ form.catchphrase.vars.value|default('')|escape('js') }}');
+            editorCatchphrase.setOptions({
+                showInvisibles: true
+            });
+
+            $("#catchphrase").resizable({
+                resize: function () {
+                    editorCatchphrase.resize();
+                }
+            });
+        }
+
+        $('#content_features_form').on('submit', function() {
+			const ids = $('.related-category-checkbox:checked')
+				.map(function () { return $(this).val(); })
+				.get();
+            $('#form_description').val(editor.getValue());
+			$('#form_related_category_ids').val(ids.join(','));
+			if (editorCatchphrase !== null) {
+                $('#form_catchphrase').val(editorCatchphrase.getValue());
+            }
+        });
+
+
+		const tags = [];
+		const $input = $('#keyword-input');
+		const $tags = $('#keyword-tags');
+		const $hidden = $('#form_keywords');
+
+		function renderTags() {
+		$tags.empty();
+		tags.forEach((tag, idx) => {
+			$tags.append(`<span class="badge bg-secondary me-1">${tag} <a href="#" data-idx="${idx}" class="text-white ms-1">x</a></span>`);
+		});
+		$hidden.val(tags.join(','));
+		}
+
+		function addTag(value) {
+		const v = value.trim();
+		if (!v || tags.includes(v)) return;
+		tags.push(v);
+		renderTags();
+		}
+
+		const initialKeywords = ($hidden.val() || '')
+			.split(',')
+			.map(function (value) { return value.trim(); })
+			.filter(function (value) { return value !== ''; });
+		initialKeywords.forEach(function (keyword) {
+			addTag(keyword);
+		});
+
+		$input.on('keydown', function (e) {
+		if (e.key === 'Tab' || e.key === 'Enter' || e.key === ',') {
+			e.preventDefault();
+			addTag($input.val());
+			$input.val('');
+		}
+		});
+
+		$tags.on('click', 'a[data-idx]', function (e) {
+		e.preventDefault();
+		tags.splice(Number($(this).data('idx')), 1);
+		renderTags();
+		});
+});
+</script>
+{% endblock %}
