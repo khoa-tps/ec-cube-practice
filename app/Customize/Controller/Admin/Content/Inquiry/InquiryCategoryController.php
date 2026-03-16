@@ -71,6 +71,8 @@ class InquiryCategoryController extends AbstractController
         $builder = $this->formFactory->createBuilder(FormType::class, $inquiryCategory)
         ->add('name', TextType::class)
         ->add('parent_id', EntityType::class, [
+            'placeholder' => '選択してください',
+            'data' => $inquiryCategory->getParentId() ? $this->inquiryCategoryRepository->find($inquiryCategory->getParentId()) : null,
             'class' => InquiryCategory::class,
             'choice_label' => 'name',
             'required' => false,
@@ -135,5 +137,24 @@ class InquiryCategoryController extends AbstractController
         $this->entityManager->flush();
         $this->addSuccess('admin.common.delete_complete', 'admin');
         return $this->redirectToRoute('admin_content_inquiry_category');
+    }
+
+    /**
+     * @Route("/%eccube_admin_route%/content/inquiry_category/sort_no_move", name="admin_content_features_group_sort_no_move", methods={"POST"})
+     */
+    public function sortNoMove(Request $request)
+    {
+        $this->isTokenValid();
+        $sortNos = $request->request->all();
+        foreach ($sortNos as $id => $sortNo) {
+            $inquiryCategory = $this->inquiryCategoryRepository->find($id);
+            $inquiryCategory->setSortNo($sortNo);
+            $this->entityManager->persist($inquiryCategory);
+        }
+        $this->entityManager->flush();
+        return $this->json([
+            'success' => true,
+            'message' => 'admin.common.update_complete',
+        ]);
     }
 }

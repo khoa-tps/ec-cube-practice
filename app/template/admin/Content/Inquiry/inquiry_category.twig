@@ -49,7 +49,7 @@ file that was distributed with this source code.
                 newSortNos[this.dataset.id] = oldSortNos[i];
                 i++;
             });
-
+            
             $.ajax({
                 url: '{{ url('admin_content_features_group_sort_no_move') }}',
                 type: 'POST',
