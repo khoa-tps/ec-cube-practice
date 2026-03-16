@@ -1,0 +1,93 @@
+{#
+This file is part of EC-CUBE
+
+Copyright(c) EC-CUBE CO.,LTD. All Rights Reserved.
+
+http://www.ec-cube.co.jp/
+
+For the full copyright and license information, please view the LICENSE
+file that was distributed with this source code.
+#}
+{% extends '@admin/default_frame.twig' %}
+
+{% set menus = ['content', 'inquiry'] %}
+
+{% block title %}
+	{{ 'admin.content.inquiry'|trans }}
+{% endblock %}
+{% block sub_title %}
+	{{ 'admin.content.inquiry'|trans }}
+{% endblock %}
+
+{% block main %}
+	<div class="c-contentsArea__cols">
+		<div class="c-contentsArea__primaryCol">
+			<div class="c-primaryCol">
+				<div class="d-block mb-3">
+					<a class="btn btn-ec-regular" href="{{ url('admin_content_inquiry_sub_category_create') }}">
+						{{ 'admin.common.create__new'|trans }}
+					</a>
+				</div>
+				<div class="card rounded border-0 mb-4">
+					<div class="card-header">
+						<span class="card-title">{{ 'admin.content.inquiry_sub_category_management'|trans }}</span>
+					</div>
+					<div class="card-body p-0">
+						<div class="table-responsive">
+							<table class="table table-striped mb-0">
+								<thead>
+									<tr>
+										<th></th>
+										<th class="ps-3">ID</th>
+                                        <th>問い合わせ区分</th>
+                                        <th>問い合わせカテゴリ</th>
+										<th>問い合わせ子カテゴリ</th>
+										<th>メールアドレス</th>
+                                        <th>問い合わせ日時</th>
+										<th></th>
+									</tr>
+								</thead>
+								<tbody class="sortable-container">
+									{% for item in inquiries %}
+										<tr class="sortable-item" data-id="{{ item.id }}" data-sort-no="{{ item.sortNo }}">
+											<td>
+												<div class="col-auto d-flex align-items-center">
+													<i class="fa fa-bars text-ec-gray"></i>
+												</div>
+											</td>
+											<td class="ps-3">{{ item.subCategory.id }}</td>
+											<td>{{ item.subCategory.createdAt|date('Y-m-d H:i:s') }}</td>
+											<td>{{ item.subCategory.name }}</td>
+											<td>{{ item.parentName }}</td>
+											<td>
+												<a class="btn btn-ec-actionIcon me-2 up {% if loop.first %}disabled{% endif %}" href="" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ 'admin.common.up'|trans }}">
+													<i class="fa fa-arrow-up fa-lg text-secondary"></i>
+												</a>
+												<a class="btn btn-ec-actionIcon me-2 down {% if loop.last %}disabled{% endif %}" href="" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ 'admin.common.down'|trans }}">
+													<i class="fa fa-arrow-down fa-lg text-secondary"></i>
+												</a>
+												<a class="btn btn-ec-regular" href="{{ url('admin_content_inquiry_sub_category_edit', { id: item.subCategory.id }) }}">
+													<i class="fa fa-pencil"></i>
+												</a>
+                                                <form action="{{ url('admin_content_inquiry_sub_category_delete', {id: item.subCategory.id}) }}" method="post" id="delete-form-{{ item.subCategory.id }}" style="display: inline;">
+                                                    <input type="hidden" name="_method" value="DELETE">
+                                                    <input type="hidden" name="_token" value="{{ csrf_token('_token') }}">
+                                                    <button type="submit" class="btn btn-link p-0" onclick="return confirm('削除してもよろしいですか?')">
+
+                                                        <a class="btn btn-ec-regular">
+                                                            <i class="fa fa-trash"></i>
+                                                        </a>
+                                                    </button>
+                                                </form>
+											</td>
+										</tr>
+									{% endfor %}
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}

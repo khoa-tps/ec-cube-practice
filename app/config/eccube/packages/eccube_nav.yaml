@@ -82,6 +82,9 @@ parameters:
                 inquiry_sub_category:
                     name: admin.content.inquiry_sub_category_management
                     url: admin_content_inquiry_sub_category
+                inquiry:
+                    name: admin.content.inquiry_management
+                    url: admin_content_inquiry_list
                 page:
                     name: admin.content.page_management
                     url: admin_content_page
