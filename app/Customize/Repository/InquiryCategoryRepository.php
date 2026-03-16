@@ -29,6 +29,46 @@ class InquiryCategoryRepository extends AbstractRepository
     }
 
     /**
+     * Get all parent categories
+     *
+     * @return string
+     */
+    public function getAllParentCate()
+    {
+        $category = $this->createQueryBuilder('ic')
+            ->where('ic.parent_id IS NULL')
+            ->getQuery()
+            ->getResult();
+        return $category ? $category : null;
+    }
+
+    /**
+     * Get child categories by parent ID
+     *
+     * @param int $parentId
+     * @return array
+     */
+    public function getChildCategories($parentId)
+    {
+        $category = $this->createQueryBuilder('ic')
+            ->where('ic.parent_id = :parent_id')
+            ->setParameter('parent_id', $parentId)
+            ->getQuery()
+            ->getResult();
+        return $category ? $category : null;
+    }
+
+    public function getSubCategories($parentId)
+    {
+        $category = $this->createQueryBuilder('ic')
+            ->where('ic.parent_id = :parent_id')
+            ->setParameter('parent_id', $parentId)
+            ->getQuery()
+            ->getResult();
+        return $category ? $category : null;
+    }
+
+    /**
      * Get parent name by parent ID
      *
      * @param int $id

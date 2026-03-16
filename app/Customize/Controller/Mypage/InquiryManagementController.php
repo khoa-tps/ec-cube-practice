@@ -7,6 +7,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Eccube\Controller\AbstractController;
 use Customize\Repository\InquiryRepository;
 use Customize\Entity\Inquiry;
+use Customize\Repository\InquiryCategoryRepository;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -15,10 +16,12 @@ use Symfony\Component\HttpFoundation\Request;
 class InquiryManagementController extends AbstractController
 {
     private $inquiryRepository;
+    private $inquiryCategoryRepository;
 
-    public function __construct(InquiryRepository $inquiryRepository)
+    public function __construct(InquiryRepository $inquiryRepository, InquiryCategoryRepository $inquiryCategoryRepository)
     {
         $this->inquiryRepository = $inquiryRepository;
+        $this->inquiryCategoryRepository = $inquiryCategoryRepository;
     }
     /**
      * @Route("/mypage/inquiry", name="mypage_inquiry")
@@ -42,6 +45,7 @@ class InquiryManagementController extends AbstractController
      */
     public function create(Request $request)
     {
+        $inquiry_categories = $this->inquiryCategoryRepository->getAllParentCate();
         $builder = $this->formFactory->createBuilder(FormType::class, new Inquiry())
         ->add('title', TextType::class)
         ->add('detail', TextareaType::class)
@@ -65,6 +69,31 @@ class InquiryManagementController extends AbstractController
         }
         return [
             'form' => $form->createView(),
+            'inquiry_categories' => $inquiry_categories,
         ];
+    }
+
+    /**
+     * @Route("/mypage/inquiry/get-child-categories", name="mypage_inquiry_get_child_categories")
+     */
+    public function getChildCategories(Request $request)
+    {
+        $categoryId = $request->request->get('category_id');
+        $childCategories = $this->inquiryCategoryRepository->getChildCategories($categoryId);
+        return $this->json([
+            'child_categories' => $childCategories,
+        ]);
+    }
+
+    /**
+     * @Route("/mypage/inquiry/get-sub-categories", name="mypage_inquiry_get_sub_categories")
+     */
+    public function getSubCategories(Request $request)
+    {
+        $categoryId = $request->request->get('category_id');
+        $subCategories = $this->inquiryCategoryRepository->getSubCategories($categoryId);
+        return $this->json([
+            'sub_categories' => $subCategories,
+        ]);
     }
 }
