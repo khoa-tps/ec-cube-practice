@@ -50,7 +50,8 @@ class InquirySubCategoryController extends AbstractController
             ];
         }
         return [
-            'inquirySubCategory' => $categoriesWithParentNames
+            'inquirySubCategory' => $categoriesWithParentNames,
+            'menus' => ['inquiry_management', 'inquiry_sub_category'],
         ];   
     }
 
@@ -119,7 +120,8 @@ class InquirySubCategoryController extends AbstractController
         }
         
         return [
-            'form' => $form->createView()
+            'form' => $form->createView(),
+            'menus' => ['inquiry_management', 'inquiry_sub_category'],
         ];
     }
 

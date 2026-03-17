@@ -32,6 +32,7 @@ class InquiryController extends AbstractController
         $inquiries = $this->inquiryRepository->findAll(['status' => 'ASC']);
         return [
             'inquiries' => $inquiries,
+            'menus' => ['inquiry_management', 'inquiry'],
         ];
     }
 
