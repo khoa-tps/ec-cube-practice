@@ -393,7 +393,8 @@ file that was distributed with this source code.
                         <h2>{{ 'front.shopping.user_note'|trans }}</h2>
                     </div>
                     <div class="ec-input">
-                        <textarea name="user_note" placeholder="{{ 'front.shopping.user_note_placeholder'|trans }}" rows="6"></textarea>
+                        {{ form_widget(form.user_note, {'attr': {'class': 'form-control', 'placeholder': 'front.shopping.user_note_placeholder'|trans, 'rows': '6'}}) }}
+                        {{ form_errors(form.user_note) }}
                     </div>
                 </div>
                 {% for activeTradeLaw in activeTradeLaws|filter(t => t.name and t.description) %}
