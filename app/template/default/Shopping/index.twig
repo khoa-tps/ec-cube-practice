@@ -359,6 +359,9 @@ file that was distributed with this source code.
                             <div style="display: block;">
                                 {% set Payment = form.Payment.vars.choices[key].data %}
                                 {{ form_widget(child, { 'attr': { 'data-trigger': 'change' }}) }}
+                                {% if Payment.method == 'COD' or Payment.method == '代金引換' %}
+                                    <p class="ec-半角英数字">{{ 'front.shopping.cod_fee'|trans({ '%fee%': '10' }) }}</p>
+                                {% endif %}
                                 {% if Payment.payment_image is not null %}
                                     <p><img src="{{ asset(Payment.payment_image, 'save_image') }}"></p>
                                 {% endif %}
