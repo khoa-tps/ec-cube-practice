@@ -288,6 +288,7 @@ class ShoppingController extends AbstractShoppingController
             'form' => $form->createView(),
             'Order' => $Order,
             'activeTradeLaws' => $activeTradeLaws,
+            'Prefs' => $this->prefRepository->findAll(),
         ];
     }
 
@@ -399,6 +400,7 @@ class ShoppingController extends AbstractShoppingController
             'form' => $form->createView(),
             'Order' => $Order,
             'activeTradeLaws' => $activeTradeLaws,
+            'Prefs' => $this->prefRepository->findAll(),
         ];
     }
 
