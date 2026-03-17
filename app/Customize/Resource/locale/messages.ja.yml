@@ -9,3 +9,5 @@ admin.content.inquiry_list_management: 問い合わせ一覧管理
 admin.content.inquiry_list: 問い合わせ一覧
 admin.content.inquiry_management: 問い合わせ管理
 front.mypage.nav__inquiry: 問い合わせ
+front.shopping.user_note: 備考
+front.shopping.user_note_placeholder: 備考を入力してください
