@@ -44,13 +44,20 @@ file that was distributed with this source code.
                         </thead>
                         <tbody> 
                         {% for item in Coupons %}
-                             <tr style="border-bottom: 1px solid #dee2e6; transition: background-color 0.2s;">
+                            <tr style="border-bottom: 1px solid #dee2e6; transition: background-color 0.2s;">
                              <td style="padding: 12px; vertical-align: middle;">{{ loop.index }}</td>
                              <td style="padding: 12px; vertical-align: middle; font-weight: 500;">{{ item.coupon_name }}</td>
                              <td style="padding: 12px; vertical-align: middle; font-size: 14px; color: #6c757d;">{{ item.coupon_cd }}</td>
                              <td style="padding: 12px; vertical-align: middle; font-size: 14px; color: #6c757d;">{{ item.create_date|date('Y-m-d H:i') }}</td>
                              <td style="padding: 12px; vertical-align: middle; font-size: 14px; color: #6c757d;">{{ item.available_to_date|date('Y-m-d H:i') }}</td>
-                             <td style="padding: 12px; vertical-align: middle; font-size: 14px; color: #6c757d;">{{ item.target_users|json_encode|raw }}</td>
+                             <td style="padding: 12px; vertical-align: middle; font-size: 14px; color: #6c757d;">
+                                 {% set target_users_list = constant('Customize\\Config\\CouponConfig::TARGET_USERS_LIST') %}
+                                 {% if item.target_users %}
+                                     {% for val in item.target_users %}
+                                         {{ target_users_list[val] }}{% if not loop.last %}, {% endif %}
+                                     {% endfor %}
+                                 {% endif %}
+                             </td>
                             </tr>
                         {% endfor %}
                         </tbody>

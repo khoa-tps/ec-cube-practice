@@ -384,14 +384,12 @@
 
                         <div class="collapse show ec-cardCollapse" id="productArea">
                             <div class="card-body">
-                                <div class="text-center">
-                                    <a id="showSearchProductModal" class="btn btn-ec-regular me-2 add" data-bs-toggle="modal" data-bs-target="#searchProductModal">商品の追加</a>
-                                </div>
-                                <div class="tableish" id="coupon_detail_list" data-prototype="{{ include('Coupon42/Resource/template/admin/regist_product_list_prototype.twig') }}">
+                                <div>Target Users</div>
+                                <div class="tableish" id="target_users_list" data-prototype="{{ include('Coupon42/Resource/template/admin/regist_product_list_prototype.twig') }}">
                                     <div class="row item_box">
                                         {{ form_widget(form.target_users) }}
                                         {{ form_errors(form.target_users) }}
-                                    </div><!-- /.item_box -->
+                                    </div>
                                 </div>
 
                             </div>
