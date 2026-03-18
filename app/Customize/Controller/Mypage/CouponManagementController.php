@@ -18,7 +18,12 @@ class CouponManagementController extends AbstractController
      */
     public function index()
     {
-        $Coupons = $this->entityManager->getRepository(Coupon::class)->findAll();
+        $qb = $this->entityManager->getRepository(Coupon::class)->createQueryBuilder('c');
+        $Coupons = $qb->where('c.coupon_use_time > :minTime')
+                      ->setParameter('minTime', 0)
+                      ->getQuery()
+                      ->getResult();
+
         return [
             'Coupons' => $Coupons,
         ];
