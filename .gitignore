@@ -15,6 +15,7 @@ node_modules
 !/app/template/default
 !/app/template/user_data
 !/app/template/smartphone
+!/app/template/plugin
 /app/proxy/entity/*
 !/app/proxy/entity/.gitkeep
 /html/plugin/*
