@@ -241,3 +241,8 @@ services:
     Eccube\Util\CacheUtil:
         arguments:
             $container: !tagged_locator { tag: 'cache.pool.clearer' }
+
+    # Override Plugin Coupon Controller
+    Plugin\Coupon42\Controller\CouponShoppingController:
+        alias: Customize\Controller\CustomCouponShoppingController
+        public: true
