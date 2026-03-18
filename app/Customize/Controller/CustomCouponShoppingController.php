@@ -103,21 +103,21 @@ class CustomCouponShoppingController extends CouponShoppingController
                 }
                 // Validate target user
                 $targetUsers = $Coupon->getTargetUsers() ?: [];
-                $currentMonth = date('m'); // Lấy tháng hiện tại (01 đến 12)
+                $currentMonth = date('m');
 
                 if (!empty($targetUsers)) {
-                    // Nếu khách chưa đăng nhập (GUEST)
+                    // If user is not logged in
                     if (!$this->isGranted('ROLE_USER')) {
-                        // Bắt buộc đăng nhập nếu mã coupon yêu cầu đối tượng User
+                        // If the coupon code requires a user object
                         if (in_array(CouponConfig::TARGET_USERS_NEW, $targetUsers) || in_array(CouponConfig::TARGET_USERS_BIRTHDAY, $targetUsers)) {
                             $form->get('coupon_cd')->addError(new FormError(trans('plugin_coupon.front.shopping.member')));
                             $error = true;
                         }
                     } else {
-                        // Khách ĐÃ đăng nhập
+                        // User is logged in
                         $Customer = $this->getUser();
 
-                        // 1. Kiểm tra ưu đãi cho Khách Hàng Mới trong tháng
+                        // 1. Check new customer
                         if (in_array(CouponConfig::TARGET_USERS_NEW, $targetUsers)) {
                             if ($Customer->getCreateDate()->format('m') !== $currentMonth) {
                                 $form->get('coupon_cd')->addError(new FormError('This promotional code is only for new customers who register this month.'));
@@ -125,11 +125,20 @@ class CustomCouponShoppingController extends CouponShoppingController
                             }
                         }
 
-                        // 2. Kiểm tra ưu đãi cho Khách Hàng Sinh Nhật trong tháng
+                        // 2. Check birthday customer
                         if (in_array(CouponConfig::TARGET_USERS_BIRTHDAY, $targetUsers)) {
                             $userBirth = $Customer->getBirth(); // Ngày sinh có thể bị Null nếu khách không nhập
                             if (!$userBirth || $userBirth->format('m') !== $currentMonth) {
                                 $form->get('coupon_cd')->addError(new FormError('This promotional code is only for customers who have a birthday this month.'));
+                                $error = true;
+                            }
+                        }
+
+                        // 3. Check specific user
+                        if (in_array(CouponConfig::TARGET_SPECIFIC_USERS, $targetUsers)) {
+                            $customer = $Coupon->getCustomer();
+                            if (!$customer || $customer->getId() !== $Customer->getId()) {
+                                $form->get('coupon_cd')->addError(new FormError('This promotional code is only for specific customers.'));
                                 $error = true;
                             }
                         }

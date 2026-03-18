@@ -249,6 +249,16 @@
                     showTodayButton: true
                 });
             }
+
+            $("input[name='coupon[target_users][]']").on("change", function () {
+                if ($("input[name='coupon[target_users][]'][value='3']").is(':checked')) {
+                    $("#specificUsersArea").show();
+                } else {
+                    $("#specificUsersArea").hide();
+                    $("#coupon_Customer").val('');
+                }
+            });
+            $("input[name='coupon[target_users][]']").trigger("change");
         });
     </script>
 {% endblock javascript %}
@@ -382,13 +392,25 @@
                             </div>
                         </div>
 
-                        <div class="collapse show ec-cardCollapse" id="productArea">
+                        <div class="collapse show ec-cardCollapse" id="targetUsersArea">
                             <div class="card-body">
                                 <div>Target Users</div>
-                                <div class="tableish" id="target_users_list" data-prototype="{{ include('Coupon42/Resource/template/admin/regist_product_list_prototype.twig') }}">
+                                <div class="tableish" id="target_users_list">
                                     <div class="row item_box">
                                         {{ form_widget(form.target_users) }}
                                         {{ form_errors(form.target_users) }}
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="collapse show ec-cardCollapse" id="specificUsersArea" style="display: none">
+                            <div class="card-body">
+                                <div>Specific Users</div>
+                                <div class="tableish" id="specific_users_list">
+                                    <div class="row item_box">
+                                        {{ form_widget(form.customer) }}
+                                        {{ form_errors(form.customer) }}
                                     </div>
                                 </div>
 

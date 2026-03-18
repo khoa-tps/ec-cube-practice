@@ -8,5 +8,7 @@ class CouponConfig
     public const TARGET_USERS_NEW = 1;
     public const TARGET_USERS_BIRTHDAY = 2;
 
-    public const TARGET_USERS_LIST = [ 'All', 'New Users', 'Birthday Users'];
+    public const TARGET_SPECIFIC_USERS = 3;
+
+    public const TARGET_USERS_LIST = [ 'All', 'New Users', 'Birthday Users', 'Specific Users'];
 }
