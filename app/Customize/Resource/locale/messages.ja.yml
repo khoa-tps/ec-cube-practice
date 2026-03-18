@@ -13,3 +13,4 @@ front.shopping.user_note: 備考
 front.shopping.user_note_placeholder: 備考を入力してください
 admin.order.user_note: 備考
 front.shopping.cod_fee: 手数料 %fee% 円がかかります
+front.mypage.nav__coupon: クーポン

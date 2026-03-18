@@ -30,6 +30,9 @@ file that was distributed with this source code.
         <li class="ec-navlistRole__item {% if mypageno|default('') == 'inquiry' %}active{% endif %}">
             <a href="{{ url('mypage_inquiry') }}">{{ 'front.mypage.nav__inquiry'|trans }}</a>
         </li>
+        <li class="ec-navlistRole__item {% if mypageno|default('') == 'coupon' %}active{% endif %}">
+            <a href="{{ url('mypage_coupon') }}">{{ 'front.mypage.nav__coupon'|trans }}</a>
+        </li>
     </ul>
 </div>
 
