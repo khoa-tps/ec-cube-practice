@@ -1,0 +1,179 @@
+{#
+This file is part of EC-CUBE
+
+Copyright(c) EC-CUBE CO.,LTD. All Rights Reserved.
+
+http://www.ec-cube.co.jp/
+
+For the full copyright and license information, please view the LICENSE
+file that was distributed with this source code.
+#}
+{% extends 'default_frame.twig' %}
+
+{% set body_class = 'mypage' %}
+
+{% set mypageno = 'change' %}
+
+{% form_theme form 'Form/form_div_layout.twig' %}
+
+{% block javascript %}
+    <script>
+        $(document).ready(function() {
+            $('#inquiry_category').change(function() {
+                var categoryId = $(this).val();
+                $.ajax({
+                    url: '{{ url('mypage_inquiry_get_child_categories') }}',
+                    type: 'POST',
+                    data: {
+                        category_id: categoryId
+                    },
+                    success: function(response) {
+                        var childCategories = response.child_categories;
+                        var childCategorySelect = $('#child_inquiry_category');
+                        childCategorySelect.empty();
+                        childCategorySelect.append('<option value="">Select Category</option>');
+                        $.each(childCategories, function(index, category) {
+                            childCategorySelect.append('<option value="' + category.id + '">' + category.name + '</option>');
+                        });
+                    }
+                });
+            });
+
+            $('#child_inquiry_category').change(function() {
+            var categoryId = $(this).val();
+            $.ajax({
+                url: '{{ url('mypage_inquiry_get_sub_categories') }}',
+                type: 'POST',
+                data: {
+                    category_id: categoryId
+                },
+                success: function(response) {
+                    var subCategories = response.sub_categories;
+                    var subCategorySelect = $('#sub_inquiry_category');
+                    subCategorySelect.empty();
+                    subCategorySelect.append('<option value="">Select Sub Category</option>');
+                    $.each(subCategories, function(index, category) {
+                        subCategorySelect.append('<option value="' + category.id + '">' + category.name + '</option>');
+                    });
+                }
+            });
+        });
+        });
+    </script>
+{% endblock javascript %}
+
+{% block main %}
+    <div class="ec-layoutRole__main">
+        <div class="ec-mypageRole">
+            <div class="ec-pageHeader">
+                <h1>{{ 'front.mypage.title'|trans }}/{{ 'front.mypage.nav__customer'|trans }}</h1>
+            </div>
+            {% include 'Mypage/navi.twig' %}
+        </div>
+        <div class="ec-mypageRole">
+            <div class="ec-editRole">
+                <div class="ec-off1Grid">
+                    <div class="ec-off1Grid__cell">
+                        <form method="post" action="{{ url('mypage_inquiry_create') }}" novalidate class="h-adr">
+                            <span class="p-country-name" style="display:none;">Japan</span>
+                            {{ form_widget(form._token) }}
+                            <div class="ec-borderedDefs">
+                                <dl>
+                                    <dt>
+                                       Inquiry Category
+                                    </dt>
+                                    <dd>
+                                        <div class="ec-halfInput{{ has_errors(form.title) ? ' error'}}">
+                                            <select name="inquiry_category" id="inquiry_category">
+                                                <option value="">Select Category</option>
+                                                {% for category in inquiry_categories %}
+                                                    <option value="{{ category.id }}">{{ category.name }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </dd>
+                                </dl>
+                            </div>
+                            <div class="ec-borderedDefs">
+                                <dl>
+                                    <dt>
+                                       Inquiry Category
+                                    </dt>
+                                    <dd>
+                                        <div class="ec-halfInput{{ has_errors(form.title) ? ' error'}}">
+                                            <select name="child_inquiry_category" id="child_inquiry_category">
+                                                <option value="">Select Category</option>
+                                            </select>
+                                        </div>
+                                    </dd>
+                                </dl>
+                            </div>
+                            <div class="ec-borderedDefs">
+                                <dl>
+                                    <dt>
+                                       Inquiry Sub Category
+                                    </dt>
+                                    <dd>
+                                        <div class="ec-halfInput{{ has_errors(form.title) ? ' error'}}">
+                                            <select name="sub_inquiry_category" id="sub_inquiry_category">
+                                                <option value="">Select Sub Category</option>
+                                            </select>
+                                        </div>
+                                    </dd>
+                                </dl>
+                            </div>
+                            <div class="ec-borderedDefs">
+                                <dl>
+                                    <dt>
+                                        {{ form_label(form.title) }}
+                                    </dt>
+                                    <dd>
+                                        <div class="ec-halfInput{{ has_errors(form.title) ? ' error'}}">
+                                            {{ form_widget(form.title) }}
+                                            {{ form_errors(form.title) }}
+                                        </div>
+                                    </dd>
+                                </dl>
+                            </div>
+                            <div class="ec-borderedDefs">
+                                <dl>
+                                    <dt>
+                                        {{ form_label(form.detail) }}
+                                    </dt>
+                                    <dd>
+                                        <div class="ec-halfInput{{ has_errors(form.detail) ? ' error'}}">
+                                            {{ form_widget(form.detail) }}
+                                            {{ form_errors(form.detail) }}
+                                        </div>
+                                    </dd>
+                                </dl>
+                            </div>
+                            <div class="ec-borderedDefs">
+                                <dl>
+                                    <dt>
+                                        {{ form_label(form.email) }}
+                                    </dt>
+                                    <dd>
+                                        <div class="ec-halfInput{{ has_errors(form.email) ? ' error'}}">
+                                            {{ form_widget(form.email) }}
+                                            {{ form_errors(form.email) }}
+                                        </div>
+                                    </dd>
+                                </dl>
+                            </div>
+
+                            <div class="ec-RegisterRole__actions">
+                                <div class="ec-off4Grid">
+                                    <div class="ec-off4Grid__cell">
+                                        <button type="submit"
+                                                class="ec-blockBtn--cancel">{{ 'common.registration'|trans }}</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

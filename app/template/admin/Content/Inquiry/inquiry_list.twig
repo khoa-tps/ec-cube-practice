@@ -1,0 +1,110 @@
+{#
+This file is part of EC-CUBE
+
+Copyright(c) EC-CUBE CO.,LTD. All Rights Reserved.
+
+http://www.ec-cube.co.jp/
+
+For the full copyright and license information, please view the LICENSE
+file that was distributed with this source code.
+#}
+{% extends '@admin/default_frame.twig' %}
+
+{% set menus = ['inquiry_management', 'inquiry'] %}
+
+{% block title %}
+	{{ 'admin.content.inquiry'|trans }}
+{% endblock %}
+{% block sub_title %}
+	{{ 'admin.content.inquiry'|trans }}
+{% endblock %}
+
+{% block javascript %}
+	<script>
+		$(document).ready(function() {
+			$('select[name="status"]').change(function() {
+				var status = $(this).val();
+				var id = $(this).data('id');
+				$.ajax({
+					url: '{{ url('admin_content_inquiry_update_status') }}',
+					type: 'POST',
+					data: {
+						id: id,
+						status: status
+					}
+				});
+			});
+		});
+	</script>
+{% endblock %}
+
+{% block main %}
+	<div class="c-contentsArea__cols">
+		<div class="c-contentsArea__primaryCol">
+			<div class="c-primaryCol">
+				<div class="d-block mb-3">
+					<a class="btn btn-ec-regular" href="{{ url('admin_content_inquiry_sub_category_create') }}">
+						{{ 'admin.common.create__new'|trans }}
+					</a>
+				</div>
+				<div class="card rounded border-0 mb-4">
+					<div class="card-header">
+						<span class="card-title">{{ 'admin.content.inquiry_sub_category_management'|trans }}</span>
+					</div>
+					<div class="card-body p-0">
+						<div class="table-responsive">
+							<table class="table table-striped mb-0">
+								<thead>
+									<tr>
+										<th></th>
+										<th class="ps-3">ID</th>
+                                        <th>Created At</th>
+                                        <th>Title</th>
+										<th>Detail</th>
+										<th>Email</th>
+                                        <th>Status</th>
+										<th></th>
+									</tr>
+								</thead>
+								<tbody class="sortable-container">
+									{% for item in inquiries %}
+										<tr class="sortable-item" data-id="{{ item.id }}">
+											<td>
+												<div class="col-auto d-flex align-items-center">
+													<i class="fa fa-bars text-ec-gray"></i>
+												</div>
+											</td>
+											<td class="ps-3">{{ item.id }}</td>
+											<td>{{ item.createdAt|date('Y-m-d H:i:s') }}</td>
+											<td>{{ item.title }}</td>
+											<td>{{ item.detail }}</td>
+											<td>{{ item.email }}</td>
+											<td>
+												<select name="status" id="status-{{ item.id }}" data-id="{{ item.id }}">
+													<option value="0" {% if item.status == 0 %}selected{% endif %}>Pending</option>
+													<option value="1" {% if item.status == 1 %}selected{% endif %}>Completed</option>
+												</select>
+											</td>
+											<td>
+                                                <form action="{{ url('admin_content_inquiry_delete', {id: item.id}) }}" method="post" id="delete-form-{{ item.id }}" style="display: inline;">
+                                                    <input type="hidden" name="_method" value="DELETE">
+                                                    <input type="hidden" name="_token" value="{{ csrf_token('_token') }}">
+                                                    <button type="submit" class="btn btn-link p-0" onclick="return confirm('削除してもよろしいですか?')">
+
+                                                        <a class="btn btn-ec-regular">
+                                                            <i class="fa fa-trash"></i>
+                                                        </a>
+                                                    </button>
+                                                </form>
+											</td>
+										</tr>
+									{% endfor %}
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}

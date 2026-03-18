@@ -1,0 +1,15 @@
+admin.content.mall_custom_management: モールからのお知らせ詳細
+admin.content.features_management: 特集一覧
+admin.content.features_group_management: 特集グループ一覧
+admin.content.inquiry_category_management: 問い合わせカテゴリ管理
+admin.content.inquiry_category: 問い合わせカテゴリ
+admin.content.inquiry_sub_category_management: 問い合わせサブカテゴリ管理
+admin.content.inquiry_sub_category: 問い合わせサブカテゴリ
+admin.content.inquiry_list_management: 問い合わせ一覧管理
+admin.content.inquiry_list: 問い合わせ一覧
+admin.content.inquiry_management: 問い合わせ管理
+front.mypage.nav__inquiry: 問い合わせ
+front.shopping.user_note: 備考
+front.shopping.user_note_placeholder: 備考を入力してください
+admin.order.user_note: 備考
+front.shopping.cod_fee: 手数料 %fee% 円がかかります
