@@ -380,4 +380,24 @@ class ProductController extends BaseProductController
             'ChoicedCategoryIds' => $ChoicedCategoryIds,
         ];
     }
+
+    /**
+     * ProductCategory作成
+     *
+     * @param Product $Product
+     * @param \Eccube\Entity\Category $Category
+     * @param int $count
+     *
+     * @return ProductCategory
+     */
+    private function createProductCategory($Product, $Category, $count)
+    {
+        $ProductCategory = new ProductCategory();
+        $ProductCategory->setProduct($Product);
+        $ProductCategory->setProductId($Product->getId());
+        $ProductCategory->setCategory($Category);
+        $ProductCategory->setCategoryId($Category->getId());
+
+        return $ProductCategory;
+    }
 }
