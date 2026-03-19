@@ -43,6 +43,11 @@ class ShopController extends AbstractController
     public function create(Request $request, $id = null)
     {
         $logoSource = null;
+        $Prefs = $this->entityManager->getRepository(Pref::class)->findAll();
+        $prefChoices = [];
+        foreach ($Prefs as $Pref) {
+            $prefChoices[$Pref->getName()] = $Pref->getId();
+        }
         if(is_null($id)){
             $shop = new Shop();
         }else{
@@ -70,17 +75,8 @@ class ShopController extends AbstractController
             'required' => false,
         ])
         ->add('city_id', ChoiceType::class, [
-            'choices' => $this->entityManager->getRepository(Pref::class)->findAll(),
-            'choice_label' => 'name',
-            'choice_value' => 'id',
+            'choices' => $prefChoices,
         ])
-        ->add('created_at', DateTimeType::class,
-            [
-                'required' => true,
-                'widget' => 'single_text',
-                'html5' => true,
-            ]
-        )
         ->add('updated_at', DateTimeType::class,
             [
                 'mapped' => false,
@@ -113,8 +109,10 @@ class ShopController extends AbstractController
                     ];
                 }
             }
+            $shop->setCreatedAt(new \DateTime());
             $shop->setUpdatedAt(new \DateTime());
             $shop->setDeletedAt(null);
+            $shop->setCustomerId($this->getUser()->getId());
             $this->entityManager->persist($shop);
             $this->entityManager->flush();
             return $this->redirectToRoute('admin_shop_list');
