@@ -169,6 +169,16 @@ parameters:
                         system_index:
                             name: admin.setting.system.system_info
                             url: admin_setting_system_system
+        shop:
+            name: admin.shop
+            icon: fa-cog
+            children:
+                shop_index:
+                    name: admin.shop.list
+                    url: admin_shop_list
+                shop_register:
+                    name: admin.shop.shop_register
+                    url: admin_shop_create
         store:
             name: admin.store
             icon: fa-plug

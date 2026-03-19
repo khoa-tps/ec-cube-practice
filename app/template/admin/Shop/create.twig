@@ -1,0 +1,234 @@
+{#
+This file is part of EC-CUBE
+
+Copyright(c) EC-CUBE CO.,LTD. All Rights Reserved.
+
+http://www.ec-cube.co.jp/
+
+For the full copyright and license information, please view the LICENSE
+file that was distributed with this source code.
+#}
+{% extends '@admin/default_frame.twig' %}
+{% form_theme form '@admin/Form/bootstrap_4_horizontal_layout.html.twig' %}
+
+{% set menus = ['shop', 'create'] %}
+
+{% block title %}
+	{{ 'admin.shop.management'|trans }}
+{% endblock %}
+{% block sub_title %}
+	{{ 'admin.shop.create'|trans }}
+{% endblock %}
+
+{% block main %}
+	{{ form_start(form, { attr: { id: 'shop_form' } }) }}
+	<div class="c-contentsArea__cols">
+		<div class="c-contentsArea__primaryCol">
+			<div class="c-primaryCol">
+				<div class="card rounded border-0 mb-4">
+					<div class="card-header">
+						<div class="row">
+							<div class="col-8">
+								<span class="card-title">店舗登録</span>
+							</div>
+						</div>
+					</div>
+					<div class="card-body">
+						<div class="row mb-3">
+							<label class="col-sm-4 col-form-label">作成日<i class="fa fa-question-circle fa-lg ms-1"></i>
+							</label>
+							<div class="col-sm-8">
+								<div class="row">
+									<div class="col-sm-4">
+										{{ form_widget(form.created_at) }}
+									</div>
+								</div>
+								{{ form_errors(form.created_at) }}
+							</div>
+						</div>
+						<div class="row mb-3">
+							<label class="col-sm-4 col-form-label">店舗名<i class="fa fa-question-circle fa-lg ms-1"></i>
+							</label>
+							<div class="col-sm-8">
+								{{ form_widget(form.name) }}
+								{{ form_errors(form.name) }}
+							</div>
+						</div>
+                        <div class="row mb-3">
+							<label class="col-sm-4 col-form-label">カナ<i class="fa fa-question-circle fa-lg ms-1"></i>
+							</label>
+							<div class="col-sm-8">
+								{{ form_widget(form.kana_name) }}
+								{{ form_errors(form.kana_name) }}
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-3">
+								<div class="d-inline-block" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ 'tooltip.shop.logo'|trans }}">
+									<span>Logo</span>
+									<i class="fa fa-question-circle fa-lg ms-1"></i>
+									<br>Logo size
+								</div>
+							</div>
+							<div class="col mb-2">
+								<p id="message"></p>
+								<div id="upload-zone" class="rounded">
+									{{ form_widget(form.logo, { attr : { style : 'display:none;' } }) }}
+									{{ form_errors(form.logo) }}
+								</div>
+								<span class="invalid-feedback" id="thumbnail_error" style="display: none">
+									<span class="d-block">
+										<span class="form-error-icon badge bg-danger text-uppercase">{{ 'Error'|trans({}, 'validators') }}</span>
+										<span class="form-error-message"></span>
+									</span>
+								</span>
+							</div>
+						</div>
+						<div class="row mb-3">
+							<label class="col-sm-3 col-form-label">説明<i class="fa fa-question-circle fa-lg ms-1"></i></label>
+							<div class="col-sm-9">
+								<div id="description" style="height: 360px" class="form-control{{ has_errors(form.description) ? ' is-invalid' }}"></div>
+								<div style="display: none">{{ form_widget(form.description) }}</div>
+								{{ form_errors(form.description) }}
+							</div>
+						</div>
+						 <div class="row mb-3">
+							<label class="col-sm-4 col-form-label">住所<i class="fa fa-question-circle fa-lg ms-1"></i>
+							</label>
+							<div class="col-sm-8">
+								{{ form_widget(form.address01) }}
+								{{ form_errors(form.address01) }}
+							</div>
+						</div>
+						 <div class="row mb-3">
+							<label class="col-sm-4 col-form-label">住所<i class="fa fa-question-circle fa-lg ms-1"></i>
+							</label>
+							<div class="col-sm-8">
+								{{ form_widget(form.address02) }}
+								{{ form_errors(form.address02) }}
+							</div>
+						</div>
+                        <div class="row mb-3">
+							<label class="col-sm-4 col-form-label">都道府県<i class="fa fa-question-circle fa-lg ms-1"></i>
+							</label>
+							<div class="col-sm-8">
+								{{ form_widget(form.city_id) }}
+								{{ form_errors(form.city_id) }}
+							</div>
+						</div>
+						 <div class="row mb-3">
+							<label class="col-sm-4 col-form-label">電話番号<i class="fa fa-question-circle fa-lg ms-1"></i>
+							</label>
+							<div class="col-sm-8">
+								{{ form_widget(form.phone_number) }}
+								{{ form_errors(form.phone_number) }}
+							</div>
+						</div>
+						 <div class="row mb-3">
+							<label class="col-sm-4 col-form-label">メールアドレス<i class="fa fa-question-circle fa-lg ms-1"></i>
+							</label>
+							<div class="col-sm-8">
+								{{ form_widget(form.email) }}
+								{{ form_errors(form.email) }}
+							</div>
+						</div>  
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="c-conversionArea">
+		<div class="c-conversionArea__container">
+			<div class="row justify-content-between align-items-center">
+				<div class="col-6">
+					<div class="c-conversionArea__leftBlockItem">
+						<a class="c-baseLink" href="{{ url('admin_content_features') }}">
+							<i class="fa fa-backward" aria-hidden="true"></i>
+							<span>{{ 'admin.content.features_management'|trans }}</span>
+						</a>
+					</div>
+				</div>
+				<div class="col-6">
+					<div class="row align-items-center justify-content-end">
+						<div class="col-6">
+                        <div id="ex-conversion-action" class="row align-items-center justify-content-end">
+                            <div class="col-auto">
+                                {{ form_widget(form.status) }}
+                                {{ form_errors(form.status) }}
+                            </div>
+                            <div class="col-auto">
+                                <button class="btn btn-ec-conversion px-5" type="submit">{{ 'admin.common.registration'|trans }}</button>
+                            </div>
+                        </div>
+                    </div>
+				</div>
+			</div>
+		</div>
+	</div>
+	{{ form_end(form) }}
+{% endblock %}
+
+{% block javascript %}
+<script>
+$(function() {
+    var inputFileElement = document.getElementById('{{ form.logo.vars.id }}');
+    if (inputFileElement) {
+        {% if eccube_config.locale == 'ja' or eccube_config.locale == 'en' %}
+        FilePond.setOptions(FilePondLocale_{{ eccube_config.locale }});
+        {% endif %}
+
+        FilePond.create(inputFileElement, {
+            server: {
+                load: {
+                    url: '{{ path('admin_product_image_load') }}?source=',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                }
+            },
+            allowFileTypeValidation: true,
+            acceptedFileTypes: ['image/gif', 'image/png', 'image/jpeg', 'image/webp'],
+            allowFileSizeValidation: true,
+            maxFileSize: 10000000,
+            maxFiles: 1,
+            allowBrowse: true,
+            allowDrop: true,
+            storeAsFile: true,
+            instantUpload: false,
+            allowProcess: false,
+            labelIdle: '<i class="fa fa-cloud-upload fa-3x text-ec-lightGray mx-3 align-middle" aria-hidden="true" style="font-size: 40px"></i>{{ 'admin.common.drag_and_drop_image_description'|trans }}<span class="filepond--label-action">{{ 'admin.common.file_select'|trans }}</span>',
+            styleItemPanelAspectRatio: 0.5625,
+            {% if logoSource %}
+            files: [
+                {
+                    source: '{{ logoSource }}',
+                    options: {
+                        type: 'local'
+                    }
+                }
+            ]
+			{% endif %}
+        });
+    }
+
+    ace.require('ace/ext/language_tools');
+    var editor = ace.edit('description');
+    editor.session.setMode('ace/mode/text');
+    editor.setTheme('ace/theme/tomorrow');
+    editor.setValue('{{ form.description.vars.value|default('')|escape('js') }}');
+    editor.setOptions({
+        showInvisibles: true
+    });
+
+    $("#description").resizable({
+        resize: function () {
+            editor.resize();
+        }
+    });
+
+    $('#shop_form').on('submit', function() {
+        $('#form_description').val(editor.getValue());
+    });
+});
+</script>
+{% endblock %}

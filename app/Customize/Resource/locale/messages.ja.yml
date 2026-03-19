@@ -15,3 +15,6 @@ admin.order.user_note: 備考
 front.shopping.cod_fee: 手数料 %fee% 円がかかります
 front.mypage.nav__coupon: クーポン
 plugin_coupon.admin.label.target_users: 対象ユーザー
+admin.shop: ショップ
+admin.shop.list: ショップ一覧
+admin.shop.shop_register: ショップ登録

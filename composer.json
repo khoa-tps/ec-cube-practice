@@ -36,7 +36,6 @@
         "doctrine/orm": "^2.11",
         "doctrine/persistence": "^3.1",
         "ec-cube/api42": "^4.3",
-        "ec-cube/chatgpt": "^4.3",
         "ec-cube/coupon42": "^4.3",
         "ec-cube/mailmagazine42": "^4.3",
         "ec-cube/oauth2login": "^1.0",
