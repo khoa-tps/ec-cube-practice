@@ -183,6 +183,15 @@
     "friendsofphp/proxy-manager-lts": {
         "version": "v1.0.5"
     },
+    "google/apiclient": {
+        "version": "2.19",
+        "recipe": {
+            "repo": "github.com/symfony/recipes-contrib",
+            "branch": "main",
+            "version": "2.10",
+            "ref": "07a97ec434d43b7903c78069a04c92adb6442e52"
+        }
+    },
     "graham-campbell/result-type": {
         "version": "v1.0.4"
     },
@@ -207,6 +216,19 @@
     "laminas/laminas-code": {
         "version": "3.4.1"
     },
+    "league/oauth2-server-bundle": {
+        "version": "0.5",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "0.4",
+            "ref": "7f26963037fce3b69c1b3f6a75a3265edb1e1caa"
+        },
+        "files": [
+            "app/config/eccube/packages/league_oauth2_server.yaml",
+            "app/config/eccube/routes/league_oauth2_server.yaml"
+        ]
+    },
     "mikey179/vfsstream": {
         "version": "v1.6.5"
     },
@@ -224,6 +246,18 @@
     },
     "nikic/php-parser": {
         "version": "v4.0.3"
+    },
+    "nyholm/psr7": {
+        "version": "1.8",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "1.0",
+            "ref": "4a8c0345442dcca1d8a2c65633dcf0285dd5a5a2"
+        },
+        "files": [
+            "app/config/eccube/packages/nyholm_psr7.yaml"
+        ]
     },
     "phar-io/manifest": {
         "version": "1.0.1"

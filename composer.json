@@ -43,6 +43,8 @@
         "ec-cube/oricopaymentplus2": "^2.6",
         "ec-cube/plugin-installer": "^2.0",
         "ec-cube/productreview42": "^4.3",
+        "ec-cube/recommend42": "^4.3",
+        "ec-cube/relatedproduct42": "^4.3",
         "ec-cube/sitekit42": "^4.3",
         "ec-cube/yamatopayment42": "^4.2",
         "egulias/email-validator": "^4.0",

@@ -17,6 +17,13 @@
         <server name="SHELL_VERBOSITY" value="-1" />
         <server name="SYMFONY_PHPUNIT_REMOVE" value="symfony/yaml" />
         <server name="SYMFONY_PHPUNIT_VERSION" value="9.5" />
+
+        <!-- ###+ league/oauth2-server-bundle ### -->
+        <env name="OAUTH_PRIVATE_KEY" value="%kernel.project_dir%/app/config/eccube/jwt/private.pem"/>
+        <env name="OAUTH_PUBLIC_KEY" value="%kernel.project_dir%/app/config/eccube/jwt/public.pem"/>
+        <env name="OAUTH_PASSPHRASE" value="65653f0e332085117708c9bc9bf0888b"/>
+        <env name="OAUTH_ENCRYPTION_KEY" value="bbe2a6f9e3a19041bac9a13e89fce938"/>
+        <!-- ###- league/oauth2-server-bundle ### -->
     </php>
 
     <testsuites>
