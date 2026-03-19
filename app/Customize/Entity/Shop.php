@@ -48,7 +48,7 @@ class Shop
     private $address02;
     /**
      * @var int
-     * @ORM\Column(name="city_id", type="integer", nullable=false)
+     * @ORM\Column(name="city_id", type="integer", nullable=true)
      */
     private $city_id;
     /**
@@ -63,7 +63,7 @@ class Shop
     private $logo;
     /**
      * @var int
-     * @ORM\Column(name="status", type="integer", nullable=false)
+     * @ORM\Column(name="status", type="integer", nullable=true)
      */
     private $status;
     /**
@@ -78,7 +78,7 @@ class Shop
     private $updated_at;
     /**
      * @var \DateTime
-     * @ORM\Column(name="deleted_at", type="datetime", nullable=false)
+     * @ORM\Column(name="deleted_at", type="datetime", nullable=true)
      */
     private $deleted_at;
     /**

@@ -11,7 +11,7 @@ file that was distributed with this source code.
 {% extends '@admin/default_frame.twig' %}
 {% form_theme form '@admin/Form/bootstrap_4_horizontal_layout.html.twig' %}
 
-{% set menus = ['shop', 'create'] %}
+{% set menus = ['shop', 'shop_register'] %}
 
 {% block title %}
 	{{ 'admin.shop.management'|trans }}
@@ -51,7 +51,7 @@ file that was distributed with this source code.
 							</div>
 						</div>
 						<div class="row">
-							<div class="col-3">
+							<div class="col-4">
 								<div class="d-inline-block" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ 'tooltip.shop.logo'|trans }}">
 									<span>Logo</span>
 									<i class="fa fa-question-circle fa-lg ms-1"></i>
@@ -72,9 +72,9 @@ file that was distributed with this source code.
 								</span>
 							</div>
 						</div>
-						<div class="row mb-3">
-							<label class="col-sm-3 col-form-label">説明<i class="fa fa-question-circle fa-lg ms-1"></i></label>
-							<div class="col-sm-9">
+						<div class="row mb-4">
+							<label class="col-sm-4 col-form-label">説明<i class="fa fa-question-circle fa-lg ms-1"></i></label>
+							<div class="col-sm-8">
 								<div id="description" style="height: 360px" class="form-control{{ has_errors(form.description) ? ' is-invalid' }}"></div>
 								<div style="display: none">{{ form_widget(form.description) }}</div>
 								{{ form_errors(form.description) }}
