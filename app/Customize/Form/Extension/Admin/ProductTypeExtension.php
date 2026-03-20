@@ -12,6 +12,7 @@ use Eccube\Repository\CategoryRepository;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Customize\Entity\Shop;
 use Doctrine\ORM\EntityManagerInterface;
+use Customize\Entity\ProductFeature;
 
 
 class ProductTypeExtension extends AbstractTypeExtension
@@ -48,6 +49,12 @@ class ProductTypeExtension extends AbstractTypeExtension
             $shopChoices[$Shop->getName()] = $Shop->getId();
         }
 
+        $ProductFeatures = $this->entityManager->getRepository(ProductFeature::class)->findAll();
+        $productFeatureChoices = [];
+        foreach ($ProductFeatures as $ProductFeature) {
+            $productFeatureChoices[$ProductFeature->getFeatureName()] = $ProductFeature->getId();
+        }
+
 
         $builder->add('shop_id', ChoiceType::class, [
             'choices' => $shopChoices,
@@ -58,6 +65,10 @@ class ProductTypeExtension extends AbstractTypeExtension
             'constraints' => [
                 new Assert\Length(['max' => $this->eccubeConfig['eccube_ltext_len']]),
             ],
+        ])
+        ->add('product_feature_id', ChoiceType::class, [
+           'choices' => $productFeatureChoices,
+           'multiple' => false,
         ]);
     }
 

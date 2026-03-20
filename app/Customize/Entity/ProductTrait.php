@@ -23,6 +23,13 @@ trait ProductTrait
      */
     private $shop_id;
 
+    /**
+     * @ORM\Column(name="product_feature_id", type="integer", nullable=true)
+     * @OneToOne(targetEntity="Eccube\Entity\ProductFeature")
+     * @JoinColumn(name="product_feature_id", referencedColumnName="id")
+     */
+    private $product_feature_id;
+
     public function getDescriptionDetailEnglish(): ?string
     {
         return $this->description_detail_english;
@@ -43,6 +50,18 @@ trait ProductTrait
     public function setShopId(?int $shopId): self
     {
         $this->shop_id = $shopId;
+
+        return $this;
+    }
+
+    public function getProductFeatureId(): ?int
+    {
+        return $this->product_feature_id;
+    }
+
+    public function setProductFeatureId(?int $productFeatureId): self
+    {
+        $this->product_feature_id = $productFeatureId;
 
         return $this;
     }
