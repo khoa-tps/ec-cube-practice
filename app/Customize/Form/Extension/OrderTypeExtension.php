@@ -15,10 +15,7 @@ class OrderTypeExtension extends AbstractTypeExtension
            if (!$options['skip_add_form']) {
             $builder->add('user_note', TextareaType::class, [
                 'required' => false,
-                'label' => 'front.shopping.user_note',
-                'constraints' => [
-                    new Length(['max' => 4000]),
-                ],
+                'label' => 'front.shopping.user_note'
             ]);
         }
     }

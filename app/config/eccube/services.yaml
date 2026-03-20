@@ -246,3 +246,7 @@ services:
     Plugin\Coupon42\Controller\CouponShoppingController:
         alias: Customize\Controller\CustomCouponShoppingController
         public: true
+
+    Eccube\Repository\ProductRepository:
+        alias: Customize\Repository\ProductRepository
+        public: true
