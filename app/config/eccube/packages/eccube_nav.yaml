@@ -47,6 +47,16 @@ parameters:
                 shipping_csv_import:
                     name: admin.order.shipping_csv_upload
                     url: admin_shipping_csv_import
+        coupon:
+            name: admin.coupon.coupon_management
+            icon: fa-gift
+            children:
+                coupon_list:
+                    name: admin.coupon.coupon_list
+                    url: plugin_coupon_list
+                coupon_edit:
+                    name: admin.coupon.coupon_registration
+                    url: plugin_coupon_new
         customer:
             name: admin.customer.customer_management
             icon: fa-users
@@ -174,7 +184,7 @@ parameters:
                             url: admin_setting_system_system
         shop:
             name: admin.shop
-            icon: fa-cog
+            icon: fa-shopping-cart
             children:
                 shop_index:
                     name: admin.shop.list

@@ -19,3 +19,7 @@ admin.shop: ショップ
 admin.shop.list: ショップ一覧
 admin.shop.shop_register: ショップ登録
 admin.product.feature_management: 特集管理
+admin.product.shop: ショップ
+admin.coupon.coupon_management: クーポン管理
+admin.coupon.coupon_list: クーポン一覧
+admin.coupon.coupon_registration: クーポン登録
