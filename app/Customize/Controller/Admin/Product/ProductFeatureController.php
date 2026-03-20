@@ -11,6 +11,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
 class ProductFeatureController extends AbstractController
 {
@@ -38,7 +39,7 @@ class ProductFeatureController extends AbstractController
     /**
      * @Route("/%eccube_admin_route%/product/feature/create", name="admin_product_feature_create", methods={"GET", "POST"})
      * @Route("/%eccube_admin_route%/product/feature/{id}", name="admin_product_feature_edit", methods={"GET", "POST"})
-     * @Template("@admin/Product/ProductFeature/index.twig")
+     * @Template("@admin/Product/ProductFeature/create_edit.twig")
      */
     public function edit(Request $request, $id = null)
     {
@@ -52,24 +53,26 @@ class ProductFeatureController extends AbstractController
         }
         $form = $this->createForm(FormType::class, $feature)
         ->add('feature_name', TextType::class, [
-            'label' => '特集名',
+            'label' => 'Feature Name',
         ])
-        ->add('created_at', DateType::class, [
-            'label' => '公開開始日時',
-        ])
-        ->add('publish_date_to', DateType::class, [
-            'label' => '公開終了日時',
-        ])
-        ->add('submit', SubmitType::class, [
-            'label' => '保存',
+        ->add('status',  ChoiceType::class, [
+            'label' => 'Status',
+            'choices' => [
+                'Active' => 1,
+                'Inactive' => 0,
+            ],
         ]);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
+            $feature->setCreatedAt(new \DateTime());
+            $feature->setUpdatedAt(new \DateTime());
             $this->productFeatureRepository->save($feature);
+            $this->entityManager->flush();
             return $this->redirectToRoute('admin_product_feature');
         }
         return [
             'form' => $form->createView(),
+            'feature' => $feature,
         ];
     }
 }

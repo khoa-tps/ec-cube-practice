@@ -24,7 +24,7 @@ file that was distributed with this source code.
 		<div class="c-contentsArea__primaryCol">
 			<div class="c-primaryCol">
 				<div class="d-block mb-3">
-					<a class="btn btn-ec-regular" href="{{ url('admin_content_features_group_create') }}">
+					<a class="btn btn-ec-regular" href="{{ url('admin_product_feature_create') }}">
 						{{ 'admin.common.create__new'|trans }}
 					</a>
 				</div>
@@ -47,7 +47,7 @@ file that was distributed with this source code.
 								</thead>
 								<tbody class="sortable-container">
 									{% for item in features %}
-										<tr class="sortable-item" data-id="{{ item.id }}" data-sort-no="{{ item.sortNo }}">
+										<tr class="sortable-item" data-id="{{ item.id }}">
 											<td>
 												<div class="col-auto d-flex align-items-center">
 													<i class="fa fa-bars text-ec-gray"></i>
