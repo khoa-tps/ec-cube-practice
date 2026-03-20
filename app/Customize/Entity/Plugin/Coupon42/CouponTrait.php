@@ -17,6 +17,7 @@ trait CouponTrait
     private $target_users;
 
     /**
+     * @var Customer
      * @ORM\ManyToOne(targetEntity="Eccube\Entity\Customer")
      * @ORM\JoinColumn(name="customer_id", referencedColumnName="id", nullable=true)
      */
@@ -27,9 +28,9 @@ trait CouponTrait
         return $this->target_users;
     }
 
-    public function setTargetUsers(?array $value): self
+    public function setTargetUsers(?array $target_users): self
     {
-        $this->target_users = $value;
+        $this->target_users = $target_users;
 
         return $this;
     }

@@ -19,6 +19,9 @@ parameters:
                 product_tag:
                     name: admin.product.tag_management
                     url: admin_product_tag
+                product_feature:
+                    name: admin.product.feature_management
+                    url: admin_product_feature
                 product_csv_import:
                     name: admin.product.product_csv_upload
                     url: admin_product_csv_import

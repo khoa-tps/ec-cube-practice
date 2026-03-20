@@ -18,3 +18,4 @@ plugin_coupon.admin.label.target_users: 対象ユーザー
 admin.shop: ショップ
 admin.shop.list: ショップ一覧
 admin.shop.shop_register: ショップ登録
+admin.product.feature_management: 特集管理
