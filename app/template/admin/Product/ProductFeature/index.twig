@@ -61,9 +61,9 @@ file that was distributed with this source code.
 												<a class="btn btn-ec-regular" href="{{ url('admin_product_feature_edit', { id: item.id }) }}">
 													<i class="fa fa-pencil"></i>
 												</a>
-                                                {# <a class="btn btn-ec-regular" href="{{ url('admin_content_features_group_delete', { id: featureGroup.id }) }}" onclick="return confirm('削除してもよろしいですか?')">
+                                                <a class="btn btn-ec-regular" href="{{ url('admin_product_feature_delete', { id: item.id }) }}" onclick="return confirm('削除してもよろしいですか?')">
 													<i class="fa fa-trash"></i>
-												</a> #}
+												</a>
 											</td>
 										</tr>
 									{% endfor %}

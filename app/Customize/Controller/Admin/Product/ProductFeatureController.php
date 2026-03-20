@@ -75,4 +75,18 @@ class ProductFeatureController extends AbstractController
             'feature' => $feature,
         ];
     }
+
+    /**
+     * @Route("/%eccube_admin_route%/product/feature/{id}/delete", name="admin_product_feature_delete", methods={"GET", "POST"})
+     */
+    public function delete(Request $request, $id)
+    {
+        $feature = $this->productFeatureRepository->find($id);
+        if(is_null($feature)){
+            throw new \Exception('Feature not found');
+        }
+        $this->entityManager->remove($feature);
+        $this->entityManager->flush();
+        return $this->redirectToRoute('admin_product_feature');
+    }
 }
