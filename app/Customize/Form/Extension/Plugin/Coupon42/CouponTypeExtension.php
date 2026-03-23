@@ -16,6 +16,7 @@ use Eccube\Entity\Product;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Eccube\Entity\Category;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 
 
 class CouponTypeExtension extends AbstractTypeExtension
@@ -248,6 +249,10 @@ class CouponTypeExtension extends AbstractTypeExtension
             },
             'placeholder' => '---',
             'label' => 'Categories eligible for issuance',
+            'required' => false,
+        ])
+        ->add('term_coupon_available_unlimited', CheckboxType::class, [
+            'label' => 'Indefinite',
             'required' => false,
         ]);
     }

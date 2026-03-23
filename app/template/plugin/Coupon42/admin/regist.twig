@@ -279,13 +279,28 @@
 	$("input[name='coupon[discount_type]']").on("change", function () {
 		let coupon_type = $(this).val();	
 		if (coupon_type == 2) {
-			$("#discount_price").show();
+			$("#discount_price").attr('disabled', 'disabled');
 			$("#discount_rate").show();
 		} else {
-			$("#discount_price").hide();
+			$("#discount_price").removeAttr('disabled');
 			$("#discount_rate").hide();
 		}
 	});
+
+	$("input[name='usage_period_type']").on("change", function () {
+		let usage_period_type = $(this).val();	
+		if (usage_period_type == 1) {
+			$("#coupon_term_usage_period").attr('disabled', 'disabled');
+			$("#coupon_term_usage_period_from").removeAttr('disabled');
+			$("#coupon_term_usage_period_to").removeAttr('disabled');
+			$("#coupon_term_coupon_available_unlimited").prop('checked', false);
+		} else {
+			$("#coupon_term_usage_period").removeAttr('disabled');
+			$("#coupon_term_usage_period_from").attr('disabled', 'disabled');
+			$("#coupon_term_usage_period_to").attr('disabled', 'disabled');
+			$("#coupon_term_coupon_available_unlimited").prop('checked', true);
+		}
+	}).filter(':checked').trigger('change');
 	</script>
 {% endblock javascript %}
 
@@ -349,7 +364,7 @@
 									{{ form_errors(form.discount_type) }}
 								</div>
 							</div>
-							<div class="row" id="discount_price" style="display: none;">
+							<div class="row" id="discount_price">
 								<div class="col-3">{{ form_label(form.discount_price) }}</div>
 								<div class="col mb-2">
 									{{ form_widget(form.discount_price) }}
@@ -376,7 +391,7 @@
 								<div class="col-3">{{ form_label(form.issuance_trigger) }}<span class="badge bg-primary ms-1">{{ 'admin.common.required'|trans }}</span>
 								</div>
 								<div class="col mb-2">
-									{{ form_widget(form.issuance_trigger) }}
+									{{ form_widget(form.issuance_trigger, {'label_attr': {'class': 'radio-inline'}}) }}
 									{{ form_errors(form.issuance_trigger) }}
 								</div>
 							</div>
@@ -460,7 +475,7 @@
 								<div class="col-3">{{ form_label(form.issuance_display) }}<span class="badge bg-primary ms-1">{{ 'admin.common.required'|trans }}</span>
 								</div>
 								<div class="col mb-2">
-									{{ form_widget(form.issuance_display) }}
+									{{ form_widget(form.issuance_display, {'label_attr': {'class': 'radio-inline'}}) }}
 									{{ form_errors(form.issuance_display) }}
 								</div>
 							</div>
@@ -561,8 +576,8 @@
 								<div class="col mb-2">
 									<div class="row">
 										<div class="col col-4">
-											<input type='radio' name='group' ng-model='mValue' value='first'/>Set a uniform period.
-											<input type='radio' name='group' ng-model='mValue' value='second'/>
+											<input type='radio' name='usage_period_type' ng-model='mValue' value='1'/>Set a uniform period.
+											<input type='radio' name='usage_period_type' ng-model='mValue' value='2'/>
 											Configure for each trigger.
 										</div>
 										<div class="col col-3">
@@ -570,6 +585,14 @@
 											{{ form_errors(form.term_usage_period) }}
 										</div>
 									</div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-6">
+								</div>
+								<div class="col mb-6">
+									{{ form_widget(form.term_coupon_available_unlimited) }}
+									{{ form_errors(form.term_coupon_available_unlimited) }}
 								</div>
 							</div>
 							<div class="row">
@@ -598,7 +621,6 @@
 											{{ form_widget(form.term_available_count) }}
 											{{ form_errors(form.term_available_count) }}
 										</div>
-										~
 										<div class="col col-3">
 											<div>
 												{{ form_widget(form.term_available_cycle_cycle) }}
@@ -667,8 +689,6 @@
 
 					</div>
 				</div>
-
-
 				<div class="card rounded border-0 mb-4">
 					<div class="card-header">
 						<span>Issuance notification email</span>
