@@ -13,6 +13,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Customize\Entity\Shop;
 use Eccube\Entity\Product;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 
 
 class CouponTypeExtension extends AbstractTypeExtension
@@ -84,6 +85,10 @@ class CouponTypeExtension extends AbstractTypeExtension
             },
             'placeholder' => '---',
             'label' => 'Products eligible for issuance',
+            'required' => false,
+        ])
+        ->add('email_notification_content', TextType::class, [
+            'label' => 'Inserted text',
             'required' => false,
         ]);
     }

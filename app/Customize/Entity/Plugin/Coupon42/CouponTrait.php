@@ -7,6 +7,7 @@ use Eccube\Annotation\EntityExtension;
 use Eccube\Entity\Customer;
 use Doctrine\ORM\Mapping\JoinColumn;
 use Doctrine\ORM\Mapping\OneToOne;
+use Dom\Text;
 
 /**
  * @EntityExtension("Plugin\Coupon42\Entity\Coupon")
@@ -60,6 +61,11 @@ trait CouponTrait
      * @JoinColumn(name="product_id", referencedColumnName="id")
      */
     private $product_id;
+
+    /**
+     * @ORM\Column(name="email_notification_content", type="text", nullable=true)
+     */
+    private $email_notification_content;
 
     public function getTargetUsers(): ?array
     {
@@ -150,6 +156,17 @@ trait CouponTrait
     public function setProductId(?int $product_id): self
     {
         $this->product_id = $product_id;
+        return $this;
+    }
+
+    public function getEmailNotificationContent(): ?Text
+    {
+        return $this->email_notification_content;
+    }
+
+    public function setEmailNotificationContent(?text $email_notification_content): self
+    {
+        $this->email_notification_content = $email_notification_content;
         return $this;
     }
 }
