@@ -28,6 +28,7 @@ class CouponTypeExtension extends AbstractTypeExtension
             'required' => true,
             'expanded' => true,
             'multiple' => false,
+            'data' => 2,
             'constraints' => [
                 new Assert\NotBlank(),
             ],

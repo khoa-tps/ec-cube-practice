@@ -35,222 +35,228 @@
 	<script src="{{ asset('assets/js/vendor/moment-ja.js', 'admin') }}"></script>
 	<script src="{{ asset('assets/js/vendor/bootstrap-datetimepicker.min.js', 'admin') }}"></script>
 	<script>
-		$(function () {
-// ==================================
-// 商品の追加 ボタンクリック時表示
-// ==================================
-$('#showSearchProductModal').on('click', function () {
-var tbody = $('#searchProductModalList tbody');
-tbody.children().remove();
-$('div.box-footer').remove();
-});
+	$(function () {
+		// ==================================
+		// 商品の追加 ボタンクリック時表示
+		// ==================================
+		$('#showSearchProductModal').on('click', function () {
+			var tbody = $('#searchProductModalList tbody');
+			tbody.children().remove();
+			$('div.box-footer').remove();
+		});
 
-// ==================================
-// カテゴリの追加 ボタンクリック時表示
-// ==================================
-$('#showSearchCategoryModal').on('click', function () {
-var tbody = $('#searchCategoryModalList tbody');
-tbody.children().remove();
-$('div.box-footer').remove();
-});
-// ==================================
-// 商品検索ダイアログ - 検索ボタンクリック時表示
-// ==================================
-$('#searchProductModalButton').on('click', function () {
-var existProductId = "";
-$(":input[id^=coupon_CouponDetails_][id$=_Product]").each(function (index, elem) {
-if (existProductId == "") {
-existProductId = elem.value;
-} else {
-existProductId = existProductId + "," + elem.value;
-}
-});
-var tbody = $('#searchProductModalList tbody');
-tbody.children().remove();
-$.ajax({
-type: 'POST',
-dataType: 'html',
-data: {
-'id': $('#admin_search_product_id').val(),
-'category_id': $('#admin_search_product_category_id').val(),
-'exist_product_id': existProductId
-},
-url: '{{ url('plugin_coupon_search_product') }}',
-success: function (data) { // モーダルに結果を書き出し.
-$('#searchProductModalList').html(data);
+		// ==================================
+		// カテゴリの追加 ボタンクリック時表示
+		// ==================================
+		$('#showSearchCategoryModal').on('click', function () {
+			var tbody = $('#searchCategoryModalList tbody');
+			tbody.children().remove();
+			$('div.box-footer').remove();
+		});
+		// ==================================
+		// 商品検索ダイアログ - 検索ボタンクリック時表示
+		// ==================================
+		$('#searchProductModalButton').on('click', function () {
+			var existProductId = "";
+			$(":input[id^=coupon_CouponDetails_][id$=_Product]").each(function (index, elem) {
+				if (existProductId == "") {
+					existProductId = elem.value;
+				} else {
+					existProductId = existProductId + "," + elem.value;
+				}
+			});
+			var tbody = $('#searchProductModalList tbody');
+			tbody.children().remove();
+			$.ajax({
+				type: 'POST',
+				dataType: 'html',
+				data: {
+					'id': $('#admin_search_product_id').val(),
+					'category_id': $('#admin_search_product_category_id').val(),
+					'exist_product_id': existProductId
+				},
+				url: '{{ url('plugin_coupon_search_product') }}',
+				success: function (data) { // モーダルに結果を書き出し.
+					$('#searchProductModalList').html(data);
 
-},
-error: function () {
-alert('search product failed.');
-}
-});
-});
+				},
+				error: function () {
+					alert('search product failed.');
+				}
+			});
+		});
 
-// ==================================
-// カテゴリ検索ダイアログ表示
-// ==================================
-$('#searchCategoryModalButton').on('click', function () {
-var existCategoryId = "";
-$(":input[id^=coupon_CouponDetails_][id$=_Category]").each(function (index, elem) {
-if (existCategoryId == "") {
-existCategoryId = elem.value;
-} else {
-existCategoryId = existCategoryId + "," + elem.value;
-}
-});
+		// ==================================
+		// カテゴリ検索ダイアログ表示
+		// ==================================
+		$('#searchCategoryModalButton').on('click', function () {
+			var existCategoryId = "";
+			$(":input[id^=coupon_CouponDetails_][id$=_Category]").each(function (index, elem) {
+				if (existCategoryId == "") {
+					existCategoryId = elem.value;
+				} else {
+					existCategoryId = existCategoryId + "," + elem.value;
+				}
+			});
 
-var tbody = $('#searchCategoryModalList tbody');
-tbody.children().remove();
-$.ajax({
-type: 'POST',
-dataType: 'html',
-data: {
-'category_id': $('#coupon_search_category_category_id').val(),
-'exist_category_id': existCategoryId
-},
-url: '{{ url('plugin_coupon_search_category') }}',
-success: function (data) { // モーダルに結果を書き出し.
-$('#searchCategoryModalList').html(data);
+			var tbody = $('#searchCategoryModalList tbody');
+			tbody.children().remove();
+			$.ajax({
+				type: 'POST',
+				dataType: 'html',
+				data: {
+					'category_id': $('#coupon_search_category_category_id').val(),
+					'exist_category_id': existCategoryId
+				},
+				url: '{{ url('plugin_coupon_search_category') }}',
+				success: function (data) { // モーダルに結果を書き出し.
+					$('#searchCategoryModalList').html(data);
 
-},
-error: function () {
-alert('search product failed.');
-}
-});
-});
+				},
+				error: function () {
+					alert('search product failed.');
+				}
+			});
+		});
 
-coupon_details_count = {{ form.CouponDetails|length }};
+		coupon_details_count = {{ form.CouponDetails | length }}
+	};
 
-// 項目数が多く、入力している項目によってEnter押下時に期待する動作が変わるので、いったん禁止
-$("input").on("keydown", function (e) {
-if ((e.which && e.which === 13) || (e.keyCode && e.keyCode === 13)) {
-return false;
-} else {
-return true;
-}
-});
+	// 項目数が多く、入力している項目によってEnter押下時に期待する動作が変わるので、いったん禁止
+	$("input").on("keydown", function (e) {
+		if ((e.which && e.which === 13) || (e.keyCode && e.keyCode === 13)) {
+			return false;
+		} else {
+			return true;
+		}
+	});
 
-// ==================================
-// 商品一覧の削除ボタンクリック時の処理
-// ==================================
-$("#coupon_detail_list").on("click", ".delete-item", function () {
-$(this).parents(".item_box").remove();
-});
-// ==================================
-// カテゴリ一覧の削除ボタンクリック時の処理
-// ==================================
-$("#coupon_detail_list2").on("click", ".delete-item", function () {
-$(this).parents(".item_box").remove();
-});
+	// ==================================
+	// 商品一覧の削除ボタンクリック時の処理
+	// ==================================
+	$("#coupon_detail_list").on("click", ".delete-item", function () {
+		$(this).parents(".item_box").remove();
+	});
+	// ==================================
+	// カテゴリ一覧の削除ボタンクリック時の処理
+	// ==================================
+	$("#coupon_detail_list2").on("click", ".delete-item", function () {
+		$(this).parents(".item_box").remove();
+	});
 
-// set radio button default.
-if ($('input[name~="coupon[coupon_type]"]:checked').length == 0) {
-$('#coupon_coupon_type_0').attr('checked', 'checked');
-}
+	// set radio button default.
+	if ($('input[name~="coupon[coupon_type]"]:checked').length == 0) {
+		$('#coupon_coupon_type_0').attr('checked', 'checked');
+	}
 
-if ($('input[name~="coupon[coupon_member]"]:checked').length == 0) {
-$('#coupon_coupon_member_1').attr('checked', 'checked');
-}
+	if ($('input[name~="coupon[coupon_member]"]:checked').length == 0) {
+		$('#coupon_coupon_member_1').attr('checked', 'checked');
+	}
 
-if ($('input[name~="coupon[discount_type]"]:checked').length == 0) {
-$('#coupon_discount_type_0').attr('checked', 'checked');
-}
+	if ($('input[name~="coupon[discount_type]"]:checked').length == 0) {
+		$('#coupon_discount_type_0').attr('checked', 'checked');
+	}
 
-// ==================================
-// クリック時の処理
-// ==================================
-// 値引き額
-$("#coupon_discount_type_0").on("click", function () {
-$("#coupon_discount_price").removeAttr('disabled');
-$("#coupon_discount_rate").attr('disabled', 'disabled');
-});
-// 値引率
-$("#coupon_discount_type_1").on("click", function () {
-$("#coupon_discount_price").attr('disabled', 'disabled');
-$("#coupon_discount_rate").removeAttr('disabled');
-});
-// クーポン種別 - 商品
-$("#coupon_coupon_type_0").on("click", function () {
-if ($("#category_area").find(".item_box").length > 0) {
-if (confirm("{{ 'plugin_coupon.admin.regist.remove_category_confirm'|trans }}")) {
-$("#category_area").find(".item_box").remove();
-} else {
-return false;
-}
-}
-$("#product_area").show();
-$("#category_area").hide();
-});
-// クーポン種別 - カテゴリ
-$("#coupon_coupon_type_1").on("click", function () {
-if ($("#product_area").find(".item_box").length > 0) {
-if (confirm("{{ 'plugin_coupon.admin.regist.remove_product_confirm'|trans }}")) {
-$("#product_area").find(".item_box").remove();
-} else {
-return false;
-}
-}
-$("#product_area").hide();
-$("#category_area").show();
-});
+	// ==================================
+	// クリック時の処理
+	// ==================================
+	// 値引き額
+	$("#coupon_discount_type_0").on("click", function () {
+		$("#coupon_discount_price").removeAttr('disabled');
+		$("#coupon_discount_rate").attr('disabled', 'disabled');
+	});
+	// 値引率
+	$("#coupon_discount_type_1").on("click", function () {
+		$("#coupon_discount_price").attr('disabled', 'disabled');
+		$("#coupon_discount_rate").removeAttr('disabled');
+	});
+	// クーポン種別 - 商品
+	$("#coupon_coupon_type_0").on("click", function () {
+		if ($("#category_area").find(".item_box").length > 0) {
+			if (confirm("{{ 'plugin_coupon.admin.regist.remove_category_confirm'|trans }}")) {
+				$("#category_area").find(".item_box").remove();
+			} else {
+				return false;
+			}
+		}
+		$("#product_area").show();
+		$("#category_area").hide();
+	});
+	// クーポン種別 - カテゴリ
+	$("#coupon_coupon_type_1").on("click", function () {
+		if ($("#product_area").find(".item_box").length > 0) {
+			if (confirm("{{ 'plugin_coupon.admin.regist.remove_product_confirm'|trans }}")) {
+				$("#product_area").find(".item_box").remove();
+			} else {
+				return false;
+			}
+		}
+		$("#product_area").hide();
+		$("#category_area").show();
+	});
 
-$("#coupon_coupon_type_2").on("click", function () {
-if ($("#product_area").find(".item_box").length > 0 || $("#category_area").find(".item_box").length) {
-if (confirm("{{ 'plugin_coupon.admin.regist.remove_both_confirm'|trans }}")) {
-$("#product_area").find(".item_box").remove();
-$("#category_area").find(".item_box").remove();
-} else {
-return false;
-}
-}
-$("#product_area").hide();
-$("#category_area").hide();
-});
+	$("#coupon_coupon_type_2").on("click", function () {
+		if ($("#product_area").find(".item_box").length > 0 || $("#category_area").find(".item_box").length) {
+			if (confirm("{{ 'plugin_coupon.admin.regist.remove_both_confirm'|trans }}")) {
+				$("#product_area").find(".item_box").remove();
+				$("#category_area").find(".item_box").remove();
+			} else {
+				return false;
+			}
+		}
+		$("#product_area").hide();
+		$("#category_area").hide();
+	});
 
-// ==========================
-// 初期処理
-// ==========================
-// 値引き額
-if ($("#coupon_discount_type_0").prop('checked')) {
-$("#coupon_discount_price").removeAttr('disabled');
-} else {
-$("#coupon_discount_price").attr('disabled', 'disabled');
-}
-// 値引率
-if ($("#coupon_discount_type_1").prop('checked')) {
-$("#coupon_discount_rate").removeAttr('disabled');
-} else {
-$("#coupon_discount_rate").attr('disabled', 'disabled');
-}
-// クーポン種別 - 商品
-if ($("#coupon_coupon_type_0").prop('checked')) {
-$("#product_area").show();
-} else {
-$("#product_area").hide();
-}
-// クーポン種別 - カテゴリ
-if ($("#coupon_coupon_type_1").prop('checked')) {
-$("#category_area").show();
-} else {
-$("#category_area").hide();
-}
+	// ==========================
+	// 初期処理
+	// ==========================
+	// 値引き額
+	if ($("#coupon_discount_type_0").prop('checked')) {
+		$("#coupon_discount_price").removeAttr('disabled');
+	} else {
+		$("#coupon_discount_price").attr('disabled', 'disabled');
+	}
+	// 値引率
+	if ($("#coupon_discount_type_1").prop('checked')) {
+		$("#coupon_discount_rate").removeAttr('disabled');
+	} else {
+		$("#coupon_discount_rate").attr('disabled', 'disabled');
+	}
+	// クーポン種別 - 商品
+	if ($("#coupon_coupon_type_0").prop('checked')) {
+		$("#product_area").show();
+	} else {
+		$("#product_area").hide();
+	}
+	// クーポン種別 - カテゴリ
+	if ($("#coupon_coupon_type_1").prop('checked')) {
+		$("#category_area").show();
+	} else {
+		$("#category_area").hide();
+	}
 
-var inputDate = document.createElement('input');
-inputDate.setAttribute('type', 'date');
-if (inputDate.type !== 'date') {
-$('input[id$=_date]').datetimepicker({locale: 'ja', format: 'YYYY-MM-DD', useCurrent: false, showTodayButton: true});
-}
+	var inputDate = document.createElement('input');
+	inputDate.setAttribute('type', 'date');
+	if (inputDate.type !== 'date') {
+		$('input[id$=_date]').datetimepicker({ locale: 'ja', format: 'YYYY-MM-DD', useCurrent: false, showTodayButton: true });
+	}
 
-$("input[name='coupon[target_users][]']").on("change", function () {
-if ($("input[name='coupon[target_users][]'][value='3']").is(':checked')) {
-$("#specificUsersArea").show();
-} else {
-$("#specificUsersArea").hide();
-$("#coupon_Customer").val('');
-}
-});
-$("input[name='coupon[target_users][]']").trigger("change");
-});
+	$("input[name='coupon[target_users][]']").on("change", function () {
+		if ($("input[name='coupon[target_users][]'][value='3']").is(':checked')) {
+			$("#specificUsersArea").show();
+		} else {
+			$("#specificUsersArea").hide();
+			$("#coupon_Customer").val('');
+		}
+	});
+	$("input[name='coupon[target_users][]']").trigger("change");
+	});
+
+	$("input[name='coupon[issue_type]']").on("change", function () {
+		alert($(this).val());
+		console.log($(this).val());
+	});
 	</script>
 {% endblock javascript %}
 
@@ -274,7 +280,7 @@ $("input[name='coupon[target_users][]']").trigger("change");
 									{{ form_errors(form.issue_type) }}
 								</div>
 							</div>
-							<div class="row">
+							<div class="row" style="display: none;">
 								<div class="col-3">{{ form_label(form.issue_type_from) }}<span class="badge bg-primary ms-1">{{ 'admin.common.required'|trans }}</span>
 								</div>
 								<div class="col mb-2">
