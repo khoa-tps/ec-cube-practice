@@ -167,6 +167,16 @@ trait CouponTrait
      */
     private $term_coupon_available_unlimited;
 
+    /**
+     * @ORM\Column(name="acquisition_conditions", type="text", nullable=true)
+     */
+    private $acquisition_conditions;
+
+    /**
+     * @ORM\Column(name="detail_link", type="string", nullable=true)
+     */
+    private $detail_link;
+
     public function getTargetUsers(): ?array
     {
         return $this->target_users;
@@ -465,6 +475,28 @@ trait CouponTrait
     public function setTermCouponAvailableUnlimited(?int $term_coupon_available_unlimited): self
     {
         $this->term_coupon_available_unlimited = $term_coupon_available_unlimited;
+        return $this;
+    }
+
+    public function getAcquisitionConditions(): ?string
+    {
+        return $this->acquisition_conditions;
+    }
+
+    public function setAcquisitionConditions(?string $acquisition_conditions): self
+    {
+        $this->acquisition_conditions = $acquisition_conditions;
+        return $this;
+    }
+
+    public function getDetailLink(): ?string
+    {
+        return $this->detail_link;
+    }
+
+    public function setDetailLink(?string $detail_link): self
+    {
+        $this->detail_link = $detail_link;
         return $this;
     }
 }

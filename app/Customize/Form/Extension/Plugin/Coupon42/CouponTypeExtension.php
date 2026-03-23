@@ -253,6 +253,14 @@ class CouponTypeExtension extends AbstractTypeExtension
         ->add('term_coupon_available_unlimited', CheckboxType::class, [
             'label' => 'Indefinite',
             'required' => false,
+        ])
+        ->add('acquisition_conditions', TextType::class, [
+            'label' => 'Acquisition conditions',
+            'required' => false,
+        ])
+        ->add('detail_link', TextType::class, [
+            'label' => 'Detail link',
+            'required' => false,
         ]);
     }
 

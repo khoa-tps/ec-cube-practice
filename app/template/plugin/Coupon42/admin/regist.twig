@@ -249,6 +249,7 @@
 			$("#coupon_Customer").val('');
 		}
 	});
+
 	$("input[name='coupon[target_users][]']").trigger("change");
 
 		let previousIssueType = $("input[name='coupon[issue_type]']:checked").val();
@@ -265,14 +266,37 @@
 
 			previousIssueType = val;
 
-			const visibilityConfig = {
-				'#issue_type_from_area': (val == 1),
-				'#coupon_cd':            (val == 3),
-			};
-
-			Object.entries(visibilityConfig).forEach(([selector, isVisible]) => {
-				$(selector).toggle(isVisible);
-			});
+			if (val == 1) {
+				$('#issue_type_from_area').show();
+				$('#coupon_cd').hide();
+				$('#issuance_trigger_area').hide();
+				$('#issuance_period_area').hide();
+				$('#issuance_quantity_area').hide();
+				$('#coupon_lower_limit_area').hide();
+				$('.category_area').hide();
+				$('#acquisition_conditions_area').show();
+				$('#detail_link_area').show();
+			} else if (val == 2) {
+				$('#issue_type_from_area').hide();
+				$('#coupon_cd').hide();
+				$('#issuance_trigger_area').show();
+				$('#issuance_period_area').show();
+				$('#issuance_quantity_area').show();
+				$('#coupon_lower_limit_area').show();
+				$('.category_area').show();
+				$('#acquisition_conditions_area').hide();
+				$('#detail_link_area').hide();
+			} else if (val == 3) {
+				$('#issue_type_from_area').hide();
+				$('#coupon_cd').show();
+				$('#issuance_trigger_area').hide();
+				$('#issuance_period_area').hide();
+				$('#issuance_quantity_area').hide();
+				$('#coupon_lower_limit_area').hide();
+				$('.category_area').hide();
+				$('#acquisition_conditions_area').hide();
+				$('#detail_link_area').hide();
+			}
 		}).filter(':checked').trigger('change');
 	});
 
@@ -319,7 +343,15 @@
 			$("#coupon_term_available_cycle_count").removeAttr('disabled');
 		}
 	}).trigger('change');
-	
+
+	$("#issuance_quantity_unlimited").on("change", function () {
+		if ($(this).is(':checked')) {
+			$("#coupon_issuance_quantity").attr('disabled', 'disabled');
+		} else {
+			$("#coupon_issuance_quantity").removeAttr('disabled');
+		}
+	}).trigger('change');
+
 	</script>
 {% endblock javascript %}
 
@@ -406,7 +438,7 @@
 							<span>Issuance conditions</span>
 						</div>
 						<div class="card-body">
-							<div class="row">
+							<div class="row" id="issuance_trigger_area">
 								<div class="col-3">{{ form_label(form.issuance_trigger) }}<span class="badge bg-primary ms-1">{{ 'admin.common.required'|trans }}</span>
 								</div>
 								<div class="col mb-2">
@@ -414,7 +446,23 @@
 									{{ form_errors(form.issuance_trigger) }}
 								</div>
 							</div>
-							<div class="row">
+							<div class="row" id="acquisition_conditions_area" style="display: none;">
+								<div class="col-3">{{ form_label(form.acquisition_conditions) }}<span class="badge bg-primary ms-1">{{ 'admin.common.required'|trans }}</span>
+								</div>
+								<div class="col mb-2">
+									{{ form_widget(form.acquisition_conditions, {'label_attr': {'class': 'radio-inline'}}) }}
+									{{ form_errors(form.acquisition_conditions) }}
+								</div>
+							</div>
+							<div class="row" id="detail_link_area" style="display: none;">
+								<div class="col-3">{{ form_label(form.detail_link) }}<span class="badge bg-primary ms-1">{{ 'admin.common.required'|trans }}</span>
+								</div>
+								<div class="col mb-2">
+									{{ form_widget(form.detail_link, {'label_attr': {'class': 'radio-inline'}}) }}
+									{{ form_errors(form.detail_link) }}
+								</div>
+							</div>
+							<div class="row" id="issuance_period_area">
 								<div class="col-3">Issuance period<span class="badge bg-primary ms-1">{{ 'admin.common.required'|trans }}</span>
 								</div>
 								<div class="col mb-2">
@@ -432,16 +480,22 @@
 								{{ form_widget(form.coupon_use_time) }}
 								<input type="hidden" name="coupon_release_old" value="{{ form.vars.value.coupon_release }}">
 							</div>
-							<div class="row">
+							<div class="row" id="issuance_quantity_area">
 								<div class="col-3">Number of Issues<span class="badge bg-primary ms-1">{{ 'admin.common.required'|trans }}</span>
 								</div>
 								<div class="col mb-2">
-									{{ form_widget(form.issuance_quantity) }}
-									{{ form_errors(form.issuance_quantity) }}
+									<div class="row">
+										<div class="col-3">
+											<input id="issuance_quantity_unlimited" name="issuance_quantity_unlimited" type="checkbox" value="1" /> Unlimited
+										</div>
+										<div class="col-3">
+											{{ form_widget(form.issuance_quantity) }}
+											{{ form_errors(form.issuance_quantity) }}
+										</div>
+									</div>
 								</div>
 							</div>
-							{# 下限金額 #}
-							<div class="row">
+							<div class="row" id="coupon_lower_limit_area">
 								<div class="col-3">{{ form_label(form.coupon_lower_limit) }}</div>
 								<div class="col mb-2">
 									{{ form_widget(form.coupon_lower_limit) }}
@@ -449,7 +503,7 @@
 									<span id="coupon_lower_limit_description" class="small">{{ 'plugin_coupon.admin.regist.coupon_lower_limit.note'|trans }}</span>
 								</div>
 							</div>
-							<div class="collapse show ec-cardCollapse" id="category">
+							<div class="collapse show ec-cardCollapse category_area" id="category">
 								<div class="row">
 									<div class="col-3">Categories of publication</div>
 									<div class="col mb-2">
@@ -490,7 +544,7 @@
 									</div>
 								</div>
 							</div>
-							<div class="row">
+							<div class="row" id="issuance_display_area">
 								<div class="col-3">{{ form_label(form.issuance_display) }}<span class="badge bg-primary ms-1">{{ 'admin.common.required'|trans }}</span>
 								</div>
 								<div class="col mb-2">
@@ -499,34 +553,7 @@
 								</div>
 							</div>
 						</div>
-						<div class="card rounded border-0 mb-4" id="issuance_conditions_area">
-							<div class="card-header">
-								<div class="row">
-									<div class="col-8">
-										<div class="d-inline-block">
-											<span class="card-title">{{ 'plugin_coupon.admin.regist.header.product'|trans }}</span>
-										</div>
-									</div>
-									<div class="col-4 text-end">
-										<a data-bs-toggle="collapse" href="#productArea" aria-expanded="false" aria-controls="productArea">
-											<i class="fa fa-angle-up fa-lg"></i>
-										</a>
-									</div>
-								</div>
-							</div>
-							<div class="collapse show ec-cardCollapse" id="specificUsersArea" style="display: none">
-								<div class="card-body">
-									<div>Specific Users</div>
-									<div class="tableish" id="specific_users_list">
-										<div class="row item_box">
-											{{ form_widget(form.customer) }}
-											{{ form_errors(form.customer) }}
-										</div>
-									</div>
-
-								</div>
-							</div>
-						</div>
+						
 						<div class="card rounded border-0 mb-4" id="category_area">
 							<div class="card-header">
 								<div class="row">
