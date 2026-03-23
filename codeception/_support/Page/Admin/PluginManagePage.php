@@ -95,9 +95,15 @@ class PluginManagePage extends AbstractAdminPageStyleGuide
 
     private function ストアプラグイン_ボタンクリック($pluginCode, $label)
     {
-        $xpath = ['xpath' => $this->ストアプラグイン_セレクタ($pluginCode).'/../../td[6]//i[@data-bs-original-title="'.$label.'"]/parent::node()'];
-        $this->tester->scrollTo($xpath);
-        $this->tester->click($xpath);
+        $xpathStr = $this->ストアプラグイン_セレクタ($pluginCode).'/../../td[6]//i[@data-bs-original-title="'.$label.'"]/parent::node()';
+        $this->tester->scrollTo(['xpath' => $xpathStr]);
+        // tooltip やアラートを除去した上で JS クリックすることで、
+        // WebDriver のマウス移動による tooltip 再出現を回避する
+        $this->tester->executeJS(
+            "document.querySelectorAll('.tooltip, .alert-dismissible').forEach(e => e.remove());"
+            .'document.evaluate(arguments[0], document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.click()',
+            [$xpathStr]
+        );
 
         return $this;
     }
@@ -152,9 +158,13 @@ class PluginManagePage extends AbstractAdminPageStyleGuide
 
     private function 独自プラグイン_ボタンクリック($pluginCode, $label)
     {
-        $xpath = ['xpath' => $this->独自プラグイン_セレクタ($pluginCode).'/../td[6]//i[@data-bs-original-title="'.$label.'"]/parent::node()'];
-        $this->tester->scrollTo($xpath);
-        $this->tester->click($xpath);
+        $xpathStr = $this->独自プラグイン_セレクタ($pluginCode).'/../td[6]//i[@data-bs-original-title="'.$label.'"]/parent::node()';
+        $this->tester->scrollTo(['xpath' => $xpathStr]);
+        $this->tester->executeJS(
+            "document.querySelectorAll('.tooltip, .alert-dismissible').forEach(e => e.remove());"
+            .'document.evaluate(arguments[0], document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.click()',
+            [$xpathStr]
+        );
 
         return $this;
     }
@@ -176,6 +186,10 @@ class PluginManagePage extends AbstractAdminPageStyleGuide
      * - ページの JavaScript（function.js の data-method="post" ハンドラ）が
      *   まだ初期化されていない状態でクリックした場合
      * - フラッシュメッセージ等に遮られてクリックが届かなかった場合
+     *
+     * クリックハンドラが発火済み（pointer-events:none が付与された）場合は
+     * フォーム送信済みなので再クリックせず、サーバー応答を待つ。
+     * サーバー側の clearCache() 等で 10 秒以上かかる場合がある。
      */
     private function ページ遷移を伴うクリック(callable $clickAction)
     {
@@ -198,8 +212,22 @@ class PluginManagePage extends AbstractAdminPageStyleGuide
 
             $clickAction();
 
+            // function.js の click ハンドラが発火すると対象の <a> に pointer-events:none が
+            // 設定される。これが検出できればフォーム送信は成功しており、あとはサーバー応答
+            // （clearCache 等で時間がかかる場合がある）を待つだけなので再クリックしない。
+            $formSubmitted = false;
+            try {
+                $formSubmitted = (bool) $this->tester->executeJS(
+                    "return document.querySelector('a[token-for-anchor][style*=\"pointer-events\"]') !== null"
+                );
+            } catch (\Exception $e) {
+                // JS 実行失敗 = ページ遷移中
+                break;
+            }
+
             $navigated = false;
-            $timeout = ($attempt < $maxRetries) ? 10 : 30;
+            // フォーム送信済みならサーバー応答待ち (最大60秒)、未送信なら短めに待ってリトライ
+            $timeout = $formSubmitted ? 60 : (($attempt < $maxRetries) ? 5 : 30);
 
             $this->tester->executeInSelenium(function ($webDriver) use (&$navigated, $timeout) {
                 $deadline = microtime(true) + $timeout;
@@ -218,7 +246,7 @@ class PluginManagePage extends AbstractAdminPageStyleGuide
                 }
             });
 
-            if ($navigated) {
+            if ($navigated || $formSubmitted) {
                 break;
             }
         }
