@@ -3,16 +3,11 @@ namespace Customize\Controller\Admin\Coupon;
 
 use Plugin\Coupon42\Controller\Admin\CouponController as BaseCouponController;
 use Eccube\Common\Constant;
-use Eccube\Form\Type\Admin\SearchProductType;
 use Plugin\Coupon42\Entity\Coupon;
-use Plugin\Coupon42\Entity\CouponDetail;
-use Plugin\Coupon42\Form\Type\CouponSearchCategoryType;
 use Plugin\Coupon42\Form\Type\CouponType;
 use Plugin\Coupon42\Repository\CouponDetailRepository;
 use Plugin\Coupon42\Repository\CouponRepository;
 use Plugin\Coupon42\Service\CouponService;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -72,12 +67,10 @@ class CustomCouponController extends BaseCouponController
     {
         $Coupon = null;
         if (!$id) {
-            // 新規登録
             $Coupon = new Coupon();
             $Coupon->setEnableFlag(Constant::ENABLED);
             $Coupon->setVisible(true);
         } else {
-            // 更新
             $Coupon = $this->couponRepository->find($id);
             if (!$Coupon) {
                 $this->addError('plugin_coupon.admin.notfound', 'admin');
@@ -87,7 +80,6 @@ class CustomCouponController extends BaseCouponController
         }
 
         $form = $this->formFactory->createBuilder(CouponType::class, $Coupon)->getForm();
-        // クーポンコードの発行
         if (!$id) {
             $form->get('coupon_cd')->setData($this->couponService->generateCouponCd());
         }
@@ -98,7 +90,6 @@ class CustomCouponController extends BaseCouponController
             $CouponDetail->getCategoryFullName();
         }
         $TopCategories = $this->categoryRepository->getList(null);
-        // CouponType に Category フィールドは無い。カテゴリ対象は CouponDetails 内の Category 参照（Product 画面の form.Category 相当）
         $ChoicedCategoryIds = [];
         foreach ($CouponDetails as $CouponDetail) {
             $Category = $CouponDetail->getCategory();
@@ -111,7 +102,6 @@ class CustomCouponController extends BaseCouponController
         $form->get('CouponDetails')->setData($details);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            /** @var \Plugin\Coupon42\Entity\Coupon $Coupon */
             $Coupon = $form->getData();
             $oldReleaseNumber = $request->get('coupon_release_old');
             if (is_null($Coupon->getCouponUseTime())) {
@@ -131,7 +121,6 @@ class CustomCouponController extends BaseCouponController
                 $this->entityManager->flush($CouponDetail);
             }
             $CouponDetails = $form->get('CouponDetails')->getData();
-            /** @var CouponDetail $CouponDetail */
             foreach ($CouponDetails as $CouponDetail) {
                 $CouponDetail->setCoupon($Coupon);
                 $CouponDetail->setCouponType($Coupon->getCouponType());
@@ -141,7 +130,6 @@ class CustomCouponController extends BaseCouponController
             }
             $this->entityManager->persist($Coupon);
             $this->entityManager->flush($Coupon);
-            // 成功時のメッセージを登録する
             $this->addSuccess('plugin_coupon.admin.regist.success', 'admin');
 
             return $this->redirectToRoute('plugin_coupon_list');
@@ -152,6 +140,20 @@ class CustomCouponController extends BaseCouponController
             'id' => $id,
             'TopCategories' => $TopCategories,
             'ChoicedCategoryIds' => $ChoicedCategoryIds,
+        ]);
+    }
+
+    /**
+     * クーポンコードの新規生成（AJAX用）
+     *
+     * @Route("/%eccube_admin_route%/plugin/coupon/generate-coupon-cd", name="plugin_coupon_generate_coupon_cd", methods={"GET"})
+     */
+    public function generateCouponCd(): Response
+    {
+        $couponCd = $this->couponService->generateCouponCd();
+
+        return $this->json([
+            'coupon_cd' => $couponCd,
         ]);
     }
 }

@@ -352,6 +352,29 @@
 		}
 	}).trigger('change');
 
+	$("#generate_coupon_cd").on("click", function () {
+		const $button = $(this);
+		$button.prop('disabled', true);
+
+		$.ajax({
+			type: 'GET',
+			dataType: 'json',
+			url: '{{ url('plugin_coupon_generate_coupon_cd') }}',
+			success: function (res) {
+				if (res && res.coupon_cd) {
+					$("#coupon_coupon_cd").val(res.coupon_cd).trigger('change');
+				} else {
+					alert('Failed to generate coupon code.');
+				}
+			},
+			error: function () {
+				alert('Failed to generate coupon code.');
+			},
+			complete: function () {
+				$button.prop('disabled', false);
+			}
+		});
+	});
 	</script>
 {% endblock javascript %}
 
@@ -403,7 +426,10 @@
 								<div class="col-3">{{ form_label(form.coupon_cd) }}<span class="badge bg-primary ms-1">{{ 'admin.common.required'|trans }}</span>
 								</div>
 								<div class="col mb-2">
-									{{ form_widget(form.coupon_cd) }}
+									<div class="input-group">
+										{{ form_widget(form.coupon_cd, { 'attr': { 'id': 'coupon_cd_input' } }) }}
+										<button type="button" id="generate_coupon_cd" class="btn btn-primary">コード生成</button>
+									</div>
 									{{ form_errors(form.coupon_cd) }}
 								</div>
 							</div>
@@ -519,7 +545,6 @@
 												</div>
 											</div>
 										</div>
-										{# Coupon フォームには form.Category が無い（詳細は CouponDetails 内）。マクロ第3引数は未使用のため省略 #}
 										{% macro tree(ChoicedIds, Category) %}
 											{% import _self as selfMacro %}
 											<li class="c-directoryTree--registerItem category-li">
@@ -718,7 +743,6 @@
 											</div>
 										</div>
 									</div>
-									{# Coupon フォームには form.Category が無い（詳細は CouponDetails 内）。マクロ第3引数は未使用のため省略 #}
 									{% macro tree(ChoicedIds, Category) %}
 										{% import _self as selfMacro %}
 										<li class="c-directoryTree--registerItem category-li">
@@ -829,4 +853,3 @@
 		</div>
 	</div>
 {% endblock %}
-
