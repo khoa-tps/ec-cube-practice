@@ -171,6 +171,83 @@ class CouponTypeExtension extends AbstractTypeExtension
             'constraints' => [
                 new Assert\NotBlank(),
             ],
+        ])
+        ->add('term_usage_period', IntegerType::class, [
+            'label' => 'Usage period',
+            'required' => false,
+            'constraints' => [
+                new Assert\NotBlank(),
+            ],
+        ])
+        ->add('term_usage_period_from', DateType::class, [
+            'label' => 'Date and time of issuance reservation',
+            'required' => false,
+            'widget' => 'single_text',
+            'input' => 'datetime',
+            'constraints' => [
+                new Assert\NotBlank(),
+            ],
+        ])
+        ->add('term_usage_period_to', DateType::class, [
+            'label' => 'Date and time of issuance reservation',
+            'required' => false,
+            'widget' => 'single_text',
+            'input' => 'datetime',
+            'constraints' => [
+                new Assert\NotBlank(),
+            ],
+        ])
+        ->add('term_available_count', IntegerType::class, [
+            'label' => 'Number of uses',
+            'required' => false,
+            'constraints' => [
+                new Assert\NotBlank(),
+            ],
+        ])
+        ->add('term_available_cycle_cycle', ChoiceType::class, [
+            'required' => true,
+            'expanded' => true,
+            'multiple' => false,
+            'constraints' => [
+                new Assert\NotBlank(),
+            ],
+            'choices' => array_flip([
+                1 => 'Day',
+                2 => 'Week',
+                3 => 'Month'
+            ])
+        ])
+        ->add('term_available_cycle_count', IntegerType::class, [
+            'label' => 'Number of uses',
+            'required' => false,
+            'constraints' => [
+                new Assert\NotBlank(),
+            ],
+        ])
+        ->add('term_minimun_spend_amount', IntegerType::class, [
+            'label' => 'Minimum spend amount',
+            'required' => false,
+            'constraints' => [
+                new Assert\NotBlank(),
+            ],
+        ])
+        ->add('term_shop_id', EntityType::class, [
+            'class' => Shop::class,
+            'choice_label' => function ($Shop) {
+                return $Shop->getName();
+            },
+            'placeholder' => '---',
+            'label' => 'plugin_coupon.admin.label.shop',
+            'required' => false,
+        ])
+        ->add('term_category_id', EntityType::class, [
+            'class' => Category::class,
+            'choice_label' => function ($Category) {
+                return $Category->getName();
+            },
+            'placeholder' => '---',
+            'label' => 'Categories eligible for issuance',
+            'required' => false,
         ]);
     }
 

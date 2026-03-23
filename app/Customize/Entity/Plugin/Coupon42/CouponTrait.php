@@ -113,6 +113,55 @@ trait CouponTrait
      */
     private $issuance_quantity;
 
+    /**
+     * @ORM\Column(name="term_usage_period", type="integer", nullable=true)
+     */
+    private $term_usage_period;
+
+    /**
+     * @ORM\Column(name="term_usage_period_from", type="datetime", nullable=true)
+     */
+    private $term_usage_period_from;
+
+    /**
+     * @ORM\Column(name="term_usage_period_to", type="datetime", nullable=true)
+     */
+    private $term_usage_period_to;
+
+    /**
+     * @ORM\Column(name="term_available_count", type="integer", nullable=true)
+     */
+    private $term_available_count;
+
+    /**
+     * @ORM\Column(name="term_available_cycle_cycle", type="string", nullable=true)
+     */
+    private $term_available_cycle_cycle;
+
+    /**
+     * @ORM\Column(name="term_available_cycle_count", type="integer", nullable=true)
+     */
+    private $term_available_cycle_count;
+
+    /**
+     * @ORM\Column(name="term_minimun_spend_amount", type="integer", nullable=true)
+     */
+    private $term_minimun_spend_amount;
+
+    /**
+     * @ORM\Column(name="term_shop_id", type="integer", nullable=true)
+     * @OneToOne(targetEntity="Customize\Entity\Shop")
+     * @JoinColumn(name="term_shop_id", referencedColumnName="id")
+     */
+    private $term_shop_id;
+
+    /**
+     * @ORM\Column(name="term_category_id", type="integer", nullable=true)
+     * @OneToOne(targetEntity="Eccube\Entity\Category")
+     * @JoinColumn(name="term_category_id", referencedColumnName="id")
+     */
+    private $term_category_id;
+
     public function getTargetUsers(): ?array
     {
         return $this->target_users;
@@ -301,6 +350,105 @@ trait CouponTrait
     public function setIssuanceQuantity(?int $issuance_quantity): self
     {
         $this->issuance_quantity = $issuance_quantity;
+        return $this;
+    }
+
+    public function getTermUsagePeriod(): ?int
+    {
+        return $this->term_usage_period;
+    }
+
+    public function setTermUsagePeriod(?int $term_usage_period): self
+    {
+        $this->term_usage_period = $term_usage_period;
+        return $this;
+    }
+
+    public function getTermUsagePeriodFrom(): ?\DateTimeInterface
+    {
+        return $this->term_usage_period_from;
+    }
+
+    public function setTermUsagePeriodFrom(?\DateTimeInterface $term_usage_period_from): self
+    {
+        $this->term_usage_period_from = $term_usage_period_from;
+        return $this;
+    }
+
+    public function getTermUsagePeriodTo(): ?\DateTimeInterface
+    {
+        return $this->term_usage_period_to;
+    }
+
+    public function setTermUsagePeriodTo(?\DateTimeInterface $term_usage_period_to): self
+    {
+        $this->term_usage_period_to = $term_usage_period_to;
+        return $this;
+    }
+
+    public function getTermAvailableCount(): ?int
+    {
+        return $this->term_available_count;
+    }
+
+    public function setTermAvailableCount(?int $term_available_count): self
+    {
+        $this->term_available_count = $term_available_count;
+        return $this;
+    }
+
+    public function getTermAvailableCycleCycle(): ?string
+    {
+        return $this->term_available_cycle_cycle;
+    }
+
+    public function setTermAvailableCycleCycle(?string $term_available_cycle_cycle): self
+    {
+        $this->term_available_cycle_cycle = $term_available_cycle_cycle;
+        return $this;
+    }
+
+    public function getTermAvailableCycleCount(): ?int
+    {
+        return $this->term_available_cycle_count;
+    }
+
+    public function setTermAvailableCycleCount(?int $term_available_cycle_count): self
+    {
+        $this->term_available_cycle_count = $term_available_cycle_count;
+        return $this;
+    }
+
+    public function getTermMinimunSpendAmount(): ?int
+    {
+        return $this->term_minimun_spend_amount;
+    }
+
+    public function setTermMinimunSpendAmount(?int $term_minimun_spend_amount): self
+    {
+        $this->term_minimun_spend_amount = $term_minimun_spend_amount;
+        return $this;
+    }
+
+    public function getTermShopId(): ?int
+    {
+        return $this->term_shop_id;
+    }
+
+    public function setTermShopId(?int $term_shop_id): self
+    {
+        $this->term_shop_id = $term_shop_id;
+        return $this;
+    }
+
+    public function getTermCategoryId(): ?int
+    {
+        return $this->term_category_id;
+    }
+
+    public function setTermCategoryId(?int $term_category_id): self
+    {
+        $this->term_category_id = $term_category_id;
         return $this;
     }
 }

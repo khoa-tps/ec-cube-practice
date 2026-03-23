@@ -569,6 +569,84 @@ $("input[name='coupon[target_users][]']").trigger("change");
 							</div>
 						</div>
 					</div>
+
+					<div class="card rounded border-0 mb-4">
+						<div class="card-header">
+							<span>Term of usage</span>
+						</div>
+						<div class="card-body">
+							<div class="row">
+								<div class="col-3">
+									{{ form_label(form.term_usage_period) }}<span class="badge bg-primary ms-1"></span>
+								</div>
+								<div class="col mb-2">
+									<div class="row">
+										<div class="col col-4">
+											<input type='radio' name='group' ng-model='mValue' value='first' />Set a uniform period.
+											<input type='radio' name='group' ng-model='mValue' value='second' /> Configure for each trigger.
+										</div>
+										<div class="col col-3">
+											{{ form_widget(form.term_usage_period) }}
+											{{ form_errors(form.term_usage_period) }}
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-3">
+								</div>
+								<div class="col mb-2">
+									<div class="row">
+										<div class="col col-3">
+											{{ form_widget(form.term_usage_period_from) }}
+											{{ form_errors(form.term_usage_period_from) }}
+										</div>
+										~
+										<div class="col col-3">
+											{{ form_widget(form.term_usage_period_to) }}
+											{{ form_errors(form.term_usage_period_to) }}
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-3">
+									{{ form_label(form.term_available_count) }}<span class="badge bg-primary ms-1"></span>
+								</div>
+								<div class="col mb-2">
+									<div class="row">
+										<div class="col col-3">
+											{{ form_widget(form.term_available_count) }}
+											{{ form_errors(form.term_available_count) }}
+										</div>
+										~
+										<div class="col col-3">
+											<div>
+												{{ form_widget(form.term_available_cycle_cycle) }}
+												{{ form_errors(form.term_available_cycle_cycle) }}
+											</div>
+											<div>
+												{{ form_widget(form.term_available_cycle_count) }}
+												{{ form_errors(form.term_available_cycle_count) }}
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-3">
+									{{ form_label(form.term_minimun_spend_amount) }}<span class="badge bg-primary ms-1"></span>
+								</div>
+								<div class="col mb-2">
+									{{ form_widget(form.term_minimun_spend_amount) }}
+									{{ form_errors(form.term_minimun_spend_amount) }}
+								</div>
+							</div>
+						</div>
+					</div>
+
+
+
 					<div class="card rounded border-0 mb-4">
 						<div class="card-header">
 							<span>Issuance notification email</span>
