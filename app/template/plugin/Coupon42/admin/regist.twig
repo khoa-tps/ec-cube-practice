@@ -301,6 +301,25 @@
 			$("#coupon_term_coupon_available_unlimited").prop('checked', true);
 		}
 	}).filter(':checked').trigger('change');
+
+	$("#term_available_count_unlimited").on("change", function () {
+		if ($(this).is(':checked')) {
+			$("#coupon_term_available_count").attr('disabled', 'disabled').val('');
+		} else {
+			$("#coupon_term_available_count").removeAttr('disabled');
+		}
+	}).trigger('change');
+
+	$("#term_available_cycle_cycle_unlimited").on("change", function () {
+		if ($(this).is(':checked')) {
+			$("#coupon_term_available_cycle_cycle").attr('disabled', 'disabled').val('');
+			$("#coupon_term_available_cycle_count").attr('disabled', 'disabled').val('');
+		} else {
+			$("#coupon_term_available_cycle_cycle").removeAttr('disabled');
+			$("#coupon_term_available_cycle_count").removeAttr('disabled');
+		}
+	}).trigger('change');
+	
 	</script>
 {% endblock javascript %}
 
@@ -617,21 +636,33 @@
 								</div>
 								<div class="col mb-2">
 									<div class="row">
-										<div class="col col-3">
+										<div class="col col-12">
+											<input id="term_available_count_unlimited" type="checkbox" />Unlimited
+										</div>
+										<div class="col col-6">
 											{{ form_widget(form.term_available_count) }}
 											{{ form_errors(form.term_available_count) }}
 										</div>
-										<div class="col col-3">
-											<div>
+									</div>
+									<div>
+										<div class="col col-12">
+											<div class="col col-6">
+												<input id="term_available_cycle_cycle_unlimited" type="checkbox" />Unlimited
+											</div>
+											<div class="col col-6">
 												{{ form_widget(form.term_available_cycle_cycle) }}
 												{{ form_errors(form.term_available_cycle_cycle) }}
 											</div>
-											<div>
-												{{ form_widget(form.term_available_cycle_count) }}
-												{{ form_errors(form.term_available_cycle_count) }}
-											</div>
 										</div>
 									</div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-3">
+								</div>
+								<div class="col mb-2">
+									{{ form_widget(form.term_available_cycle_count) }}
+									{{ form_errors(form.term_available_cycle_count) }}
 								</div>
 							</div>
 							<div class="row">

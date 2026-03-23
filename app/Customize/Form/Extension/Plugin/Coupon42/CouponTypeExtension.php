@@ -207,8 +207,7 @@ class CouponTypeExtension extends AbstractTypeExtension
             ],
         ])
         ->add('term_available_cycle_cycle', ChoiceType::class, [
-            'required' => true,
-            'expanded' => true,
+            'required' => false,
             'multiple' => false,
             'constraints' => [
                 new Assert\NotBlank(),
