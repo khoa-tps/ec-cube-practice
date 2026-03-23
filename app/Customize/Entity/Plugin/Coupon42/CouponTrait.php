@@ -67,6 +67,52 @@ trait CouponTrait
      */
     private $email_notification_content;
 
+    /**
+     * @ORM\Column(name="issuance_trigger", type="integer", nullable=true)
+     */
+    private $issuance_trigger;
+
+    /**
+     * @ORM\Column(name="issuance_period_from", type="datetime", nullable=true)
+     */
+    private $issuance_period_from;
+
+    /**
+     * @ORM\Column(name="issuance_period_to", type="datetime", nullable=true)
+     */
+    private $issuance_period_to;
+
+    /**
+     * @ORM\Column(name="issuance_shop_id", type="integer", nullable=true)
+     * @OneToOne(targetEntity="Customize\Entity\Shop")
+     * @JoinColumn(name="issuance_shop_id", referencedColumnName="id")
+     */
+    private $issuance_shop_id;
+
+    /**
+     * @ORM\Column(name="issuance_product_id", type="integer", nullable=true)
+     * @OneToOne(targetEntity="Eccube\Entity\Product")
+     * @JoinColumn(name="issuance_product_id", referencedColumnName="id")
+     */
+    private $issuance_product_id;
+
+    /**
+     * @ORM\Column(name="issuance_category_id", type="integer", nullable=true)
+     * @OneToOne(targetEntity="Eccube\Entity\Category")
+     * @JoinColumn(name="issuance_category_id", referencedColumnName="id")
+     */
+    private $issuance_category_id;
+
+    /**
+     * @ORM\Column(name="issuance_display", type="integer", nullable=true)
+     */
+    private $issuance_display;
+
+    /**
+     * @ORM\Column(name="issuance_quantity", type="integer", nullable=true)
+     */
+    private $issuance_quantity;
+
     public function getTargetUsers(): ?array
     {
         return $this->target_users;
@@ -167,6 +213,94 @@ trait CouponTrait
     public function setEmailNotificationContent(?text $email_notification_content): self
     {
         $this->email_notification_content = $email_notification_content;
+        return $this;
+    }
+
+    public function getIssuanceTrigger(): ?int
+    {
+        return $this->issuance_trigger;
+    }
+
+    public function setIssuanceTrigger(?int $issuance_trigger): self
+    {
+        $this->issuance_trigger = $issuance_trigger;
+        return $this;
+    }
+
+    public function getIssuancePeriodFrom(): ?\DateTimeInterface
+    {
+        return $this->issuance_period_from;
+    }
+
+    public function setIssuancePeriodFrom(?\DateTimeInterface $issuance_period_from): self
+    {
+        $this->issuance_period_from = $issuance_period_from;
+        return $this;
+    }
+
+    public function getIssuancePeriodTo(): ?\DateTimeInterface
+    {
+        return $this->issuance_period_to;
+    }
+
+    public function setIssuancePeriodTo(?\DateTimeInterface $issuance_period_to): self
+    {
+        $this->issuance_period_to = $issuance_period_to;
+        return $this;
+    }
+
+    public function getIssuanceShopId(): ?int
+    {
+        return $this->issuance_shop_id;
+    }
+
+    public function setIssuanceShopId(?int $issuance_shop_id): self
+    {
+        $this->issuance_shop_id = $issuance_shop_id;
+        return $this;
+    }
+
+    public function getIssuanceProductId(): ?int
+    {
+        return $this->issuance_product_id;
+    }
+
+    public function setIssuanceProductId(?int $issuance_product_id): self
+    {
+        $this->issuance_product_id = $issuance_product_id;
+        return $this;
+    }
+
+    public function getIssuanceCategoryId(): ?int
+    {
+        return $this->issuance_category_id;
+    }
+
+    public function setIssuanceCategoryId(?int $issuance_category_id): self
+    {
+        $this->issuance_category_id = $issuance_category_id;
+        return $this;
+    }
+
+    public function getIssuanceDisplay(): ?int
+    {
+        return $this->issuance_display;
+    }
+
+    public function setIssuanceDisplay(?int $issuance_display): self
+    {
+        $this->issuance_display = $issuance_display;
+        return $this;
+    }
+
+    public function getIssuanceQuantity(): ?int
+    {
+        return $this->issuance_quantity;
+    }
+
+    public function setIssuanceQuantity(?int $issuance_quantity): self
+    {
+        $this->issuance_quantity = $issuance_quantity;
         return $this;
     }
 }

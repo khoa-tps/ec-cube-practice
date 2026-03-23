@@ -14,6 +14,8 @@ use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Customize\Entity\Shop;
 use Eccube\Entity\Product;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Eccube\Entity\Category;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 
 
 class CouponTypeExtension extends AbstractTypeExtension
@@ -45,7 +47,7 @@ class CouponTypeExtension extends AbstractTypeExtension
             ],
         ]);
         $builder->add('target_users', ChoiceType::class, [
-            'label' => 'Target Users',
+            'label' => 'Issuance trigger',
             'required' => true,
             'expanded' => true,
             'multiple' => false,
@@ -90,6 +92,85 @@ class CouponTypeExtension extends AbstractTypeExtension
         ->add('email_notification_content', TextType::class, [
             'label' => 'Inserted text',
             'required' => false,
+        ])
+        ->add('issuance_trigger', ChoiceType::class, [
+            'label' => 'Issuance trigger',
+            'required' => true,
+            'expanded' => true,
+            'multiple' => false,
+            'constraints' => [
+                new Assert\NotBlank(),
+            ],
+            'choices' => array_flip([
+                CouponConfig::TARGET_USERS_NEW => 'New Users',
+                CouponConfig::TARGET_USERS_PURCHASE => 'Purchase',
+                CouponConfig::TARGET_REVIEW => 'Review Submission'
+            ])
+        ])
+        ->add('issuance_period_from', DateType::class, [
+            'label' => 'Date and time of issuance reservation',
+            'required' => false,
+            'widget' => 'single_text',
+            'input' => 'datetime',
+            'constraints' => [
+                new Assert\NotBlank(),
+            ],
+        ])
+        ->add('issuance_period_to', DateType::class, [
+            'label' => 'Date and time of issuance reservation',
+            'required' => false,
+            'widget' => 'single_text',
+            'input' => 'datetime',
+            'constraints' => [
+                new Assert\NotBlank(),
+            ],
+        ])
+        ->add('issuance_shop_id', EntityType::class, [
+            'class' => Shop::class,
+            'choice_label' => function ($Shop) {
+                return $Shop->getName();
+            },
+            'placeholder' => '---',
+            'label' => 'plugin_coupon.admin.label.shop',
+            'required' => false,
+        ])
+        ->add('issuance_product_id', EntityType::class, [
+            'class' => Product::class,
+            'choice_label' => function ($Product) {
+                return $Product->getName();
+            },
+            'placeholder' => '---',
+            'label' => 'Products eligible for issuance',
+            'required' => false,
+        ])
+        ->add('issuance_category_id', EntityType::class, [
+            'class' => Category::class,
+            'choice_label' => function ($Category) {
+                return $Category->getName();
+            },
+            'placeholder' => '---',
+            'label' => 'Categories eligible for issuance',
+            'required' => false,
+        ])
+        ->add('issuance_display', ChoiceType::class, [
+            'label' => 'Display on the coupon list page',
+            'required' => true,
+            'expanded' => true,
+            'multiple' => false,
+            'constraints' => [
+                new Assert\NotBlank(),
+            ],
+            'choices' => array_flip([
+                1 => 'Yes',
+                0 => 'No'
+            ])
+        ])
+        ->add('issuance_quantity', IntegerType::class, [
+            'label' => 'Number of Issues',
+            'required' => false,
+            'constraints' => [
+                new Assert\NotBlank(),
+            ],
         ]);
     }
 
