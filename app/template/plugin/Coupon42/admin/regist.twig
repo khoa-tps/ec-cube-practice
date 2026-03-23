@@ -396,46 +396,6 @@ $("input[name='coupon[target_users][]']").trigger("change");
 									<span id="coupon_lower_limit_description" class="small">{{ 'plugin_coupon.admin.regist.coupon_lower_limit.note'|trans }}</span>
 								</div>
 							</div>
-							<div class="row" id="product_area">
-								<div class="col-3">Products eligible for issuance</div>
-								<div class="col mb-2">
-									<div class="collapse show ec-cardCollapse" id="productArea">
-										<div class="card-body">
-											<div class="text-center">
-												<a id="showSearchProductModal" class="btn btn-ec-regular me-2 add" data-bs-toggle="modal" data-bs-target="#searchProductModal">商品の追加</a>
-											</div>
-											<div class="tableish" id="coupon_detail_list" data-prototype="{{ include('Coupon42/Resource/template/admin/regist_product_list_prototype.twig') }}">
-												{% set i = 0 %}
-												{% for couponDetailForm in form.CouponDetails %}
-													{% if couponDetailForm.vars.value.Product is not null %}
-														{% if couponDetailForm.vars.value.product_name is not null %}
-															<div class="row item_box">
-																{{ form_widget(couponDetailForm.id) }}
-																{{ form_widget(couponDetailForm.Product) }}
-																<div class="col-11 item_detail">
-																	<div class="item_name_area">
-																		<div class="item_name fw-bold">
-																			<div id="coupon_CouponDetails_{{ i }}_product_name">
-																				{{ couponDetailForm.vars.value.product_name }}
-																			</div>
-																		</div>
-																	</div>
-																</div>
-																<div class="col-1 icon_edit">
-																	<a class="btn btn-ec-actionIcon mr-3 delete-item" data-bs-toggle="modal" data-bs-toggle="tooltip" data-bs-target="#confirmModal" data-bs-placement="top" title="{{ 'admin.common.delete'|trans }}">
-																		<i class="fa fa-close fa-lg text-secondary"></i>
-																	</a>
-																</div>
-															</div>
-														{% endif %}
-													{% endif %}
-													{% set i = i + 1 %}
-												{% endfor %}
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
 							<div class="collapse show ec-cardCollapse" id="category">
 								<div class="row">
 									<div class="col-3">Categories of publication</div>
@@ -582,8 +542,9 @@ $("input[name='coupon[target_users][]']").trigger("change");
 								<div class="col mb-2">
 									<div class="row">
 										<div class="col col-4">
-											<input type='radio' name='group' ng-model='mValue' value='first' />Set a uniform period.
-											<input type='radio' name='group' ng-model='mValue' value='second' /> Configure for each trigger.
+											<input type='radio' name='group' ng-model='mValue' value='first'/>Set a uniform period.
+											<input type='radio' name='group' ng-model='mValue' value='second'/>
+											Configure for each trigger.
 										</div>
 										<div class="col col-3">
 											{{ form_widget(form.term_usage_period) }}
@@ -593,8 +554,7 @@ $("input[name='coupon[target_users][]']").trigger("change");
 								</div>
 							</div>
 							<div class="row">
-								<div class="col-3">
-								</div>
+								<div class="col-3"></div>
 								<div class="col mb-2">
 									<div class="row">
 										<div class="col col-3">
@@ -643,90 +603,133 @@ $("input[name='coupon[target_users][]']").trigger("change");
 								</div>
 							</div>
 						</div>
-					</div>
-
-
-
-					<div class="card rounded border-0 mb-4">
-						<div class="card-header">
-							<span>Issuance notification email</span>
-						</div>
-						<div class="card-body">
+						<div class="collapse show ec-cardCollapse card-body" id="category">
 							<div class="row">
-								<div class="col-3">
-									{{ form_label(form.email_notification_content) }}<span class="badge bg-primary ms-1"></span>
-								</div>
+								<div class="col-3">Categories of publication</div>
 								<div class="col mb-2">
-									{{ form_widget(form.email_notification_content) }}
-									{{ form_errors(form.email_notification_content) }}
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div class="c-conversionArea">
-					<div class="c-conversionArea__container">
-						<div class="row justify-content-between align-items-center">
-							<div class="col-6">
-								<div class="c-conversionArea__leftBlockItem">
-									<a class="c-baseLink" href="{{ url('plugin_coupon_list') }}">
-										<i class="fa fa-backward" aria-hidden="true"></i>
-										<span>{{ 'common.back'|trans }}</span>
-									</a>
-								</div>
-							</div>
-							<div class="col-6">
-								<div class="row align-items-center justify-content-end">
-									<div class="col-auto">
-										<button type="submit" class="btn btn-ec-conversion">{{ 'common.registration'|trans }}</button>
+									<div class="row">
+										<div class="col">
+											<div class="input-group">
+												<div class="input-group-text">
+													<span id="basic-addon1">
+														<i class="fa fa-search"></i>
+													</span>
+												</div>
+												<input id="search-category" class="form-control" type="search" placeholder="{{ 'admin.product.search_category'|trans }}" aria-label="Search">
+											</div>
+										</div>
+									</div>
+									{# Coupon フォームには form.Category が無い（詳細は CouponDetails 内）。マクロ第3引数は未使用のため省略 #}
+									{% macro tree(ChoicedIds, Category) %}
+										{% import _self as selfMacro %}
+										<li class="c-directoryTree--registerItem category-li">
+											<input type="checkbox" id="admin_product_category_{{ Category.id }}" name="admin_product[Category][]" value="{{ Category.id }}" {% if Category.id in ChoicedIds %} checked {% endif %}>
+											<label for="admin_product_category_{{ Category.id }}">{{ Category.name }}</label>
+											<ul class="list-unstyled">
+												{% for child,ChildCategory in Category.children %}
+													{{ selfMacro.tree(ChoicedIds, ChildCategory) }}
+												{% endfor %}
+											</ul>
+										</li>
+									{% endmacro %}
+
+									<div class="c-directoryTree--register rounded border mb-3 p-3">
+										{% import _self as renderMacro %}
+										{% for TopCategory in TopCategories %}
+											<ul class="list-unstyled">
+												{{ renderMacro.tree(ChoicedCategoryIds, TopCategory) }}
+											</ul>
+										{% endfor %}
 									</div>
 								</div>
 							</div>
 						</div>
+
+
+					</div>
+				</div>
+
+
+				<div class="card rounded border-0 mb-4">
+					<div class="card-header">
+						<span>Issuance notification email</span>
+					</div>
+					<div class="card-body">
+						<div class="row">
+							<div class="col-3">
+								{{ form_label(form.email_notification_content) }}<span class="badge bg-primary ms-1"></span>
+							</div>
+							<div class="col mb-2">
+								{{ form_widget(form.email_notification_content) }}
+								{{ form_errors(form.email_notification_content) }}
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
-		</form>
-		<div class="modal" id="searchProductModal" tabindex="-1" role="dialog" aria-labelledby="searchProductModal" aria-hidden="true">
-			<div class="modal-dialog">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h4 class="modal-title" id="searchProductModalLabel">{{ 'plugin_coupon.admin.regist.modal.product'|trans }}</h4>
-						<button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
-					</div>
-					<div class="modal-body">
-						<div class="mb-3">
-							{{ form_widget(searchProductModalForm.id, { attr : { placeholder : 'admin.product.name'|trans } } ) }}
+			<div class="c-conversionArea">
+				<div class="c-conversionArea__container">
+					<div class="row justify-content-between align-items-center">
+						<div class="col-6">
+							<div class="c-conversionArea__leftBlockItem">
+								<a class="c-baseLink" href="{{ url('plugin_coupon_list') }}">
+									<i class="fa fa-backward" aria-hidden="true"></i>
+									<span>{{ 'common.back'|trans }}</span>
+								</a>
+							</div>
 						</div>
-						<div class="mb-3">
-							{{ form_widget(searchProductModalForm.category_id) }}
+						<div class="col-6">
+							<div class="row align-items-center justify-content-end">
+								<div class="col-auto">
+									<button type="submit" class="btn btn-ec-conversion">{{ 'common.registration'|trans }}</button>
+								</div>
+							</div>
 						</div>
-						<div class="text-center mb-3">
-							<button type="button" id="searchProductModalButton" class="btn btn-primary">{{ 'plugin_coupon.admin.regist.modal.search'|trans }}</button>
-						</div>
-						<div id="searchProductModalList"></div>
 					</div>
 				</div>
 			</div>
 		</div>
-		<div class="modal" id="searchCategoryModal" tabindex="-1" role="dialog" aria-labelledby="searchCategoryModal" aria-hidden="true">
-			<div class="modal-dialog">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h4 class="modal-title" id="searchCategoryModalLabel">{{ 'plugin_coupon.admin.regist.modal.category'|trans }}</h4>
-						<button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+	</form>
+	<div class="modal" id="searchProductModal" tabindex="-1" role="dialog" aria-labelledby="searchProductModal" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4 class="modal-title" id="searchProductModalLabel">{{ 'plugin_coupon.admin.regist.modal.product'|trans }}</h4>
+					<button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<div class="mb-3">
+						{{ form_widget(searchProductModalForm.id, { attr : { placeholder : 'admin.product.name'|trans } } ) }}
 					</div>
-					<div class="modal-body">
-						<div class="mb-3">
-							{{ form_widget(searchCategoryModalForm.category_id, {'attr': {'class': 'form-control'}}) }}
-						</div>
-						<div class="text-center mb-3">
-							<button type="button" id="searchCategoryModalButton" class="btn btn-primary">{{ 'plugin_coupon.admin.regist.modal.search'|trans }}</button>
-						</div>
-						<div id="searchCategoryModalList"></div>
+					<div class="mb-3">
+						{{ form_widget(searchProductModalForm.category_id) }}
 					</div>
+					<div class="text-center mb-3">
+						<button type="button" id="searchProductModalButton" class="btn btn-primary">{{ 'plugin_coupon.admin.regist.modal.search'|trans }}</button>
+					</div>
+					<div id="searchProductModalList"></div>
 				</div>
 			</div>
 		</div>
-	{% endblock %}
+	</div>
+	<div class="modal" id="searchCategoryModal" tabindex="-1" role="dialog" aria-labelledby="searchCategoryModal" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4 class="modal-title" id="searchCategoryModalLabel">{{ 'plugin_coupon.admin.regist.modal.category'|trans }}</h4>
+					<button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<div class="mb-3">
+						{{ form_widget(searchCategoryModalForm.category_id, {'attr': {'class': 'form-control'}}) }}
+					</div>
+					<div class="text-center mb-3">
+						<button type="button" id="searchCategoryModalButton" class="btn btn-primary">{{ 'plugin_coupon.admin.regist.modal.search'|trans }}</button>
+					</div>
+					<div id="searchCategoryModalList"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}
 
