@@ -119,8 +119,7 @@
 			});
 		});
 
-		coupon_details_count = {{ form.CouponDetails | length }}
-	};
+		coupon_details_count = {{ form.CouponDetails | length }};
 
 	// 項目数が多く、入力している項目によってEnter押下時に期待する動作が変わるので、いったん禁止
 	$("input").on("keydown", function (e) {
@@ -251,11 +250,41 @@
 		}
 	});
 	$("input[name='coupon[target_users][]']").trigger("change");
+
+		let previousIssueType = $("input[name='coupon[issue_type]']:checked").val();
+
+		$("input[name='coupon[issue_type]']").on("change", function () {
+			const val = $(this).val();
+
+			if (previousIssueType && previousIssueType !== val) {
+				if (!confirm("{{ 'plugin_coupon.admin.regist.change_issue_type_confirm'|trans }}")) {
+					$(`input[name='coupon[issue_type]'][value='${previousIssueType}']`).prop('checked', true);
+					return false;
+				}
+			}
+
+			previousIssueType = val;
+
+			const visibilityConfig = {
+				'#issue_type_from_area': (val == 1),
+				'#coupon_cd':            (val == 3),
+			};
+
+			Object.entries(visibilityConfig).forEach(([selector, isVisible]) => {
+				$(selector).toggle(isVisible);
+			});
+		}).filter(':checked').trigger('change');
 	});
 
-	$("input[name='coupon[issue_type]']").on("change", function () {
-		alert($(this).val());
-		console.log($(this).val());
+	$("input[name='coupon[discount_type]']").on("change", function () {
+		let coupon_type = $(this).val();	
+		if (coupon_type == 2) {
+			$("#discount_price").show();
+			$("#discount_rate").show();
+		} else {
+			$("#discount_price").hide();
+			$("#discount_rate").hide();
+		}
 	});
 	</script>
 {% endblock javascript %}
@@ -280,7 +309,7 @@
 									{{ form_errors(form.issue_type) }}
 								</div>
 							</div>
-							<div class="row" style="display: none;">
+							<div class="row" id="issue_type_from_area" style="display: none;">
 								<div class="col-3">{{ form_label(form.issue_type_from) }}<span class="badge bg-primary ms-1">{{ 'admin.common.required'|trans }}</span>
 								</div>
 								<div class="col mb-2">
@@ -304,7 +333,7 @@
 									{{ form_errors(form.coupon_name) }}
 								</div>
 							</div>
-							<div class="row">
+							<div class="row" id="coupon_cd" style="display: none;">
 								<div class="col-3">{{ form_label(form.coupon_cd) }}<span class="badge bg-primary ms-1">{{ 'admin.common.required'|trans }}</span>
 								</div>
 								<div class="col mb-2">
@@ -312,15 +341,7 @@
 									{{ form_errors(form.coupon_cd) }}
 								</div>
 							</div>
-							<div class="row">
-								<div class="col-3">{{ form_label(form.coupon_type) }}<span class="badge bg-primary ms-1">{{ 'admin.common.required'|trans }}</span>
-								</div>
-								<div class="col mb-2">
-									{{ form_widget(form.coupon_type, {'label_attr': {'class': 'radio-inline'}}) }}
-									{{ form_errors(form.coupon_type) }}
-								</div>
-							</div>
-							<div class="row">
+							<div class="row" id="discount_type">
 								<div class="col-3">{{ form_label(form.discount_type) }}<span class="badge bg-primary ms-1">{{ 'admin.common.required'|trans }}</span>
 								</div>
 								<div class="col mb-2">
@@ -328,7 +349,7 @@
 									{{ form_errors(form.discount_type) }}
 								</div>
 							</div>
-							<div class="row">
+							<div class="row" id="discount_price" style="display: none;">
 								<div class="col-3">{{ form_label(form.discount_price) }}</div>
 								<div class="col mb-2">
 									{{ form_widget(form.discount_price) }}
@@ -336,20 +357,12 @@
 									<span id="discount_type_price_description" class="small">{{ 'plugin_coupon.admin.regist.discount_price.note'|trans }}</span>
 								</div>
 							</div>
-							<div class="row">
+							<div class="row" id="discount_rate" style="display: none;">
 								<div class="col-3">{{ form_label(form.discount_rate) }}</div>
 								<div class="col mb-2">
 									{{ form_widget(form.discount_rate) }}
 									{{ form_errors(form.discount_rate) }}
 									<span id="discount_type_rate_description" class="small">{{ 'plugin_coupon.admin.regist.discount_rate.note'|trans }}</span>
-								</div>
-							</div>
-							<div class="row">
-								<div class="col-3">Vendor selection<span class="badge bg-primary ms-1">{{ 'admin.common.required'|trans }}</span>
-								</div>
-								<div class="col mb-2">
-									{{ form_widget(form.shop_id, {'label_attr': {'class': 'radio-inline'}}) }}
-									{{ form_errors(form.shop_id) }}
 								</div>
 							</div>
 						</div>

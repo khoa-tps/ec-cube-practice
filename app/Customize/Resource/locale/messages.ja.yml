@@ -23,3 +23,4 @@ admin.product.shop: ショップ
 admin.coupon.coupon_management: クーポン管理
 admin.coupon.coupon_list: クーポン一覧
 admin.coupon.coupon_registration: クーポン登録
+plugin_coupon.admin.regist.change_issue_type_confirm: 以降の項目を初期化しますがよろしいでしょうか？
