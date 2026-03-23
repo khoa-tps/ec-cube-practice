@@ -247,6 +247,11 @@ services:
         alias: Customize\Controller\CustomCouponShoppingController
         public: true
 
+     # Override Plugin Coupon Controller
+    Plugin\Coupon42\Controller\Admin\CouponController:
+        alias: Customize\Controller\Admin\Coupon\CustomCouponController
+        public: true
+
     # Override Product Repository
     Eccube\Repository\ProductRepository:
         class: Customize\Repository\ProductRepository

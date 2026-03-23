@@ -54,6 +54,13 @@ trait CouponTrait
      */
     private $category_id;
 
+    /**
+     * @ORM\Column(name="product_id", type="integer", nullable=true)
+     * @OneToOne(targetEntity="Eccube\Entity\Product")
+     * @JoinColumn(name="product_id", referencedColumnName="id")
+     */
+    private $product_id;
+
     public function getTargetUsers(): ?array
     {
         return $this->target_users;
@@ -132,6 +139,17 @@ trait CouponTrait
     public function setCategoryId(?int $category_id): self
     {
         $this->category_id = $category_id;
+        return $this;
+    }
+
+    public function getProductId(): ?int
+    {
+        return $this->product_id;
+    }
+
+    public function setProductId(?int $product_id): self
+    {
+        $this->product_id = $product_id;
         return $this;
     }
 }
