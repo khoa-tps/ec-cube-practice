@@ -407,6 +407,7 @@
 	<form role="form" name="form1" id="form1" method="post" action="">
 		<input type="hidden" name="mode" value="">
 		{{ form_widget(form._token) }}
+		{{ form_errors(form) }}
 		<div class="c-contentsArea__cols">
 			<div class="c-contentsArea__primaryCol">
 				<div class="c-primaryCol">

@@ -19,11 +19,37 @@ use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 
 
+use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormEvent;
+use Plugin\Coupon42\Entity\Coupon;
+
+
 class CouponTypeExtension extends AbstractTypeExtension
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         parent::buildForm($builder, $options);
+
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
+            $data = $event->getData();
+            if (!isset($data['coupon_type'])) {
+                $data['coupon_type'] = Coupon::ALL;
+            }
+            if (!isset($data['coupon_member'])) {
+                $data['coupon_member'] = 1;
+            }
+            if (!isset($data['available_from_date']) || empty($data['available_from_date'])) {
+                $data['available_from_date'] = (new \DateTime())->format('Y-m-d');
+            }
+            if (!isset($data['available_to_date']) || empty($data['available_to_date'])) {
+                $data['available_to_date'] = (new \DateTime())->modify('+10 years')->format('Y-m-d');
+            }
+            if (!isset($data['coupon_release']) || empty($data['coupon_release'])) {
+                $data['coupon_release'] = 1000000;
+            }
+            $event->setData($data);
+        });
+
         $builder->add('issue_type', ChoiceType::class, [
             'label' => 'plugin_coupon.admin.label.issue_type',
             'required' => true,
@@ -44,9 +70,6 @@ class CouponTypeExtension extends AbstractTypeExtension
             'required' => false,
             'widget' => 'single_text',
             'input' => 'datetime',
-            'constraints' => [
-                new Assert\NotBlank(),
-            ],
         ]);
         $builder->add('target_users', ChoiceType::class, [
             'label' => 'Issuance trigger',
@@ -103,6 +126,44 @@ class CouponTypeExtension extends AbstractTypeExtension
         ->add('discount_rate', IntegerType::class, [
             'label' => 'Discount rate',
             'required' => false,
+        ])
+        ->add('available_from_date', DateType::class, [
+            'required' => false,
+            'widget' => 'single_text',
+            'input' => 'datetime',
+            'data' => new \DateTime(),
+            'error_bubbling' => true,
+        ])
+        ->add('available_to_date', DateType::class, [
+            'required' => false,
+            'widget' => 'single_text',
+            'input' => 'datetime',
+            'data' => (new \DateTime())->modify('+1 month'),
+            'error_bubbling' => true,
+        ])
+        ->add('coupon_release', IntegerType::class, [
+            'required' => false,
+            'data' => 1000000,
+            'error_bubbling' => true,
+        ])
+        ->add('coupon_type', ChoiceType::class, [
+            'required' => false,
+            'choices' => array_flip([
+                1 => 'Product',
+                2 => 'Category',
+                3 => 'All',
+            ]),
+            'data' => 3,
+            'error_bubbling' => true,
+        ])
+        ->add('coupon_member', ChoiceType::class, [
+            'required' => false,
+            'choices' => array_flip([
+                1 => 'Yes',
+                0 => 'No',
+            ]),
+            'data' => 1,
+            'error_bubbling' => true,
         ])
         ->add('issuance_trigger', ChoiceType::class, [
             'label' => 'Issuance trigger',
