@@ -222,16 +222,26 @@
 		$("#coupon_discount_rate").attr('disabled', 'disabled');
 	}
 	// クーポン種別 - 商品
-	if ($("#coupon_coupon_type_0").prop('checked')) {
-		$("#product_area").show();
+	if ($("#coupon_coupon_type_0").length > 0) {
+		if ($("#coupon_coupon_type_0").prop('checked')) {
+			$("#product_area").show();
+		} else {
+			$("#product_area").hide();
+		}
 	} else {
-		$("#product_area").hide();
+		// If no coupon_type radios, show product_area by default if it exists
+		$("#product_area").show();
 	}
 	// クーポン種別 - カテゴリ
-	if ($("#coupon_coupon_type_1").prop('checked')) {
-		$("#category_area").show();
+	if ($("#coupon_coupon_type_1").length > 0) {
+		if ($("#coupon_coupon_type_1").prop('checked')) {
+			$("#category_area").show();
+		} else {
+			$("#category_area").hide();
+		}
 	} else {
-		$("#category_area").hide();
+		// If no coupon_type radios, handle by issue_type or show by default
+		// We'll let applyIssueTypeDisplay handle it below
 	}
 
 	var inputDate = document.createElement('input');
@@ -265,6 +275,7 @@
 				$('#issuance_quantity_area').hide().find(':input').prop('disabled', true);
 				$('#coupon_lower_limit_area').hide().find(':input').prop('disabled', true);
 				$('.category_area').hide().find(':input').prop('disabled', true);
+				$('#product_area').show().find(':input').prop('disabled', true);
 				$('#acquisition_conditions_area').show().find(':input').prop('disabled', false);
 				$('#detail_link_area').show().find(':input').prop('disabled', false);
 			} else if (val == 2) {
@@ -275,6 +286,7 @@
 				$('#issuance_quantity_area').show().find(':input').prop('disabled', false);
 				$('#coupon_lower_limit_area').show().find(':input').prop('disabled', false);
 				$('.category_area').show().find(':input').prop('disabled', false);
+				$('#product_area').show().find(':input').prop('disabled', false);
 				$('#acquisition_conditions_area').hide().find(':input').prop('disabled', true);
 				$('#detail_link_area').hide().find(':input').prop('disabled', true);
 			} else if (val == 3) {
@@ -285,6 +297,7 @@
 				$('#issuance_quantity_area').hide().find(':input').prop('disabled', true);
 				$('#coupon_lower_limit_area').hide().find(':input').prop('disabled', true);
 				$('.category_area').hide().find(':input').prop('disabled', true);
+				$('#product_area').hide().find(':input').prop('disabled', true);
 				$('#acquisition_conditions_area').hide().find(':input').prop('disabled', true);
 				$('#detail_link_area').hide().find(':input').prop('disabled', true);
 			}
@@ -576,6 +589,58 @@
 									<span id="coupon_lower_limit_description" class="small">{{ 'plugin_coupon.admin.regist.coupon_lower_limit.note'|trans }}</span>
 								</div>
 							</div>
+							<div class="card rounded border-0 mb-4" id="product_area">
+								<div class="card-header">
+									<div class="row">
+										<div class="col-8">
+											<div class="d-inline-block">
+												<span class="card-title">{{ 'plugin_coupon.admin.regist.header.product'|trans }}</span>
+											</div>
+										</div>
+										<div class="col-4 text-end">
+											<a data-bs-toggle="collapse" href="#productArea" aria-expanded="false" aria-controls="productArea">
+												<i class="fa fa-angle-up fa-lg"></i>
+											</a>
+										</div>
+									</div>
+								</div>
+
+								<div class="collapse show ec-cardCollapse" id="productArea">
+									<div class="card-body">
+										<div class="text-center">
+											<a id="showSearchProductModal" class="btn btn-ec-regular me-2 add" data-bs-toggle="modal" data-bs-target="#searchProductModal">商品の追加</a>
+										</div>
+										<div class="tableish" id="coupon_detail_list" data-prototype="{{ include('Coupon42/Resource/template/admin/regist_product_list_prototype.twig') }}">
+											{% set i = 0 %}
+											{% for couponDetailForm in form.CouponDetails %}
+												{% if couponDetailForm.vars.value.Product is not null %}
+													{% if couponDetailForm.vars.value.product_name is not null %}
+														<div class="row item_box">
+															{{ form_widget(couponDetailForm.id) }}
+															{{ form_widget(couponDetailForm.Product) }}
+															<div class="col-11 item_detail">
+																<div class="item_name_area">
+																	<div class="item_name fw-bold">
+																		<div id="coupon_CouponDetails_{{ i }}_product_name">
+																			{{ couponDetailForm.vars.value.product_name }}
+																		</div>
+																	</div>
+																</div>
+															</div>
+															<div class="col-1 icon_edit">
+																<a class="btn btn-ec-actionIcon mr-3 delete-item" data-bs-toggle="modal" data-bs-toggle="tooltip" data-bs-target="#confirmModal" data-bs-placement="top" title="{{ 'admin.common.delete'|trans }}">
+																	<i class="fa fa-close fa-lg text-secondary"></i>
+																</a>
+															</div>
+														</div><!-- /.item_box -->
+													{% endif %}
+												{% endif %}
+												{% set i = i + 1 %}
+											{% endfor %}
+										</div>
+									</div>
+								</div>
+							</div>
 							<div class="collapse show ec-cardCollapse category_area" id="category">
 								<div class="row">
 									<div class="col-3">Categories of publication</div>
@@ -639,44 +704,6 @@
 											<i class="fa fa-angle-up fa-lg"></i>
 										</a>
 									</div>
-								</div>
-							</div>
-
-							<div class="collapse show ec-cardCollapse" style="display: block;" id="categoryArea">
-								<div class="card-body">
-									<div class="text-center">
-										<a id="showSearchCategoryModal" class="btn btn-ec-regular mr-2 add" data-bs-toggle="modal" data-bs-target="#searchCategoryModal">カテゴリの追加</a>
-									</div>
-									<div class="tableish" id="coupon_detail_list2" data-prototype="{{ include('Coupon42/Resource/template/admin/regist_category_list_prototype.twig') }}">
-										{% set i = 0 %}
-										{% for couponDetailForm in form.CouponDetails %}
-											{% if couponDetailForm.vars.value.Category is not null %}
-												{% if couponDetailForm.vars.value.category_full_name is not null %}
-													<div class="row item_box">
-														{{ form_widget(couponDetailForm.id) }}
-														{{ form_widget(couponDetailForm.Category) }}
-														<div class="col-11 item_detail">
-															<div class="item_name_area">
-																<div class="item_name fw-bold">
-																	<div id="coupon_CouponDetails_{{ i }}_category_name">
-																		{{ couponDetailForm.vars.value.category_full_name }}
-																	</div>
-																</div>
-															</div>
-														</div>
-
-														<div class="col-1 icon_edit">
-															<a class="btn btn-ec-actionIcon mr-3 delete-item" data-bs-toggle="modal" data-bs-toggle="tooltip" data-bs-target="#confirmModal" data-bs-placement="top" title="{{ 'admin.common.delete'|trans }}">
-																<i class="fa fa-close fa-lg text-secondary"></i>
-															</a>
-														</div>
-													</div>
-												{% endif %}
-											{% endif %}
-											{% set i = i + 1 %}
-										{% endfor %}
-									</div>
-
 								</div>
 							</div>
 						</div>
