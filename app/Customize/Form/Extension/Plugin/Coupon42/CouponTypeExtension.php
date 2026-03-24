@@ -92,6 +92,18 @@ class CouponTypeExtension extends AbstractTypeExtension
             'label' => 'Inserted text',
             'required' => false,
         ])
+        ->add('coupon_cd', TextType::class, [
+            'label' => 'Coupon code',
+            'required' => false,
+        ])
+        ->add('discount_price', IntegerType::class, [
+            'label' => 'Discount price',
+            'required' => false,
+        ])
+        ->add('discount_rate', IntegerType::class, [
+            'label' => 'Discount rate',
+            'required' => false,
+        ])
         ->add('issuance_trigger', ChoiceType::class, [
             'label' => 'Issuance trigger',
             'required' => false,
