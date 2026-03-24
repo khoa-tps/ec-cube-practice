@@ -8,6 +8,7 @@ use Plugin\Coupon42\Entity\CouponDetail;
 use Plugin\Coupon42\Form\Type\CouponType;
 use Plugin\Coupon42\Repository\CouponDetailRepository;
 use Plugin\Coupon42\Repository\CouponRepository;
+use Customize\Repository\CustomCouponRepository;
 use Plugin\Coupon42\Service\CouponService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,11 +17,13 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Eccube\Controller\AbstractController;
 use Eccube\Repository\CategoryRepository;
+use Plugin\Coupon42\Form\Type\Admin\CouponSearchType;
+use Knp\Component\Pager\PaginatorInterface;
 
 class CustomCouponController extends BaseCouponController
 {
     /**
-     * @var CouponRepository
+     * @var CustomCouponRepository
      */
     private $couponRepository;
 
@@ -40,19 +43,81 @@ class CustomCouponController extends BaseCouponController
     private $categoryRepository;
 
     /**
+     * @var PaginatorInterface
+     */
+    private $paginator;
+
+    /**
      * CouponController constructor.
      *
-     * @param CouponRepository $couponRepository
-     * @param CouponService $couponService
      * @param CouponDetailRepository $couponDetailRepository
+     * @param CategoryRepository $categoryRepository
+     * @param PaginatorInterface $paginator
      */
-    public function __construct(CouponRepository $couponRepository, CouponService $couponService, CouponDetailRepository $couponDetailRepository,  CategoryRepository $categoryRepository)
-    {
+    public function __construct(
+        CustomCouponRepository $couponRepository,
+        CouponService $couponService,
+        CouponDetailRepository $couponDetailRepository,
+        CategoryRepository $categoryRepository,
+        PaginatorInterface $paginator
+    ) {
         parent::__construct($couponRepository, $couponService, $couponDetailRepository);
         $this->couponRepository = $couponRepository;
         $this->couponService = $couponService;
         $this->couponDetailRepository = $couponDetailRepository;
         $this->categoryRepository = $categoryRepository;
+        $this->paginator = $paginator;
+    }
+
+    /**
+     * @Route("/%eccube_admin_route%/plugin/coupon", name="plugin_coupon_list")
+     */
+    public function index(Request $request)
+    {
+        $searchForm = $this->formFactory
+            ->createBuilder(CouponSearchType::class)
+            ->getForm();
+
+        /**
+         * フォームの初期値を一旦空にする
+         * クエリパラメータがあれば、それを引き継ぐ
+         */
+        $searchData = [
+            'id' => null,
+            'coupon_type' => [],
+            'enable_flag' => [],
+            'create_datetime_start' => null,
+            'create_datetime_end' => null,
+            'update_datetime_start' => null,
+            'update_datetime_end' => null,
+        ];
+
+        if ('POST' === $request->getMethod()) {
+            $searchForm->handleRequest($request);
+            if ($searchForm->isSubmitted() && $searchForm->isValid()) {
+                $searchData = $searchForm->getData();
+            }
+        } else {
+            // GETの場合はクエリパラメータから取得（ページネーション用）
+            $searchData = $request->query->all();
+            $searchForm->submit($searchData);
+            $searchData = $searchForm->getData();
+        }
+
+        $qb = $this->couponRepository->getQueryBuilderBySearchData($searchData);
+
+        $pagination = $this->paginator->paginate(
+            $qb,
+            $request->query->get('page_no', 1),
+            $request->query->get('page_count', 20)
+        );
+
+        return $this->render('@Coupon42/admin/index.twig', [
+            'searchForm' => $searchForm->createView(),
+            'pagination' => $pagination,
+            'Coupons' => $pagination,
+            'has_errors' => $searchForm->isSubmitted() && !$searchForm->isValid(),
+        ]);
     }
 
     /**

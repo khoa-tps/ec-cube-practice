@@ -16,7 +16,109 @@
 {% block sub_title %}{{ 'plugin_coupon.admin.index.subtitle'|trans }}{% endblock %}
 
 {% block main %}
-<form name="search_form" id="search_form" method="post" action="">
+    <div class="c-outsideBlock">
+        <form id='search_form' method="post" action="{{ url('plugin_coupon_list') }}">
+            {{ form_widget(searchForm._token) }}
+            <div class="c-outsideBlock__contents">
+                <div class="row justify-content-start">
+
+                    <div class="col-6">
+                        <div class="mb-2">
+                            <label class="col-form-label" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ 'tooltip.product.multi_search_label'|trans }}">{{ 'admin.product.multi_search_label'|trans }}<i class="fa fa-question-circle fa-lg ms-1"></i></label>
+                            {{ form_widget(searchForm.id) }}
+                            {{ form_errors(searchForm.id) }}
+                        </div>
+                        <div class="d-inline-block mb-3" data-bs-toggle="collapse" href="#searchDetail"
+                             aria-expanded="false" aria-controls="searchDetail"><a><i
+                                         class="fa fa-plus-square-o fw-bold me-1"></i><span
+                                         class="fw-bold">{{ 'admin.common.search_detail'|trans }}</span></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="c-subContents collapse ec-collapse" id="searchDetail">
+                <div class="row mb-2">
+                    <div class="col-6">
+                        <div class="row mb-2">
+                            <div class="col-12">
+                                <p class="col-form-label">{{ 'plugin_coupon.admin.index.col04'|trans }}</p>
+                                {{ form_widget(searchForm.coupon_type, {'label_attr': {'class': 'checkbox-inline'}}) }}
+                                {{ form_errors(searchForm.coupon_type, {'label_attr': {'class': 'checkbox-inline'}}) }}
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-12">
+                                <p class="col-form-label">{{ 'admin.product.display_status'|trans }}</p>
+                                {{ form_widget(searchForm.enable_flag, {'label_attr': {'class': 'checkbox-inline'}}) }}
+                                {{ form_errors(searchForm.enable_flag, {'label_attr': {'class': 'checkbox-inline'}}) }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="mb-2">
+                            <label class="col-form-label">
+                                {{ 'admin.common.create_date'|trans }}
+                            </label>
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    {{ form_widget(searchForm.create_datetime_start) }}
+                                    {{ form_errors(searchForm.create_datetime_start) }}
+                                </div>
+                                <div class="col-auto text-center"><span>{{ 'admin.common.separator__range'|trans }}</span>
+                                </div>
+                                <div class="col">
+                                    {{ form_widget(searchForm.create_datetime_end) }}
+                                    {{ form_errors(searchForm.create_datetime_end) }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-2">
+                            <label class="col-form-label">{{ 'admin.common.update_date'|trans }}</label>
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    {{ form_widget(searchForm.update_datetime_start) }}
+                                    {{ form_errors(searchForm.update_datetime_start) }}
+                                </div>
+                                <div class="col-auto"><span>{{ 'admin.common.separator__range'|trans }}</span></div>
+                                <div class="col">
+                                    {{ form_widget(searchForm.update_datetime_end) }}
+                                    {{ form_errors(searchForm.update_datetime_end) }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {# エンティティ拡張の自動出力 #}
+                {% for f in searchForm|filter(f => f.vars.eccube_form_options.auto_render) %}
+                    <div class="row mb-2">
+                        {% if f.vars.eccube_form_options.form_theme %}
+                            {% form_theme f f.vars.eccube_form_options.form_theme %}
+                            {{ form_row(f) }}
+                        {% else %}
+                            <div class="col">
+                                <div class="mb-3">
+                                    <label>{{ f.vars.label|trans }}</label>
+                                    {{ form_widget(f) }}
+                                    {{ form_errors(f) }}
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="c-outsideBlock__contents mb-5">
+                <button class="btn btn-ec-conversion px-5" type="submit">{{ 'admin.common.search'|trans }}</button>
+                <a href="{{ url('plugin_coupon_list') }}" class="btn btn-ec-sub px-5 ms-2">Reset</a>
+                {% if pagination %}
+                    <span class="fw-bold ms-2">{{ 'admin.common.search_result'|trans({"%count%":pagination.totalItemCount|number_format})|raw }}</span>
+                {% endif %}
+            </div>
+            <div class="c-outsideBlock__contents mb-5">
+                {{ include('@admin/search_items.twig', { 'form': searchForm }, ignore_missing = true) }}
+            </div>
+        </form>
+    </div>
+
     <div class="row justify-content-between mb-2">
         <div class="col-11 text-end">
             <div class="d-inline-block">
@@ -34,7 +136,7 @@
         <div class="c-contentsArea__primaryCol">
             <div class="c-primaryCol">
                 <div class="card rounded border-0 mb-4">
-                    <div class="card-header"><span class="normal">{{ 'plugin_coupon.admin.index.number'|trans({'%number%': Coupons|length})|raw }}</span></div>
+                    <div class="card-header"><span class="normal">{{ 'plugin_coupon.admin.index.number'|trans({'%number%': Coupons.totalItemCount})|raw }}</span></div>
                     <div class="card-body p-0">
                             <table class="table table-sm table-hover">
                                 <thead>
@@ -135,6 +237,12 @@
                             </table>
                     </div>
                 </div>
+
+                {% if Coupons.totalItemCount > 0 %}
+                    <div class="row justify-content-md-center mb-4 pb-4">
+                        {% include "@admin/pager.twig" with { 'pages' : Coupons.paginationData, 'routes' : 'plugin_coupon_list' } %}
+                    </div>
+                {% endif %}
             </div>
 
             <div class="card rounded border-0">
@@ -147,5 +255,4 @@
 
         </div>
     </div>
-</form>
 {% endblock %}
