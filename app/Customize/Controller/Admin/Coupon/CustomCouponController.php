@@ -4,6 +4,7 @@ namespace Customize\Controller\Admin\Coupon;
 use Plugin\Coupon42\Controller\Admin\CouponController as BaseCouponController;
 use Eccube\Common\Constant;
 use Plugin\Coupon42\Entity\Coupon;
+use Plugin\Coupon42\Entity\CouponDetail;
 use Plugin\Coupon42\Form\Type\CouponType;
 use Plugin\Coupon42\Repository\CouponDetailRepository;
 use Plugin\Coupon42\Repository\CouponRepository;
@@ -90,11 +91,15 @@ class CustomCouponController extends BaseCouponController
             $CouponDetail->getCategoryFullName();
         }
         $TopCategories = $this->categoryRepository->getList(null);
-        $ChoicedCategoryIds = [];
-        foreach ($CouponDetails as $CouponDetail) {
-            $Category = $CouponDetail->getCategory();
-            if ($Category !== null) {
-                $ChoicedCategoryIds[] = $Category->getId();
+        $adminProduct = $request->get('admin_product');
+        if ($request->isMethod('POST') && is_array($adminProduct) && isset($adminProduct['Category'])) {
+            $ChoicedCategoryIds = (array) $adminProduct['Category'];
+        } else {
+            $ChoicedCategoryIds = [];
+            foreach ($CouponDetails as $CouponDetail) {
+                if ($CouponDetail->getCategory()) {
+                    $ChoicedCategoryIds[] = $CouponDetail->getCategory()->getId();
+                }
             }
         }
         $ChoicedCategoryIds = array_values(array_unique($ChoicedCategoryIds));
@@ -103,6 +108,42 @@ class CustomCouponController extends BaseCouponController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $Coupon = $form->getData();
+
+            // 既存の明細を一旦削除
+            $oldDetails = $this->couponDetailRepository->findBy(['Coupon' => $Coupon]);
+            foreach ($oldDetails as $detail) {
+                $this->entityManager->remove($detail);
+            }
+            $this->entityManager->flush();
+
+            // 1. フォーム経由の明細（商品等）を保存
+            $CouponDetailsFromForm = $form->get('CouponDetails')->getData();
+            foreach ($CouponDetailsFromForm as $CouponDetail) {
+                $CouponDetail->setCoupon($Coupon);
+                $CouponDetail->setCouponType($Coupon->getCouponType());
+                $CouponDetail->setVisible(false);
+                $this->entityManager->persist($CouponDetail);
+            }
+
+            // 2. マクロツリー（カテゴリー）を保存
+            $adminProduct = $request->get('admin_product');
+            $categoryIds = (is_array($adminProduct) && isset($adminProduct['Category'])) ? (array)$adminProduct['Category'] : [];
+            if (!empty($categoryIds)) {
+                // カテゴリーが選바れている場合は、適切なタイプ（CATEGORY=2）を設定
+                $Coupon->setCouponType(Coupon::CATEGORY);
+                foreach ($categoryIds as $categoryId) {
+                    $Category = $this->categoryRepository->find($categoryId);
+                    if ($Category) {
+                        $CouponDetail = new CouponDetail();
+                        $CouponDetail->setCoupon($Coupon);
+                        $CouponDetail->setCategory($Category);
+                        $CouponDetail->setCouponType(Coupon::CATEGORY);
+                        $CouponDetail->setVisible(false);
+                        $this->entityManager->persist($CouponDetail);
+                    }
+                }
+            }
+
             $oldReleaseNumber = $request->get('coupon_release_old');
             if (is_null($Coupon->getCouponUseTime())) {
                 $Coupon->setCouponUseTime($Coupon->getCouponRelease());
@@ -112,24 +153,8 @@ class CustomCouponController extends BaseCouponController
                 }
             }
 
-            $CouponDetails = $this->couponDetailRepository->findBy([
-                'Coupon' => $Coupon,
-            ]);
-            foreach ($CouponDetails as $CouponDetail) {
-                $Coupon->removeCouponDetail($CouponDetail);
-                $this->entityManager->remove($CouponDetail);
-                $this->entityManager->flush($CouponDetail);
-            }
-            $CouponDetails = $form->get('CouponDetails')->getData();
-            foreach ($CouponDetails as $CouponDetail) {
-                $CouponDetail->setCoupon($Coupon);
-                $CouponDetail->setCouponType($Coupon->getCouponType());
-                $CouponDetail->setVisible(false);
-                $Coupon->addCouponDetail($CouponDetail);
-                $this->entityManager->persist($CouponDetail);
-            }
             $this->entityManager->persist($Coupon);
-            $this->entityManager->flush($Coupon);
+            $this->entityManager->flush();
             $this->addSuccess('plugin_coupon.admin.regist.success', 'admin');
 
             return $this->redirectToRoute('plugin_coupon_list');

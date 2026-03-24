@@ -162,7 +162,7 @@ trait CouponTrait
     private $term_category_id;
 
     /**
-     * @ORM\Column(name="term_coupon_available_unlimited", type="integer", nullable=true)
+     * @ORM\Column(name="term_coupon_available_unlimited", type="boolean", nullable=true)
      */
     private $term_coupon_available_unlimited;
 
@@ -466,12 +466,12 @@ trait CouponTrait
         return $this;
     }
 
-    public function getTermCouponAvailableUnlimited(): ?int
+    public function getTermCouponAvailableUnlimited(): ?bool
     {
         return $this->term_coupon_available_unlimited;
     }
 
-    public function setTermCouponAvailableUnlimited(?int $term_coupon_available_unlimited): self
+    public function setTermCouponAvailableUnlimited(?bool $term_coupon_available_unlimited): self
     {
         $this->term_coupon_available_unlimited = $term_coupon_available_unlimited;
         return $this;

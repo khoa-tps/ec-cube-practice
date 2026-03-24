@@ -30,6 +30,33 @@ class CouponTypeExtension extends AbstractTypeExtension
     {
         parent::buildForm($builder, $options);
 
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
+            $coupon = $event->getData();
+            if (!$coupon || null === $coupon->getId()) {
+                // Set defaults for NEW coupon only
+                if ($coupon instanceof \Plugin\Coupon42\Entity\Coupon) {
+                    if (null === $coupon->getIssueType()) {
+                        $coupon->setIssueType(2); // Issued as needed
+                    }
+                    if (null === $coupon->getCouponType()) {
+                        $coupon->setCouponType(Coupon::ALL);
+                    }
+                    if (null === $coupon->getCouponMember()) {
+                        $coupon->setCouponMember(true);
+                    }
+                    if (null === $coupon->getAvailableFromDate()) {
+                        $coupon->setAvailableFromDate(new \DateTime());
+                    }
+                    if (null === $coupon->getAvailableToDate()) {
+                        $coupon->setAvailableToDate((new \DateTime())->modify('+10 years'));
+                    }
+                    if (null === $coupon->getCouponRelease()) {
+                        $coupon->setCouponRelease(1000000);
+                    }
+                }
+            }
+        });
+
         $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
             $data = $event->getData();
             if (!isset($data['coupon_type'])) {
@@ -55,7 +82,7 @@ class CouponTypeExtension extends AbstractTypeExtension
             'required' => true,
             'expanded' => true,
             'multiple' => false,
-            'data' => 2,
+            'multiple' => false,
             'constraints' => [
                 new Assert\NotBlank(),
             ],
@@ -131,19 +158,16 @@ class CouponTypeExtension extends AbstractTypeExtension
             'required' => false,
             'widget' => 'single_text',
             'input' => 'datetime',
-            'data' => new \DateTime(),
             'error_bubbling' => true,
         ])
         ->add('available_to_date', DateType::class, [
             'required' => false,
             'widget' => 'single_text',
             'input' => 'datetime',
-            'data' => (new \DateTime())->modify('+1 month'),
             'error_bubbling' => true,
         ])
         ->add('coupon_release', IntegerType::class, [
             'required' => false,
-            'data' => 1000000,
             'error_bubbling' => true,
         ])
         ->add('coupon_type', ChoiceType::class, [
@@ -153,7 +177,6 @@ class CouponTypeExtension extends AbstractTypeExtension
                 2 => 'Category',
                 3 => 'All',
             ]),
-            'data' => 3,
             'error_bubbling' => true,
         ])
         ->add('coupon_member', ChoiceType::class, [
@@ -162,7 +185,6 @@ class CouponTypeExtension extends AbstractTypeExtension
                 1 => 'Yes',
                 0 => 'No',
             ]),
-            'data' => 1,
             'error_bubbling' => true,
         ])
         ->add('issuance_trigger', ChoiceType::class, [
