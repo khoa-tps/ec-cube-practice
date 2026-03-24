@@ -12,6 +12,7 @@ use Plugin\Coupon42\Service\CouponService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Eccube\Controller\AbstractController;
 use Eccube\Repository\CategoryRepository;
@@ -180,5 +181,101 @@ class CustomCouponController extends BaseCouponController
         return $this->json([
             'coupon_cd' => $couponCd,
         ]);
+    }
+
+    /**
+     * クーポンCSVの出力.
+     *
+     * @Route("/%eccube_admin_route%/plugin/coupon/export", name="plugin_coupon_export", methods={"GET"})
+     *
+     * @param Request $request
+     *
+     * @return StreamedResponse
+     */
+    public function export(Request $request)
+    {
+        // タイムアウトを無効にする.
+        set_time_limit(0);
+
+        // クーポンデータを取得
+        $Coupons = $this->couponRepository->findBy(
+            ['visible' => true],
+            ['id' => 'DESC']
+        );
+
+        $response = new StreamedResponse();
+        $response->setCallback(function () use ($Coupons) {
+            $handle = fopen('php://output', 'w');
+            
+            // BOM (Excel等での文字化け防止)
+            fwrite($handle, "\xEF\xBB\xBF");
+
+            // ヘッダ行の出力
+            $headers = [
+                $this->translator->trans('plugin_coupon.admin.index.col01'),
+                $this->translator->trans('plugin_coupon.admin.index.col02'),
+                $this->translator->trans('plugin_coupon.admin.index.col03'),
+                $this->translator->trans('plugin_coupon.admin.index.col04'),
+                $this->translator->trans('plugin_coupon.admin.index.col05'),
+                $this->translator->trans('plugin_coupon.admin.index.col06'),
+                $this->translator->trans('plugin_coupon.admin.index.col07'),
+                $this->translator->trans('plugin_coupon.admin.index.col08'),
+                $this->translator->trans('plugin_coupon.admin.index.col09'),
+                $this->translator->trans('plugin_coupon.admin.index.col11'), // Status
+            ];
+            fputcsv($handle, $headers);
+
+            foreach ($Coupons as $Coupon) {
+                // クーポン種別
+                $type = '';
+                if ($Coupon->getCouponType() == 1) {
+                    $type = $this->translator->trans('plugin_coupon.admin.coupon_type.product');
+                } elseif ($Coupon->getCouponType() == 2) {
+                    $type = $this->translator->trans('plugin_coupon.admin.coupon_type.category');
+                } elseif ($Coupon->getCouponType() == 3) {
+                    $type = $this->translator->trans('plugin_coupon.admin.coupon_type.all');
+                }
+
+                // 会員限定
+                $member = ($Coupon->getCouponMember() == 1) 
+                    ? $this->translator->trans('plugin_coupon.admin.coupon_member.yes') 
+                    : $this->translator->trans('plugin_coupon.admin.coupon_member.no');
+
+                // 値引き情報
+                $discount = '';
+                if ($Coupon->getDiscountType() == 1) {
+                    $discount = $Coupon->getDiscountPrice();
+                } elseif ($Coupon->getDiscountType() == 2) {
+                    $discount = $Coupon->getDiscountRate() . '%';
+                }
+
+                // ステータス
+                $status = ($Coupon->getEnableFlag() == 1) 
+                    ? $this->translator->trans('common.enabled') 
+                    : $this->translator->trans('common.disabled');
+
+                $row = [
+                    $Coupon->getId(),
+                    $Coupon->getCouponCd(),
+                    $Coupon->getCouponName(),
+                    $type,
+                    $member,
+                    $discount,
+                    $Coupon->getCouponUseTime() . ' / ' . $Coupon->getCouponRelease(),
+                    $Coupon->getCouponLowerLimit(),
+                    $Coupon->getAvailableFromDate()->format('Y-m-d') . ' ～ ' . $Coupon->getAvailableToDate()->format('Y-m-d'),
+                    $status
+                ];
+                fputcsv($handle, $row);
+            }
+            fclose($handle);
+        });
+
+        $now = new \DateTime();
+        $filename = 'coupon_'.$now->format('YmdHis').'.csv';
+        $response->headers->set('Content-Type', 'text/csv; charset=utf-8');
+        $response->headers->set('Content-Disposition', 'attachment; filename='.$filename);
+
+        return $response;
     }
 }
