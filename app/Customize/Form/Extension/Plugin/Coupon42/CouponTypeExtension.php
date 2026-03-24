@@ -50,12 +50,9 @@ class CouponTypeExtension extends AbstractTypeExtension
         ]);
         $builder->add('target_users', ChoiceType::class, [
             'label' => 'Issuance trigger',
-            'required' => true,
+            'required' => false,
             'expanded' => true,
             'multiple' => false,
-            'constraints' => [
-                new Assert\NotBlank(),
-            ],
             'choices' => [
                 'All' => CouponConfig::TARGET_USERS_ALL,
                 'New Users' => CouponConfig::TARGET_USERS_NEW,
@@ -97,12 +94,9 @@ class CouponTypeExtension extends AbstractTypeExtension
         ])
         ->add('issuance_trigger', ChoiceType::class, [
             'label' => 'Issuance trigger',
-            'required' => true,
+            'required' => false,
             'expanded' => true,
             'multiple' => false,
-            'constraints' => [
-                new Assert\NotBlank(),
-            ],
             'choices' => array_flip([
                 CouponConfig::TARGET_USERS_NEW => 'New Users',
                 CouponConfig::TARGET_USERS_PURCHASE => 'Purchase',
@@ -114,18 +108,12 @@ class CouponTypeExtension extends AbstractTypeExtension
             'required' => false,
             'widget' => 'single_text',
             'input' => 'datetime',
-            'constraints' => [
-                new Assert\NotBlank(),
-            ],
         ])
         ->add('issuance_period_to', DateType::class, [
             'label' => 'Date and time of issuance reservation',
             'required' => false,
             'widget' => 'single_text',
             'input' => 'datetime',
-            'constraints' => [
-                new Assert\NotBlank(),
-            ],
         ])
         ->add('issuance_shop_id', EntityType::class, [
             'class' => Shop::class,
@@ -170,48 +158,30 @@ class CouponTypeExtension extends AbstractTypeExtension
         ->add('issuance_quantity', IntegerType::class, [
             'label' => 'Number of Issues',
             'required' => false,
-            'constraints' => [
-                new Assert\NotBlank(),
-            ],
         ])
         ->add('term_usage_period', IntegerType::class, [
             'label' => 'Usage period',
             'required' => false,
-            'constraints' => [
-                new Assert\NotBlank(),
-            ],
         ])
         ->add('term_usage_period_from', DateType::class, [
             'label' => 'Date and time of issuance reservation',
             'required' => false,
             'widget' => 'single_text',
             'input' => 'datetime',
-            'constraints' => [
-                new Assert\NotBlank(),
-            ],
         ])
         ->add('term_usage_period_to', DateType::class, [
             'label' => 'Date and time of issuance reservation',
             'required' => false,
             'widget' => 'single_text',
             'input' => 'datetime',
-            'constraints' => [
-                new Assert\NotBlank(),
-            ],
         ])
         ->add('term_available_count', IntegerType::class, [
             'label' => 'Number of uses',
             'required' => false,
-            'constraints' => [
-                new Assert\NotBlank(),
-            ],
         ])
         ->add('term_available_cycle_cycle', ChoiceType::class, [
             'required' => false,
             'multiple' => false,
-            'constraints' => [
-                new Assert\NotBlank(),
-            ],
             'choices' => array_flip([
                 1 => 'Day',
                 2 => 'Week',
@@ -221,16 +191,10 @@ class CouponTypeExtension extends AbstractTypeExtension
         ->add('term_available_cycle_count', IntegerType::class, [
             'label' => 'Number of uses',
             'required' => false,
-            'constraints' => [
-                new Assert\NotBlank(),
-            ],
         ])
         ->add('term_minimun_spend_amount', IntegerType::class, [
             'label' => 'Minimum spend amount',
             'required' => false,
-            'constraints' => [
-                new Assert\NotBlank(),
-            ],
         ])
         ->add('term_shop_id', EntityType::class, [
             'class' => Shop::class,

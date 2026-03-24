@@ -7,7 +7,6 @@ use Eccube\Annotation\EntityExtension;
 use Eccube\Entity\Customer;
 use Doctrine\ORM\Mapping\JoinColumn;
 use Doctrine\ORM\Mapping\OneToOne;
-use Dom\Text;
 
 /**
  * @EntityExtension("Plugin\Coupon42\Entity\Coupon")
@@ -269,12 +268,12 @@ trait CouponTrait
         return $this;
     }
 
-    public function getEmailNotificationContent(): ?Text
+    public function getEmailNotificationContent(): ?string
     {
         return $this->email_notification_content;
     }
 
-    public function setEmailNotificationContent(?text $email_notification_content): self
+    public function setEmailNotificationContent(?string $email_notification_content): self
     {
         $this->email_notification_content = $email_notification_content;
         return $this;

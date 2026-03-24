@@ -253,50 +253,74 @@
 	$("input[name='coupon[target_users][]']").trigger("change");
 
 		let previousIssueType = $("input[name='coupon[issue_type]']:checked").val();
+		let pendingIssueType = null;
+		const issueTypeConfirmModalEl = document.getElementById('issueTypeChangeConfirmModal');
+		const issueTypeConfirmModal = issueTypeConfirmModalEl ? new bootstrap.Modal(issueTypeConfirmModalEl) : null;
+
+		const applyIssueTypeDisplay = function (val) {
+			if (val == 1) {
+				$('#issue_type_from_area').show().find(':input').prop('disabled', false);
+				$('#coupon_cd').hide().find(':input').prop('disabled', true);
+				$('#issuance_trigger_area').hide().find(':input').prop('disabled', true);
+				$('#issuance_period_area').hide().find(':input').prop('disabled', true);
+				$('#issuance_quantity_area').hide().find(':input').prop('disabled', true);
+				$('#coupon_lower_limit_area').hide().find(':input').prop('disabled', true);
+				$('.category_area').hide().find(':input').prop('disabled', true);
+				$('#acquisition_conditions_area').show().find(':input').prop('disabled', false);
+				$('#detail_link_area').show().find(':input').prop('disabled', false);
+			} else if (val == 2) {
+				$('#issue_type_from_area').hide().find(':input').prop('disabled', true);
+				$('#coupon_cd').hide().find(':input').prop('disabled', true);
+				$('#issuance_trigger_area').show().find(':input').prop('disabled', false);
+				$('#issuance_period_area').show().find(':input').prop('disabled', false);
+				$('#issuance_quantity_area').show().find(':input').prop('disabled', false);
+				$('#coupon_lower_limit_area').show().find(':input').prop('disabled', false);
+				$('.category_area').show().find(':input').prop('disabled', false);
+				$('#acquisition_conditions_area').hide().find(':input').prop('disabled', true);
+				$('#detail_link_area').hide().find(':input').prop('disabled', true);
+			} else if (val == 3) {
+				$('#issue_type_from_area').hide().find(':input').prop('disabled', true);
+				$('#coupon_cd').show().find(':input').prop('disabled', false);
+				$('#issuance_trigger_area').hide().find(':input').prop('disabled', true);
+				$('#issuance_period_area').hide().find(':input').prop('disabled', true);
+				$('#issuance_quantity_area').hide().find(':input').prop('disabled', true);
+				$('#coupon_lower_limit_area').hide().find(':input').prop('disabled', true);
+				$('.category_area').hide().find(':input').prop('disabled', true);
+				$('#acquisition_conditions_area').hide().find(':input').prop('disabled', true);
+				$('#detail_link_area').hide().find(':input').prop('disabled', true);
+			}
+		};
+
+		if (issueTypeConfirmModalEl) {
+			$(issueTypeConfirmModalEl).find('[data-role="message"]').text("{{ 'plugin_coupon.admin.regist.change_issue_type_confirm'|trans }}");
+			$(issueTypeConfirmModalEl).find('[data-role="confirm"]').on("click", function () {
+				if (!pendingIssueType) {
+					issueTypeConfirmModal.hide();
+					return;
+				}
+				$(`input[name='coupon[issue_type]'][value='${pendingIssueType}']`).prop('checked', true);
+				previousIssueType = pendingIssueType;
+				applyIssueTypeDisplay(pendingIssueType);
+				pendingIssueType = null;
+				issueTypeConfirmModal.hide();
+			});
+			$(issueTypeConfirmModalEl).on('hidden.bs.modal', function () {
+				pendingIssueType = null;
+			});
+		}
 
 		$("input[name='coupon[issue_type]']").on("change", function () {
 			const val = $(this).val();
 
-			if (previousIssueType && previousIssueType !== val) {
-				if (!confirm("{{ 'plugin_coupon.admin.regist.change_issue_type_confirm'|trans }}")) {
-					$(`input[name='coupon[issue_type]'][value='${previousIssueType}']`).prop('checked', true);
-					return false;
-				}
+			if (previousIssueType && previousIssueType !== val && issueTypeConfirmModal) {
+				pendingIssueType = val;
+				$(`input[name='coupon[issue_type]'][value='${previousIssueType}']`).prop('checked', true);
+				issueTypeConfirmModal.show();
+				return false;
 			}
 
 			previousIssueType = val;
-
-			if (val == 1) {
-				$('#issue_type_from_area').show();
-				$('#coupon_cd').hide();
-				$('#issuance_trigger_area').hide();
-				$('#issuance_period_area').hide();
-				$('#issuance_quantity_area').hide();
-				$('#coupon_lower_limit_area').hide();
-				$('.category_area').hide();
-				$('#acquisition_conditions_area').show();
-				$('#detail_link_area').show();
-			} else if (val == 2) {
-				$('#issue_type_from_area').hide();
-				$('#coupon_cd').hide();
-				$('#issuance_trigger_area').show();
-				$('#issuance_period_area').show();
-				$('#issuance_quantity_area').show();
-				$('#coupon_lower_limit_area').show();
-				$('.category_area').show();
-				$('#acquisition_conditions_area').hide();
-				$('#detail_link_area').hide();
-			} else if (val == 3) {
-				$('#issue_type_from_area').hide();
-				$('#coupon_cd').show();
-				$('#issuance_trigger_area').hide();
-				$('#issuance_period_area').hide();
-				$('#issuance_quantity_area').hide();
-				$('#coupon_lower_limit_area').hide();
-				$('.category_area').hide();
-				$('#acquisition_conditions_area').hide();
-				$('#detail_link_area').hide();
-			}
+			applyIssueTypeDisplay(val);
 		}).filter(':checked').trigger('change');
 	});
 
@@ -349,6 +373,14 @@
 			$("#coupon_issuance_quantity").attr('disabled', 'disabled');
 		} else {
 			$("#coupon_issuance_quantity").removeAttr('disabled');
+		}
+	}).trigger('change');
+
+	$("#coupon_term_coupon_available_unlimited").on("change", function () {
+		if ($(this).is(':checked')) {
+			$("#coupon_term_usage_period_to").attr('disabled', 'disabled');
+		} else {
+			$("#coupon_term_usage_period_to").removeAttr('disabled');
 		}
 	}).trigger('change');
 
@@ -811,6 +843,22 @@
 			</div>
 		</div>
 	</form>
+	<div class="modal fade" id="issueTypeChangeConfirmModal" tabindex="-1" role="dialog" aria-labelledby="issueTypeChangeConfirmModal" aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">{{ 'admin.common.confirm'|trans }}</h5>
+					<button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<p data-role="message"></p>
+				</div>
+				<div class="modal-footer">
+					<button class="btn btn-ec-conversion" type="button" data-role="confirm">OK</button>
+				</div>
+			</div>
+		</div>
+	</div>
 	<div class="modal" id="searchProductModal" tabindex="-1" role="dialog" aria-labelledby="searchProductModal" aria-hidden="true">
 		<div class="modal-dialog">
 			<div class="modal-content">
