@@ -10,7 +10,7 @@
 
 {% extends '@admin/default_frame.twig' %}
 
-{% set menus = ['order', 'plugin_coupon'] %}
+{% set menus = ['coupon', 'coupon_list'] %}
 
 {% block title %}{{ 'plugin_coupon.admin.index.title'|trans }}{% endblock %}
 {% block sub_title %}{{ 'plugin_coupon.admin.index.subtitle'|trans }}{% endblock %}
@@ -243,16 +243,7 @@
                         {% include "@admin/pager.twig" with { 'pages' : Coupons.paginationData, 'routes' : 'plugin_coupon_list' } %}
                     </div>
                 {% endif %}
-            </div>
-
-            <div class="card rounded border-0">
-                <div class="card-body p-4">
-                    <div class="text-center">
-                        <a href="{{ url('plugin_coupon_new') }}" class="btn btn-ec-regular ps-4 pe-4">{{ 'plugin_coupon.admin.index.create_button'|trans }}</a>
-                    </div>
-                </div>
-            </div>
-
+            </div>  
         </div>
     </div>
 {% endblock %}
