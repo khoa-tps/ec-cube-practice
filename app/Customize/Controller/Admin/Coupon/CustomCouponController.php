@@ -19,6 +19,8 @@ use Eccube\Controller\AbstractController;
 use Eccube\Repository\CategoryRepository;
 use Plugin\Coupon42\Form\Type\Admin\CouponSearchType;
 use Knp\Component\Pager\PaginatorInterface;
+use Eccube\Repository\Master\PageMaxRepository;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 class CustomCouponController extends BaseCouponController
 {
@@ -59,7 +61,8 @@ class CustomCouponController extends BaseCouponController
         CouponService $couponService,
         CouponDetailRepository $couponDetailRepository,
         CategoryRepository $categoryRepository,
-        PaginatorInterface $paginator
+        PaginatorInterface $paginator,
+        private PageMaxRepository $pageMaxRepository
     ) {
         parent::__construct($couponRepository, $couponService, $couponDetailRepository);
         $this->couponRepository = $couponRepository;
@@ -71,17 +74,15 @@ class CustomCouponController extends BaseCouponController
 
     /**
      * @Route("/%eccube_admin_route%/plugin/coupon", name="plugin_coupon_list")
+     * @Route("/%eccube_admin_route%/plugin/coupon/page/{page_no}", requirements={"page_no" = "\d+"}, name="plugin_coupon_list_page")
+     * @Template("@Coupon42/admin/index.twig")
      */
-    public function index(Request $request)
+    public function index(Request $request, $page_no = null)
     {
         $searchForm = $this->formFactory
             ->createBuilder(CouponSearchType::class)
             ->getForm();
 
-        /**
-         * フォームの初期値を一旦空にする
-         * クエリパラメータがあれば、それを引き継ぐ
-         */
         $searchData = [
             'id' => null,
             'coupon_type' => [],
@@ -98,7 +99,6 @@ class CustomCouponController extends BaseCouponController
                 $searchData = $searchForm->getData();
             }
         } else {
-            // GETの場合はクエリパラメータから取得（ページネーション用）
             $searchData = $request->query->all();
             $searchForm->submit($searchData);
             $searchData = $searchForm->getData();
@@ -112,12 +112,28 @@ class CustomCouponController extends BaseCouponController
             $request->query->get('page_count', 20)
         );
 
-        return $this->render('@Coupon42/admin/index.twig', [
+        $pageMaxis = $this->pageMaxRepository->findBy([], ['id' => 'ASC', 'sort_no' => 'ASC']);
+        $pageCount = $this->session->get('eccube.admin.coupon.search.page_count', $this->eccubeConfig['eccube_default_page_count']);
+        $pageCountParam = $request->get('page_count');
+        if ($pageCountParam && is_numeric($pageCountParam)) {
+            foreach ($pageMaxis as $pageMax) {
+                if ($pageCountParam == $pageMax->getName()) {
+                    $pageCount = $pageMax->getName();
+                    $this->session->set('eccube.admin.coupon.search.page_count', $pageCount);
+                    break;
+                }
+            }
+        }
+
+        return [
             'searchForm' => $searchForm->createView(),
             'pagination' => $pagination,
             'Coupons' => $pagination,
             'has_errors' => $searchForm->isSubmitted() && !$searchForm->isValid(),
-        ]);
+            'pageMaxis' => $pageMaxis,
+            'page_count' => $pageCount,
+            'page_no' => $page_no,
+        ];
     }
 
     /**

@@ -120,7 +120,16 @@
     </div>
 
     <div class="row justify-content-between mb-2">
-        <div class="col-11 text-end">
+        <div class="col-5 offset-7 text-end">
+            <div class="d-inline-block me-2 align-bottom">
+                <div>
+                    <select class="form-select" onchange="location = this.value;">
+                        {% for pageMax in pageMaxis %}
+                            <option {% if pageMax.name == page_count %} selected="" {% endif %} value="{{ path('plugin_coupon_list_page', {'page_no': 1, 'page_count': pageMax.name}) }}">{{ 'admin.common.count'|trans({ '%count%': pageMax.name }) }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
             <div class="d-inline-block">
                 <div class="btn-group" role="group">
                     <a class="btn btn-ec-regular" href="{{ url('plugin_coupon_export') }}">
