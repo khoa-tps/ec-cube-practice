@@ -56,6 +56,8 @@ node_modules
 /app/config/eccube/jwt/*.pem
 ###< league/oauth2-server-bundle ###
 
-###> symfony/runtime env resolve cache ###
-env_*_resolve_*
-###< symfony/runtime env resolve cache ###
+###> friendsofphp/php-cs-fixer ###
+/.php-cs-fixer.cache
+/.php-cs-fixer.*.php
+###< friendsofphp/php-cs-fixer ###
+screenshots/
