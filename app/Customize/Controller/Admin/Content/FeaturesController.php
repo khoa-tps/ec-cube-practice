@@ -5,7 +5,8 @@ namespace Customize\Controller\Admin\Content;
 use Eccube\Controller\AbstractController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Customize\Entity\Features;
 use Customize\Repository\FeaturesRepository;
@@ -21,21 +22,17 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class FeaturesController extends AbstractController
 {
-    private FeaturesRepository $featuresRepository;
-    private CategoryRepository $categoryRepository;
-
-    public function __construct(FeaturesRepository $featuresRepository, CategoryRepository $categoryRepository)
-    {
-        $this->featuresRepository = $featuresRepository;
-        $this->categoryRepository = $categoryRepository;
+    public function __construct(
+        private FeaturesRepository $featuresRepository,
+        private CategoryRepository $categoryRepository
+    ) {
     }
     /**
-     * @Route("/%eccube_admin_route%/content/features", name="admin_content_features", methods={"GET", "POST"})
-     * @Template("@admin/Content/Features/index.twig")
      * @param Request $request
-     * @return array
      */
-    public function index(Request $request)
+    #[Route('/%eccube_admin_route%/content/features', name: 'admin_content_features', methods: ['GET', 'POST'])]
+    #[Template('@admin/Content/Features/index.twig')]
+    public function index(Request $request): array
     {
         $Features = $this->featuresRepository->findAll();
 
@@ -46,14 +43,11 @@ class FeaturesController extends AbstractController
 
     /**
      * Create a new feature.
-     *
-     * @Route("/%eccube_admin_route%/content/features/create", name="admin_content_features_create", methods={"GET", "POST"})
-     * @Route("/%eccube_admin_route%/content/features/{id}/edit", requirements={"id" = "\d+"}, name="admin_content_features_edit", methods={"GET", "POST"})
-     * @Template("@admin/Content/Features/create.twig")
-     * @param Request $request
-     * @return array
      */
-    public function create(Request $request, $id = null)
+    #[Route('/%eccube_admin_route%/content/features/create', name: 'admin_content_features_create', methods: ['GET', 'POST'])]
+    #[Route('/%eccube_admin_route%/content/features/{id}/edit', name: 'admin_content_features_edit', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
+    #[Template('@admin/Content/Features/create.twig')]
+    public function create(Request $request, ?int $id = null): array|Response
     {
         $thumbnailSource = null;
         if (is_null($id)) {
@@ -179,9 +173,6 @@ class FeaturesController extends AbstractController
 
     /**
      * Upload an image.
-     *
-     * @param UploadedFile $imageFile
-     * @return string
      */
     private function uploadImage(UploadedFile $imageFile): string
     {
@@ -216,11 +207,9 @@ class FeaturesController extends AbstractController
 
     /**
      * Delete a feature.
-     * @Route("/%eccube_admin_route%/content/features/{id}/delete", name="admin_content_features_delete", methods={"DELETE"})
-     * @param Request $request
-     * @return array
      */
-    public function delete(Request $request, $id)
+    #[Route('/%eccube_admin_route%/content/features/{id}/delete', name: 'admin_content_features_delete', methods: ['DELETE'])]
+    public function delete(Request $request, int $id): array|Response
     {
         $this->isTokenValid();
         $Feature = $this->featuresRepository->find($id);
@@ -248,13 +237,10 @@ class FeaturesController extends AbstractController
 
     /**
      * Delete an image.
-     *
-     * @param string $imageName
-     * @return void
      */
-    private function deleteImage(string $imageName): void
+    private function deleteImage(?string $imageName): void
     {
-        if (file_exists($this->getParameter('eccube_save_image_dir').'/features/'.$imageName)) {
+        if ($imageName && file_exists($this->getParameter('eccube_save_image_dir').'/features/'.$imageName)) {
             unlink($this->getParameter('eccube_save_image_dir').'/features/'.$imageName);
         }
     }

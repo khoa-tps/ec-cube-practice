@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Eccube\Controller\AbstractController;
 use Eccube\Repository\CategoryRepository;
 use Plugin\Coupon42\Form\Type\Admin\CouponSearchType;
@@ -39,12 +39,10 @@ class CustomCouponController extends BaseCouponController
         );
     }
 
-    /**
-     * @Route("/%eccube_admin_route%/plugin/coupon", name="plugin_coupon_list")
-     * @Route("/%eccube_admin_route%/plugin/coupon/page/{page_no}", requirements={"page_no" = "\d+"}, name="plugin_coupon_list_page")
-     * @Template("@Coupon42/admin/index.twig")
-     */
-    public function index(Request $request, $page_no = null)
+    #[Route('/%eccube_admin_route%/plugin/coupon', name: 'plugin_coupon_list')]
+    #[Route('/%eccube_admin_route%/plugin/coupon/page/{page_no}', name: 'plugin_coupon_list_page', requirements: ['page_no' => '\d+'])]
+    #[Template('@Coupon42/admin/index.twig')]
+    public function index(Request $request, ?int $page_no = null): array
     {
         $searchForm = $this->formFactory
             ->createBuilder(CouponSearchType::class)
@@ -105,15 +103,11 @@ class CustomCouponController extends BaseCouponController
 
     /**
      * クーポンの新規作成/編集確定.
-     *
-     * @param Request $request
-     * @param int     $id
-     *
-     * @return RedirectResponse|Response
-     * @Route("/%eccube_admin_route%/plugin/coupon/new", name="plugin_coupon_new", requirements={"id" = "\d+"})
-     * @Route("/%eccube_admin_route%/plugin/coupon/{id}/edit", name="plugin_coupon_edit", requirements={"id" = "\d+"})
      */
-    public function edit(Request $request, $id = null)
+    #[Route('/%eccube_admin_route%/plugin/coupon/new', name: 'plugin_coupon_new')]
+    #[Route('/%eccube_admin_route%/plugin/coupon/{id}/edit', name: 'plugin_coupon_edit', requirements: ['id' => '\d+'])]
+    public function edit(Request $request, $id = null): Response
+
     {
         $Coupon = null;
         if (!$id) {
@@ -146,8 +140,8 @@ class CustomCouponController extends BaseCouponController
         } else {
             $ChoicedCategoryIds = [];
             foreach ($CouponDetails as $CouponDetail) {
-                if ($CouponDetail->getCategory()) {
-                    $ChoicedCategoryIds[] = $CouponDetail->getCategory()->getId();
+                if ($categoryId = $CouponDetail->getCategory()?->getId()) {
+                    $ChoicedCategoryIds[] = $categoryId;
                 }
             }
         }
@@ -219,9 +213,8 @@ class CustomCouponController extends BaseCouponController
 
     /**
      * クーポンコードの新規生成（AJAX用）
-     *
-     * @Route("/%eccube_admin_route%/plugin/coupon/generate-coupon-cd", name="plugin_coupon_generate_coupon_cd", methods={"GET"})
      */
+    #[Route('/%eccube_admin_route%/plugin/coupon/generate-coupon-cd', name: 'plugin_coupon_generate_coupon_cd', methods: ['GET'])]
     public function generateCouponCd(): Response
     {
         $couponCd = $this->couponService->generateCouponCd();
@@ -233,14 +226,9 @@ class CustomCouponController extends BaseCouponController
 
     /**
      * クーポンCSVの出力.
-     *
-     * @Route("/%eccube_admin_route%/plugin/coupon/export", name="plugin_coupon_export", methods={"GET"})
-     *
-     * @param Request $request
-     *
-     * @return StreamedResponse
      */
-    public function export(Request $request)
+    #[Route('/%eccube_admin_route%/plugin/coupon/export', name: 'plugin_coupon_export', methods: ['GET'])]
+    public function export(Request $request): StreamedResponse
     {
         // タイムアウトを無効にする.
         set_time_limit(0);
