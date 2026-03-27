@@ -1,0 +1,78 @@
+{#
+This file is part of EC-CUBE
+
+Copyright(c) EC-CUBE CO.,LTD. All Rights Reserved.
+
+http://www.ec-cube.co.jp/
+
+For the full copyright and license information, please view the LICENSE
+file that was distributed with this source code.
+#}
+{% extends '@admin/default_frame.twig' %}
+
+{% set menus = ['product', 'product_feature'] %}
+
+{% block title %}
+	{{ 'admin.product.product_feature_management'|trans }}
+{% endblock %}
+{% block sub_title %}
+	{{ 'admin.product.product_management'|trans }}
+{% endblock %}
+
+{% block main %}
+	<div class="c-contentsArea__cols">
+		<div class="c-contentsArea__primaryCol">
+			<div class="c-primaryCol">
+				<div class="d-block mb-3">
+					<a class="btn btn-ec-regular" href="{{ url('admin_product_feature_create') }}">
+						{{ 'admin.common.create__new'|trans }}
+					</a>
+				</div>
+				<div class="card rounded border-0 mb-4">
+					<div class="card-header">
+						<span class="card-title">{{ 'admin.content.features_management'|trans }}</span>
+					</div>
+					<div class="card-body p-0">
+						<div class="table-responsive">
+							<table class="table table-striped mb-0">
+								<thead>
+									<tr>
+										<th></th>
+										<th class="ps-3">ID</th>
+										<th>Feature Name</th>
+										<th>Create at</th>
+										<th>Status</th>
+										<th></th>
+									</tr>
+								</thead>
+								<tbody class="sortable-container">
+									{% for item in features %}
+										<tr class="sortable-item" data-id="{{ item.id }}">
+											<td>
+												<div class="col-auto d-flex align-items-center">
+													<i class="fa fa-bars text-ec-gray"></i>
+												</div>
+											</td>
+											<td class="ps-3">{{ item.id }}</td>
+											<td>{{ item.feature_name }}</td>
+                                            <td>{{ item.created_at|date('Y-m-d H:i:s') }}</td>
+                                            <td>{{ item.status ? '公開' : '非公開' }}</td>
+											<td>
+												<a class="btn btn-ec-regular" href="{{ url('admin_product_feature_edit', { id: item.id }) }}">
+													<i class="fa fa-pencil"></i>
+												</a>
+                                                <a class="btn btn-ec-regular" href="{{ url('admin_product_feature_delete', { id: item.id }) }}" onclick="return confirm('削除してもよろしいですか?')">
+													<i class="fa fa-trash"></i>
+												</a>
+											</td>
+										</tr>
+									{% endfor %}
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}

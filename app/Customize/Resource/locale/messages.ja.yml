@@ -13,3 +13,14 @@ front.shopping.user_note: 備考
 front.shopping.user_note_placeholder: 備考を入力してください
 admin.order.user_note: 備考
 front.shopping.cod_fee: 手数料 %fee% 円がかかります
+front.mypage.nav__coupon: クーポン
+plugin_coupon.admin.label.target_users: 対象ユーザー
+admin.shop: ショップ
+admin.shop.list: ショップ一覧
+admin.shop.shop_register: ショップ登録
+admin.product.feature_management: 特集管理
+admin.product.shop: ショップ
+admin.coupon.coupon_management: クーポン管理
+admin.coupon.coupon_list: クーポン一覧
+admin.coupon.coupon_registration: クーポン登録
+plugin_coupon.admin.regist.change_issue_type_confirm: 以降の項目を初期化しますがよろしいでしょうか？

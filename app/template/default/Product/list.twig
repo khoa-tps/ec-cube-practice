@@ -21,6 +21,12 @@ file that was distributed with this source code.
         };
 
         $(function() {
+            $('.product-feature-id').change(function() {
+                var productFeatureId = $(this).val();
+                $('#product_feature_id').val(productFeatureId);
+                $('#pageno').val(1);
+                $("#form1").submit();
+            });
 
             // 表示件数を変更
             $('.disp-number').change(function() {
@@ -137,14 +143,13 @@ file that was distributed with this source code.
                         <span>{{ 'front.product.search__product_not_found'|trans }}</span>
                     {% endif %}
                 </div>
-                {% if pagination.totalItemCount > 0 %}
-                    <div class="ec-searchnavRole__actions">
-                        <div class="ec-select">
-                            {{ form_widget(search_form.disp_number, {'id': '', 'attr': {'class': 'disp-number'}}) }}
-                            {{ form_widget(search_form.orderby, {'id': '', 'attr': {'class': 'order-by'}}) }}
-                        </div>
+                <div class="ec-searchnavRole__actions">
+                    <div class="ec-select">
+                        {{ form_widget(search_form.product_feature_id, {'id': '', 'attr': {'class': 'product-feature-id'}}) }}
+                        {{ form_widget(search_form.disp_number, {'id': '', 'attr': {'class': 'disp-number'}}) }}
+                        {{ form_widget(search_form.orderby, {'id': '', 'attr': {'class': 'order-by'}}) }}
                     </div>
-                {% endif %}
+                </div>
             </div>
         </div>
         {% if pagination.totalItemCount > 0 %}

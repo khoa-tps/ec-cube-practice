@@ -1,0 +1,964 @@
+{#
+ This file is part of the Coupon plugin
+
+ Copyright(c) EC-CUBE CO.,LTD. All Rights Reserved.
+ http://www.ec-cube.co.jp/
+
+ For the full copyright and license information, please view the LICENSE
+ file that was distributed with this source code.
+#}
+{% extends '@admin/default_frame.twig' %}
+
+{% set menus = ['coupon', 'coupon_edit'] %}
+
+{% block title %}
+	{{ 'plugin_coupon.admin.regist.title'|trans }}
+{% endblock %}
+{% block sub_title %}
+	{{ 'plugin_coupon.admin.regist.subtitle'|trans }}
+{% endblock %}
+
+{% form_theme form '@admin/Form/bootstrap_4_horizontal_layout.html.twig' %}
+{% form_theme searchProductModalForm '@admin/Form/bootstrap_4_horizontal_layout.html.twig' %}
+
+{% block stylesheet %}
+	<link rel="stylesheet" href="{{ asset('assets/css/bootstrap-datetimepicker.min.css', 'admin') }}">
+	<style type="text/css">
+		.col-sm-2 {
+			width: auto;
+		}
+	</style>
+{% endblock stylesheet %}
+
+{% block javascript %}
+	<script src="{{ asset('assets/js/vendor/moment.min.js', 'admin') }}"></script>
+	<script src="{{ asset('assets/js/vendor/moment-ja.js', 'admin') }}"></script>
+	<script src="{{ asset('assets/js/vendor/bootstrap-datetimepicker.min.js', 'admin') }}"></script>
+	<script>
+	$(function () {
+		// ==================================
+		// 商品の追加 ボタンクリック時表示
+		// ==================================
+		$('#showSearchProductModal').on('click', function () {
+			var tbody = $('#searchProductModalList tbody');
+			tbody.children().remove();
+			$('div.box-footer').remove();
+		});
+
+		// ==================================
+		// カテゴリの追加 ボタンクリック時表示
+		// ==================================
+		$('#showSearchCategoryModal').on('click', function () {
+			var tbody = $('#searchCategoryModalList tbody');
+			tbody.children().remove();
+			$('div.box-footer').remove();
+		});
+		// ==================================
+		// 商品検索ダイアログ - 検索ボタンクリック時表示
+		// ==================================
+		$('#searchProductModalButton').on('click', function () {
+			var existProductId = "";
+			$(":input[id^=coupon_CouponDetails_][id$=_Product]").each(function (index, elem) {
+				if (existProductId == "") {
+					existProductId = elem.value;
+				} else {
+					existProductId = existProductId + "," + elem.value;
+				}
+			});
+			var tbody = $('#searchProductModalList tbody');
+			tbody.children().remove();
+			$.ajax({
+				type: 'POST',
+				dataType: 'html',
+				data: {
+					'id': $('#admin_search_product_id').val(),
+					'category_id': $('#admin_search_product_category_id').val(),
+					'exist_product_id': existProductId
+				},
+				url: '{{ url('plugin_coupon_search_product') }}',
+				success: function (data) { // モーダルに結果を書き出し.
+					$('#searchProductModalList').html(data);
+
+				},
+				error: function () {
+					alert('search product failed.');
+				}
+			});
+		});
+
+		// ==================================
+		// カテゴリ検索ダイアログ表示
+		// ==================================
+		$('#searchCategoryModalButton').on('click', function () {
+			var existCategoryId = "";
+			$(":input[id^=coupon_CouponDetails_][id$=_Category]").each(function (index, elem) {
+				if (existCategoryId == "") {
+					existCategoryId = elem.value;
+				} else {
+					existCategoryId = existCategoryId + "," + elem.value;
+				}
+			});
+
+			var tbody = $('#searchCategoryModalList tbody');
+			tbody.children().remove();
+			$.ajax({
+				type: 'POST',
+				dataType: 'html',
+				data: {
+					'category_id': $('#coupon_search_category_category_id').val(),
+					'exist_category_id': existCategoryId
+				},
+				url: '{{ url('plugin_coupon_search_category') }}',
+				success: function (data) { // モーダルに結果を書き出し.
+					$('#searchCategoryModalList').html(data);
+
+				},
+				error: function () {
+					alert('search product failed.');
+				}
+			});
+		});
+
+		coupon_details_count = {{ form.CouponDetails | length }};
+
+	// 項目数が多く、入力している項目によってEnter押下時に期待する動作が変わるので、いったん禁止
+	$("input").on("keydown", function (e) {
+		if ((e.which && e.which === 13) || (e.keyCode && e.keyCode === 13)) {
+			return false;
+		} else {
+			return true;
+		}
+	});
+
+	// ==================================
+	// 商品一覧の削除ボタンクリック時の処理
+	// ==================================
+	$("#coupon_detail_list").on("click", ".delete-item", function () {
+		$(this).parents(".item_box").remove();
+	});
+	// ==================================
+	// カテゴリ一覧の削除ボタンクリック時の処理
+	// ==================================
+	$("#coupon_detail_list2").on("click", ".delete-item", function () {
+		$(this).parents(".item_box").remove();
+	});
+
+	// set radio button default.
+	if ($('input[name~="coupon[coupon_type]"]:checked').length == 0) {
+		$('#coupon_coupon_type_0').attr('checked', 'checked');
+	}
+
+	if ($('input[name~="coupon[coupon_member]"]:checked').length == 0) {
+		$('#coupon_coupon_member_1').attr('checked', 'checked');
+	}
+
+	if ($('input[name~="coupon[discount_type]"]:checked').length == 0) {
+		$('#coupon_discount_type_0').attr('checked', 'checked');
+	}
+
+	// ==================================
+	// クリック時の処理 - 値引き種別
+	// ==================================
+	const applyDiscountTypeDisplay = function (val) {
+		if (val == 2) { // Percentage
+			$("#discount_price").hide().find(':input').prop('disabled', true);
+			$("#discount_rate").show().find(':input').prop('disabled', false);
+		} else { // Fixed amount
+			$("#discount_price").show().find(':input').prop('disabled', false);
+			$("#discount_rate").hide().find(':input').prop('disabled', true);
+		}
+	};
+	// クーポン種別 - 商品
+	$("#coupon_coupon_type_0").on("click", function () {
+		if ($("#category_area").find(".item_box").length > 0) {
+			if (confirm("{{ 'plugin_coupon.admin.regist.remove_category_confirm'|trans }}")) {
+				$("#category_area").find(".item_box").remove();
+			} else {
+				return false;
+			}
+		}
+		$("#product_area").show();
+		$("#category_area").hide();
+	});
+	// クーポン種別 - カテゴリ
+	$("#coupon_coupon_type_1").on("click", function () {
+		if ($("#product_area").find(".item_box").length > 0) {
+			if (confirm("{{ 'plugin_coupon.admin.regist.remove_product_confirm'|trans }}")) {
+				$("#product_area").find(".item_box").remove();
+			} else {
+				return false;
+			}
+		}
+		$("#product_area").hide();
+		$("#category_area").show();
+	});
+
+	$("#coupon_coupon_type_2").on("click", function () {
+		if ($("#product_area").find(".item_box").length > 0 || $("#category_area").find(".item_box").length) {
+			if (confirm("{{ 'plugin_coupon.admin.regist.remove_both_confirm'|trans }}")) {
+				$("#product_area").find(".item_box").remove();
+				$("#category_area").find(".item_box").remove();
+			} else {
+				return false;
+			}
+		}
+		$("#product_area").hide();
+		$("#category_area").hide();
+	});
+
+	// ==========================
+	// 初期処理
+	// ==========================
+	// 値引き額
+	if ($("#coupon_discount_type_0").prop('checked')) {
+		$("#coupon_discount_price").removeAttr('disabled');
+	} else {
+		$("#coupon_discount_price").attr('disabled', 'disabled');
+	}
+	// 値引率
+	if ($("#coupon_discount_type_1").prop('checked')) {
+		$("#coupon_discount_rate").removeAttr('disabled');
+	} else {
+		$("#coupon_discount_rate").attr('disabled', 'disabled');
+	}
+	// クーポン種別 - 商品
+	if ($("#coupon_coupon_type_0").length > 0) {
+		if ($("#coupon_coupon_type_0").prop('checked')) {
+			$("#product_area").show();
+		} else {
+			$("#product_area").hide();
+		}
+	} else {
+		// If no coupon_type radios, show product_area by default if it exists
+		$("#product_area").show();
+	}
+	// クーポン種別 - カテゴリ
+	if ($("#coupon_coupon_type_1").length > 0) {
+		if ($("#coupon_coupon_type_1").prop('checked')) {
+			$("#category_area").show();
+		} else {
+			$("#category_area").hide();
+		}
+	} else {
+		// If no coupon_type radios, handle by issue_type or show by default
+		// We'll let applyIssueTypeDisplay handle it below
+	}
+
+	var inputDate = document.createElement('input');
+	inputDate.setAttribute('type', 'date');
+	if (inputDate.type !== 'date') {
+		$('input[id$=_date]').datetimepicker({ locale: 'ja', format: 'YYYY-MM-DD', useCurrent: false, showTodayButton: true });
+	}
+
+	$("input[name='coupon[target_users][]']").on("change", function () {
+		if ($("input[name='coupon[target_users][]'][value='3']").is(':checked')) {
+			$("#specificUsersArea").show();
+		} else {
+			$("#specificUsersArea").hide();
+			$("#coupon_Customer").val('');
+		}
+	});
+
+	$("input[name='coupon[target_users][]']").trigger("change");
+
+		let previousIssueType = $("input[name='coupon[issue_type]']:checked").val();
+		let pendingIssueType = null;
+		const issueTypeConfirmModalEl = document.getElementById('issueTypeChangeConfirmModal');
+		const issueTypeConfirmModal = issueTypeConfirmModalEl ? new bootstrap.Modal(issueTypeConfirmModalEl) : null;
+
+		const applyIssueTypeDisplay = function (val) {
+			if (val == 1) {
+				$('#issue_type_from_area').show().find(':input').prop('disabled', false);
+				$('#coupon_cd').hide().find(':input').prop('disabled', true);
+				$('#issuance_trigger_area').hide().find(':input').prop('disabled', true);
+				$('#issuance_period_area').hide().find(':input').prop('disabled', true);
+				$('#issuance_quantity_area').hide().find(':input').prop('disabled', true);
+				$('#coupon_lower_limit_area').hide().find(':input').prop('disabled', true);
+				$('.category_area').hide().find(':input').prop('disabled', true);
+				$('#product_area').show().find(':input').prop('disabled', true);
+				$('#acquisition_conditions_area').show().find(':input').prop('disabled', false);
+				$('#detail_link_area').show().find(':input').prop('disabled', false);
+			} else if (val == 2) {
+				$('#issue_type_from_area').hide().find(':input').prop('disabled', true);
+				$('#coupon_cd').hide().find(':input').prop('disabled', true);
+				$('#issuance_trigger_area').show().find(':input').prop('disabled', false);
+				$('#issuance_period_area').show().find(':input').prop('disabled', false);
+				$('#issuance_quantity_area').show().find(':input').prop('disabled', false);
+				$('#coupon_lower_limit_area').show().find(':input').prop('disabled', false);
+				$('.category_area').show().find(':input').prop('disabled', false);
+				$('#product_area').show().find(':input').prop('disabled', false);
+				$('#acquisition_conditions_area').hide().find(':input').prop('disabled', true);
+				$('#detail_link_area').hide().find(':input').prop('disabled', true);
+			} else if (val == 3) {
+				$('#issue_type_from_area').hide().find(':input').prop('disabled', true);
+				$('#coupon_cd').show().find(':input').prop('disabled', false);
+				$('#issuance_trigger_area').hide().find(':input').prop('disabled', true);
+				$('#issuance_period_area').hide().find(':input').prop('disabled', true);
+				$('#issuance_quantity_area').hide().find(':input').prop('disabled', true);
+				$('#coupon_lower_limit_area').hide().find(':input').prop('disabled', true);
+				$('.category_area').hide().find(':input').prop('disabled', true);
+				$('#product_area').hide().find(':input').prop('disabled', true);
+				$('#acquisition_conditions_area').hide().find(':input').prop('disabled', true);
+				$('#detail_link_area').hide().find(':input').prop('disabled', true);
+			}
+		};
+
+		if (issueTypeConfirmModalEl) {
+			$(issueTypeConfirmModalEl).find('[data-role="message"]').text("{{ 'plugin_coupon.admin.regist.change_issue_type_confirm'|trans }}");
+			$(issueTypeConfirmModalEl).find('[data-role="confirm"]').on("click", function () {
+				if (!pendingIssueType) {
+					issueTypeConfirmModal.hide();
+					return;
+				}
+				$(`input[name='coupon[issue_type]'][value='${pendingIssueType}']`).prop('checked', true);
+				previousIssueType = pendingIssueType;
+				applyIssueTypeDisplay(pendingIssueType);
+				pendingIssueType = null;
+				issueTypeConfirmModal.hide();
+			});
+			$(issueTypeConfirmModalEl).on('hidden.bs.modal', function () {
+				pendingIssueType = null;
+			});
+		}
+
+		$("input[name='coupon[issue_type]']").on("change", function () {
+			const val = $(this).val();
+
+			if (previousIssueType && previousIssueType !== val && issueTypeConfirmModal) {
+				pendingIssueType = val;
+				$(`input[name='coupon[issue_type]'][value='${previousIssueType}']`).prop('checked', true);
+				issueTypeConfirmModal.show();
+				return false;
+			}
+
+			previousIssueType = val;
+			applyIssueTypeDisplay(val);
+		}).filter(':checked').trigger('change');
+
+	$("input[name='coupon[discount_type]']").on("change", function () {
+		applyDiscountTypeDisplay($(this).val());
+	}).filter(':checked').trigger('change');
+
+	$("input[name='usage_period_type']").on("change", function () {
+		let usage_period_type = $(this).val();	
+		if (usage_period_type == 1) {
+			$("#coupon_term_usage_period").attr('disabled', 'disabled');
+			$("#coupon_term_usage_period_from").removeAttr('disabled');
+			$("#coupon_term_usage_period_to").removeAttr('disabled');
+			$("#coupon_term_coupon_available_unlimited").prop('checked', false);
+		} else {
+			$("#coupon_term_usage_period").removeAttr('disabled');
+			$("#coupon_term_usage_period_from").attr('disabled', 'disabled');
+			$("#coupon_term_usage_period_to").attr('disabled', 'disabled');
+			$("#coupon_term_coupon_available_unlimited").prop('checked', true);
+		}
+	}).filter(':checked').trigger('change');
+
+	$("#term_available_count_unlimited").on("change", function () {
+		if ($(this).is(':checked')) {
+			$("#coupon_term_available_count").attr('disabled', 'disabled').val('');
+		} else {
+			$("#coupon_term_available_count").removeAttr('disabled');
+		}
+	}).trigger('change');
+
+	$("#term_available_cycle_cycle_unlimited").on("change", function () {
+		if ($(this).is(':checked')) {
+			$("#coupon_term_available_cycle_cycle").attr('disabled', 'disabled').val('');
+			$("#coupon_term_available_cycle_count").attr('disabled', 'disabled').val('');
+		} else {
+			$("#coupon_term_available_cycle_cycle").removeAttr('disabled');
+			$("#coupon_term_available_cycle_count").removeAttr('disabled');
+		}
+	}).trigger('change');
+
+	$("#issuance_quantity_unlimited").on("change", function () {
+		if ($(this).is(':checked')) {
+			$("#coupon_issuance_quantity").attr('disabled', 'disabled');
+		} else {
+			$("#coupon_issuance_quantity").removeAttr('disabled');
+		}
+	}).trigger('change');
+
+	$("#coupon_term_coupon_available_unlimited").on("change", function () {
+		if ($(this).is(':checked')) {
+			$("#coupon_term_usage_period_to").attr('disabled', 'disabled');
+		} else {
+			$("#coupon_term_usage_period_to").removeAttr('disabled');
+		}
+	}).trigger('change');
+
+	$("#generate_coupon_cd").on("click", function () {
+		const $button = $(this);
+		$button.prop('disabled', true);
+
+		$.ajax({
+			type: 'GET',
+			dataType: 'json',
+			url: '{{ url('plugin_coupon_generate_coupon_cd') }}',
+			success: function (res) {
+				if (res && res.coupon_cd) {
+					$("#coupon_coupon_cd").val(res.coupon_cd).trigger('change');
+				} else {
+					alert('Failed to generate coupon code.');
+				}
+			},
+			error: function () {
+				alert('Failed to generate coupon code.');
+			},
+			complete: function () {
+				$button.prop('disabled', false);
+			}
+		});
+	});
+
+	$('#search-category-1, #search-category-2').on('input', function() {
+		var searchText = $(this).val().toLowerCase().trim();
+		var $container = $(this).closest('.collapse, .card-body');
+
+		if (searchText === '') {
+			$container.find('.category-li').show();
+			return;
+		}
+		$container.find('.category-li').hide();
+		$container.find('.category-li').each(function() {
+			var $this = $(this);
+			var labelText = $this.find('> label').text().toLowerCase();
+			
+			if (labelText.indexOf(searchText) !== -1) {
+				$this.show();
+				$this.parents('.category-li').show();
+				$this.find('.category-li').show();
+			}
+		});
+	});
+});
+	</script>
+{% endblock javascript %}
+
+{% block main %}
+	{% set ChoicedCategoryIds = app.request.get('admin_product')['Category']|default(ChoicedCategoryIds) %}
+	<form role="form" name="form1" id="form1" method="post" action="">
+		<input type="hidden" name="mode" value="">
+		{{ form_widget(form._token) }}
+		{{ form_errors(form) }}
+		<div class="c-contentsArea__cols">
+			<div class="c-contentsArea__primaryCol">
+				<div class="c-primaryCol">
+					<div class="card rounded border-0 mb-4">
+						<div class="card-header">
+							<span>Issuance type selection</span>
+						</div>
+						<div class="card-body">
+							<div class="row">
+								<div class="col-3">Issue type<span class="badge bg-primary ms-1">{{ 'admin.common.required'|trans }}</span>
+								</div>
+								<div class="col mb-2">
+									{{ form_widget(form.issue_type, {'label_attr': {'class': 'radio-inline'}}) }}
+									{{ form_errors(form.issue_type) }}
+								</div>
+							</div>
+							<div class="row" id="issue_type_from_area" style="display: none;">
+								<div class="col-3">{{ form_label(form.issue_type_from) }}<span class="badge bg-primary ms-1">{{ 'admin.common.required'|trans }}</span>
+								</div>
+								<div class="col mb-2">
+									{{ form_widget(form.issue_type_from) }}
+									{{ form_errors(form.issue_type_from) }}
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="card rounded border-0 mb-4">
+						<div class="card-header">
+							<span>Publication Information</span>
+						</div>
+						<div class="card-body">
+							<div class="row">
+								<div class="col-3">
+									{{ form_label(form.coupon_name) }}<span class="badge bg-primary ms-1">{{ 'admin.common.required'|trans }}</span>
+								</div>
+								<div class="col mb-2">
+									{{ form_widget(form.coupon_name) }}
+									{{ form_errors(form.coupon_name) }}
+								</div>
+							</div>
+							<div class="row" id="coupon_cd" style="display: none;">
+								<div class="col-3">{{ form_label(form.coupon_cd) }}<span class="badge bg-primary ms-1">{{ 'admin.common.required'|trans }}</span>
+								</div>
+								<div class="col mb-2">
+									<div class="input-group">
+										{{ form_widget(form.coupon_cd, { 'attr': { 'id': 'coupon_cd_input' } }) }}
+										<button type="button" id="generate_coupon_cd" class="btn btn-primary">コード生成</button>
+									</div>
+									{{ form_errors(form.coupon_cd) }}
+								</div>
+							</div>
+							<div class="row" id="discount_type">
+								<div class="col-3">{{ form_label(form.discount_type) }}<span class="badge bg-primary ms-1">{{ 'admin.common.required'|trans }}</span>
+								</div>
+								<div class="col mb-2">
+									{{ form_widget(form.discount_type, {'label_attr': {'class': 'radio-inline'}}) }}
+									{{ form_errors(form.discount_type) }}
+								</div>
+							</div>
+							<div class="row" id="discount_price">
+								<div class="col-3">{{ form_label(form.discount_price) }}</div>
+								<div class="col mb-2">
+									{{ form_widget(form.discount_price) }}
+									{{ form_errors(form.discount_price) }}
+									<span id="discount_type_price_description" class="small">{{ 'plugin_coupon.admin.regist.discount_price.note'|trans }}</span>
+								</div>
+							</div>
+							<div class="row" id="discount_rate" style="display: none;">
+								<div class="col-3">{{ form_label(form.discount_rate) }}</div>
+								<div class="col mb-2">
+									{{ form_widget(form.discount_rate) }}
+									{{ form_errors(form.discount_rate) }}
+									<span id="discount_type_rate_description" class="small">{{ 'plugin_coupon.admin.regist.discount_rate.note'|trans }}</span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="card rounded border-0 mb-4">
+						<div class="card-header">
+							<span>Issuance conditions</span>
+						</div>
+						<div class="card-body">
+							<div class="row" id="issuance_trigger_area">
+								<div class="col-3">{{ form_label(form.issuance_trigger) }}<span class="badge bg-primary ms-1">{{ 'admin.common.required'|trans }}</span>
+								</div>
+								<div class="col mb-2">
+									{{ form_widget(form.issuance_trigger, {'label_attr': {'class': 'radio-inline'}}) }}
+									{{ form_errors(form.issuance_trigger) }}
+								</div>
+							</div>
+							<div class="row" id="acquisition_conditions_area" style="display: none;">
+								<div class="col-3">{{ form_label(form.acquisition_conditions) }}<span class="badge bg-primary ms-1">{{ 'admin.common.required'|trans }}</span>
+								</div>
+								<div class="col mb-2">
+									{{ form_widget(form.acquisition_conditions, {'label_attr': {'class': 'radio-inline'}}) }}
+									{{ form_errors(form.acquisition_conditions) }}
+								</div>
+							</div>
+							<div class="row" id="detail_link_area" style="display: none;">
+								<div class="col-3">{{ form_label(form.detail_link) }}<span class="badge bg-primary ms-1">{{ 'admin.common.required'|trans }}</span>
+								</div>
+								<div class="col mb-2">
+									{{ form_widget(form.detail_link, {'label_attr': {'class': 'radio-inline'}}) }}
+									{{ form_errors(form.detail_link) }}
+								</div>
+							</div>
+							<div class="row" id="issuance_period_area">
+								<div class="col-3">Issuance period<span class="badge bg-primary ms-1">{{ 'admin.common.required'|trans }}</span>
+								</div>
+								<div class="col mb-2">
+									<div class="row">
+										<div class="col-3">
+											{{ form_widget(form.issuance_period_from) }}
+											{{ form_errors(form.issuance_period_from) }}
+										</div>
+										<div class="col-3">
+											{{ form_widget(form.issuance_period_to) }}
+											{{ form_errors(form.issuance_period_to) }}
+										</div>
+									</div>
+								</div>
+								{{ form_widget(form.coupon_use_time) }}
+								<input type="hidden" name="coupon_release_old" value="{{ form.vars.value.coupon_release }}">
+							</div>
+							<div class="row" id="issuance_quantity_area">
+								<div class="col-3">Number of Issues<span class="badge bg-primary ms-1">{{ 'admin.common.required'|trans }}</span>
+								</div>
+								<div class="col mb-2">
+									<div class="row">
+										<div class="col-3">
+											<input id="issuance_quantity_unlimited" name="issuance_quantity_unlimited" type="checkbox" value="1" {% if app.request.get('issuance_quantity_unlimited') or (app.request.method != 'POST' and form.vars.value.issuance_quantity is empty) %} checked {% endif %} /> Unlimited
+										</div>
+										<div class="col-3">
+											{{ form_widget(form.issuance_quantity) }}
+											{{ form_errors(form.issuance_quantity) }}
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="row" id="coupon_lower_limit_area">
+								<div class="col-3">{{ form_label(form.coupon_lower_limit) }}</div>
+								<div class="col mb-2">
+									{{ form_widget(form.coupon_lower_limit) }}
+									{{ form_errors(form.coupon_lower_limit) }}
+									<span id="coupon_lower_limit_description" class="small">{{ 'plugin_coupon.admin.regist.coupon_lower_limit.note'|trans }}</span>
+								</div>
+							</div>
+							<div class="card rounded border-0 mb-4" id="product_area">
+								<div class="card-header">
+									<div class="row">
+										<div class="col-8">
+											<div class="d-inline-block">
+												<span class="card-title">{{ 'plugin_coupon.admin.regist.header.product'|trans }}</span>
+											</div>
+										</div>
+										<div class="col-4 text-end">
+											<a data-bs-toggle="collapse" href="#productArea" aria-expanded="false" aria-controls="productArea">
+												<i class="fa fa-angle-up fa-lg"></i>
+											</a>
+										</div>
+									</div>
+								</div>
+
+								<div class="collapse show ec-cardCollapse" id="productArea">
+									<div class="card-body">
+										<div class="text-center">
+											<a id="showSearchProductModal" class="btn btn-ec-regular me-2 add" data-bs-toggle="modal" data-bs-target="#searchProductModal">商品の追加</a>
+										</div>
+										<div class="row">
+											<div class="col offset-3 mb-2">
+												<table class="table" id="coupon_detail_list" data-prototype="{{ include('@Coupon42/admin/regist_product_list_prototype.twig')|e('html_attr') }}">
+													<thead>
+														<tr>
+															<th class="pt-3 pb-3 pe-3 ps-3">Product name</th>
+															<th class="pt-3 pb-3 pe-3 ps-3"></th>
+														</tr>
+													</thead>
+													<tbody>
+														{% set i = 0 %}
+														{% for couponDetailForm in form.CouponDetails %}
+															{% if couponDetailForm.vars.value.Product is not null %}
+																{% if couponDetailForm.vars.value.product_name is not null %}
+																	<tr class="item_box">
+																		<td class="align-middle pe-3 ps-3">
+																			{{ form_widget(couponDetailForm.id) }}
+																			{{ form_widget(couponDetailForm.Product) }}
+																			<div class="item_name fw-bold">
+																				<div id="coupon_CouponDetails_{{ i }}_product_name">
+																					{{ couponDetailForm.vars.value.product_name }}
+																				</div>
+																			</div>
+																		</td>
+																		<td class="align-middle text-end pe-3 ps-3">
+																			<a class="btn btn-ec-actionIcon mr-3 delete-item" data-bs-toggle="modal" data-bs-toggle="tooltip" data-bs-target="#confirmModal" data-bs-placement="top" title="{{ 'admin.common.delete'|trans }}">
+																				<i class="fa fa-close fa-lg text-secondary"></i>
+																			</a>
+																		</td>
+																	</tr>
+																	<!-- /.item_box -->
+																{% endif %}
+															{% endif %}
+															{% set i = i + 1 %}
+														{% endfor %}
+													</tbody>
+												</table>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="collapse show ec-cardCollapse category_area" id="category">
+								<div class="row">
+									<div class="col-3">Categories of publication</div>
+									<div class="col mb-2">
+										<div class="row">
+											<div class="col">
+												<div class="input-group">
+													<div class="input-group-text">
+														<span id="basic-addon1">
+															<i class="fa fa-search"></i>
+														</span>
+													</div>
+													<input id="search-category-1" class="form-control" type="search" placeholder="{{ 'admin.product.search_category'|trans }}" aria-label="Search">
+												</div>
+											</div>
+										</div>
+										{% macro tree(ChoicedIds, Category) %}
+											{% import _self as selfMacro %}
+											<li class="c-directoryTree--registerItem category-li">
+												<input type="checkbox" id="admin_product_category_{{ Category.id }}" name="admin_product[Category][]" value="{{ Category.id }}" {% if Category.id in ChoicedIds %} checked {% endif %}>
+												<label for="admin_product_category_{{ Category.id }}">{{ Category.name }}</label>
+												<ul class="list-unstyled">
+													{% for child,ChildCategory in Category.children %}
+														{{ selfMacro.tree(ChoicedIds, ChildCategory) }}
+													{% endfor %}
+												</ul>
+											</li>
+										{% endmacro %}
+
+										<div class="c-directoryTree--register rounded border mb-3 p-3">
+											{% import _self as renderMacro %}
+											{% for TopCategory in TopCategories %}
+												<ul class="list-unstyled">
+													{{ renderMacro.tree(ChoicedCategoryIds, TopCategory) }}
+												</ul>
+											{% endfor %}
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="row" id="issuance_display_area">
+								<div class="col-3">{{ form_label(form.issuance_display) }}<span class="badge bg-primary ms-1">{{ 'admin.common.required'|trans }}</span>
+								</div>
+								<div class="col mb-2">
+									{{ form_widget(form.issuance_display, {'label_attr': {'class': 'radio-inline'}}) }}
+									{{ form_errors(form.issuance_display) }}
+								</div>
+							</div>
+						</div>
+						
+						<div class="card rounded border-0 mb-4" id="category_area">
+							<div class="card-header">
+								<div class="row">
+									<div class="col-8">
+										<div class="d-inline-block">
+											<span class="card-title">{{ 'plugin_coupon.admin.regist.header.category'|trans }}</span>
+										</div>
+									</div>
+									<div class="col-4 text-end">
+										<a data-bs-toggle="collapse" href="#categoryArea" aria-expanded="false" aria-controls="category_area">
+											<i class="fa fa-angle-up fa-lg"></i>
+										</a>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="card rounded border-0 mb-4">
+						<div class="card-header">
+							<span>Term of usage</span>
+						</div>
+						<div class="card-body">
+							<div class="row">
+								<div class="col-3">
+									{{ form_label(form.term_usage_period) }}<span class="badge bg-primary ms-1"></span>
+								</div>
+								<div class="col mb-2">
+									<div class="row">
+										<div class="col col-4">
+											{% set usage_period_type = app.request.get('usage_period_type') %}
+											{% if usage_period_type is empty %}
+												{% if form.vars.value.term_usage_period is not empty %}
+													{% set usage_period_type = '2' %}
+												{% else %}
+													{% set usage_period_type = '1' %}
+												{% endif %}
+											{% endif %}
+											<input type='radio' name='usage_period_type' value='1' {% if usage_period_type == '1' %} checked {% endif %}/>Set a uniform period.
+											<input type='radio' name='usage_period_type' value='2' {% if usage_period_type == '2' %} checked {% endif %}/>
+											Configure for each trigger.
+										</div>
+										<div class="col col-3">
+											{{ form_widget(form.term_usage_period) }}
+											{{ form_errors(form.term_usage_period) }}
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-6">
+								</div>
+								<div class="col mb-6">
+									{{ form_widget(form.term_coupon_available_unlimited) }}
+									{{ form_errors(form.term_coupon_available_unlimited) }}
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-3"></div>
+								<div class="col mb-2">
+									<div class="row">
+										<div class="col col-3">
+											{{ form_widget(form.term_usage_period_from) }}
+											{{ form_errors(form.term_usage_period_from) }}
+										</div>
+										~
+										<div class="col col-3">
+											{{ form_widget(form.term_usage_period_to) }}
+											{{ form_errors(form.term_usage_period_to) }}
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-3">
+									{{ form_label(form.term_available_count) }}<span class="badge bg-primary ms-1"></span>
+								</div>
+								<div class="col mb-2">
+									<div class="row">
+										<div class="col col-12">
+											<input id="term_available_count_unlimited" name="term_available_count_unlimited" value="1" type="checkbox" {% if app.request.get('term_available_count_unlimited') or (app.request.method != 'POST' and form.vars.value.term_available_count is empty) %} checked {% endif %} />Unlimited
+										</div>
+										<div class="col col-6">
+											{{ form_widget(form.term_available_count) }}
+											{{ form_errors(form.term_available_count) }}
+										</div>
+									</div>
+									<div>
+										<div class="col col-12">
+											<div class="col col-6">
+												<input id="term_available_cycle_cycle_unlimited" name="term_available_cycle_cycle_unlimited" value="1" type="checkbox" {% if app.request.get('term_available_cycle_cycle_unlimited') or (app.request.method != 'POST' and form.vars.value.term_available_cycle_cycle is empty) %} checked {% endif %} />Unlimited
+											</div>
+											<div class="col col-6">
+												{{ form_widget(form.term_available_cycle_cycle) }}
+												{{ form_errors(form.term_available_cycle_cycle) }}
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-3">
+								</div>
+								<div class="col mb-2">
+									{{ form_widget(form.term_available_cycle_count) }}
+									{{ form_errors(form.term_available_cycle_count) }}
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-3">
+									{{ form_label(form.term_minimun_spend_amount) }}<span class="badge bg-primary ms-1"></span>
+								</div>
+								<div class="col mb-2">
+									{{ form_widget(form.term_minimun_spend_amount) }}
+									{{ form_errors(form.term_minimun_spend_amount) }}
+								</div>
+							</div>
+						</div>
+						<div class="collapse show ec-cardCollapse card-body" id="category">
+							<div class="row">
+								<div class="col-3">Categories of publication</div>
+								<div class="col mb-2">
+									<div class="row">
+										<div class="col">
+											<div class="input-group">
+												<div class="input-group-text">
+													<span id="basic-addon1">
+														<i class="fa fa-search"></i>
+													</span>
+												</div>
+												<input id="search-category-2" class="form-control" type="search" placeholder="{{ 'admin.product.search_category'|trans }}" aria-label="Search">
+											</div>
+										</div>
+									</div>
+									{% macro tree(ChoicedIds, Category) %}
+										{% import _self as selfMacro %}
+										<li class="c-directoryTree--registerItem category-li">
+											<input type="checkbox" id="admin_product_category_{{ Category.id }}" name="admin_product[Category][]" value="{{ Category.id }}" {% if Category.id in ChoicedIds %} checked {% endif %}>
+											<label for="admin_product_category_{{ Category.id }}">{{ Category.name }}</label>
+											<ul class="list-unstyled">
+												{% for child,ChildCategory in Category.children %}
+													{{ selfMacro.tree(ChoicedIds, ChildCategory) }}
+												{% endfor %}
+											</ul>
+										</li>
+									{% endmacro %}
+
+									<div class="c-directoryTree--register rounded border mb-3 p-3">
+										{% import _self as renderMacro %}
+										{% for TopCategory in TopCategories %}
+											<ul class="list-unstyled">
+												{{ renderMacro.tree(ChoicedCategoryIds, TopCategory) }}
+											</ul>
+										{% endfor %}
+									</div>
+								</div>
+							</div>
+						</div>
+
+
+					</div>
+				</div>
+				<div class="card rounded border-0 mb-4">
+					<div class="card-header">
+						<span>Issuance notification email</span>
+					</div>
+					<div class="card-body">
+						<div class="row">
+							<div class="col-3">
+								{{ form_label(form.email_notification_content) }}<span class="badge bg-primary ms-1"></span>
+							</div>
+							<div class="col mb-2">
+								{{ form_widget(form.email_notification_content) }}
+								{{ form_errors(form.email_notification_content) }}
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="c-conversionArea">
+				<div class="c-conversionArea__container">
+					<div class="row justify-content-between align-items-center">
+						<div class="col-6">
+							<div class="c-conversionArea__leftBlockItem">
+								<a class="c-baseLink" href="{{ url('plugin_coupon_list') }}">
+									<i class="fa fa-backward" aria-hidden="true"></i>
+									<span>{{ 'common.back'|trans }}</span>
+								</a>
+							</div>
+						</div>
+						<div class="col-6">
+							<div class="row align-items-center justify-content-end">
+								<div class="col-auto">
+									<button type="submit" class="btn btn-ec-conversion">{{ 'common.registration'|trans }}</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</form>
+	<div class="modal fade" id="issueTypeChangeConfirmModal" tabindex="-1" role="dialog" aria-labelledby="issueTypeChangeConfirmModal" aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">{{ 'admin.common.confirm'|trans }}</h5>
+					<button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<p data-role="message"></p>
+				</div>
+				<div class="modal-footer">
+					<button class="btn btn-ec-conversion" type="button" data-role="confirm">OK</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal" id="searchProductModal" tabindex="-1" role="dialog" aria-labelledby="searchProductModal" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4 class="modal-title" id="searchProductModalLabel">{{ 'plugin_coupon.admin.regist.modal.product'|trans }}</h4>
+					<button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<div class="mb-3">
+						{{ form_widget(searchProductModalForm.id, { attr : { placeholder : 'admin.product.name'|trans } } ) }}
+					</div>
+					<div class="mb-3">
+						{{ form_widget(searchProductModalForm.category_id) }}
+					</div>
+					<div class="text-center mb-3">
+						<button type="button" id="searchProductModalButton" class="btn btn-primary">{{ 'plugin_coupon.admin.regist.modal.search'|trans }}</button>
+					</div>
+					<div id="searchProductModalList"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal" id="searchCategoryModal" tabindex="-1" role="dialog" aria-labelledby="searchCategoryModal" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4 class="modal-title" id="searchCategoryModalLabel">{{ 'plugin_coupon.admin.regist.modal.category'|trans }}</h4>
+					<button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<div class="mb-3">
+						{{ form_widget(searchCategoryModalForm.category_id, {'attr': {'class': 'form-control'}}) }}
+					</div>
+					<div class="text-center mb-3">
+						<button type="button" id="searchCategoryModalButton" class="btn btn-primary">{{ 'plugin_coupon.admin.regist.modal.search'|trans }}</button>
+					</div>
+					<div id="searchCategoryModalList"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}

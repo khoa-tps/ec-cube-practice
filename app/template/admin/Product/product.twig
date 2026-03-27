@@ -296,6 +296,20 @@ file that was distributed with this source code.
                                 <div class="row">
                                     <div class="col-3">
                                         <div class="d-inline-block">
+                                            <span>{{ 'admin.product.shop'|trans }}</span>
+                                            <span class="badge bg-primary ms-1">
+                                                {{ 'admin.common.required'|trans }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="col mb-2">
+                                        {{ form_widget(form.shop_id) }}
+                                        {{ form_errors(form.shop_id) }}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-3">
+                                        <div class="d-inline-block">
                                             <span>{{ 'admin.product.name'|trans }}</span>
                                             <span class="badge bg-primary ms-1">
                                                 {{ 'admin.common.required'|trans }}
@@ -357,6 +371,28 @@ file that was distributed with this source code.
                                     <div class="col">
                                         {{ form_widget(form.description_detail, { attr : { rows : "8"} }) }}
                                         {{ form_errors(form.description_detail) }}
+                                        <div class="d-inline-block mb-2" data-bs-toggle="collapse" href="#addComment"
+                                             role="button" aria-expanded="false" aria-controls="addComment">
+                                            <a>
+                                                <i class="fa fa-plus-square-o fw-bold me-1"></i>
+                                                <span class="fw-bold text-ec-black">
+                                                    {{ 'admin.product.description_list__add'|trans }}
+                                                </span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-3">
+                                        <div class="d-inline-block" data-bs-toggle="tooltip" data-bs-placement="top"
+                                             title="Product Feature">
+                                            <span>Product Feature</span>
+                                            <i class="fa fa-question-circle fa-lg ms-1"></i>
+                                        </div>
+                                    </div>
+                                    <div class="col">
+                                        {{ form_widget(form.product_feature_id) }}
+                                        {{ form_errors(form.product_feature_id) }}
                                         <div class="d-inline-block mb-2" data-bs-toggle="collapse" href="#addComment"
                                              role="button" aria-expanded="false" aria-controls="addComment">
                                             <a>

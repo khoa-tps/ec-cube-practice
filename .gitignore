@@ -15,6 +15,7 @@ node_modules
 !/app/template/default
 !/app/template/user_data
 !/app/template/smartphone
+!/app/template/plugin
 /app/proxy/entity/*
 !/app/proxy/entity/.gitkeep
 /html/plugin/*
@@ -50,3 +51,14 @@ node_modules
 /.php-cs-fixer.cache
 /.php-cs-fixer.*.php
 ###< friendsofphp/php-cs-fixer ###
+
+###> league/oauth2-server-bundle ###
+/app/config/eccube/jwt/*.pem
+###< league/oauth2-server-bundle ###
+
+###> friendsofphp/php-cs-fixer ###
+/.php-cs-fixer.cache
+/.php-cs-fixer.*.php
+###< friendsofphp/php-cs-fixer ###
+screenshots/
+env_*_resolve_*

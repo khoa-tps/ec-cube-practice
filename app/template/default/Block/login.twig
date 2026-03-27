@@ -1,0 +1,97 @@
+{#
+This file is part of EC-CUBE
+
+Copyright(c) EC-CUBE CO.,LTD. All Rights Reserved.
+
+http://www.ec-cube.co.jp/
+
+For the full copyright and license information, please view the LICENSE
+file that was distributed with this source code.
+#}
+
+<div class="ec-headerNav">
+    {% if is_granted('ROLE_USER') %}
+        <div class="ec-headerNav__item ec-headerNav__item--dropdown">
+            <i class="ec-headerNav__itemIcon fas fa-user fa-fw"></i>
+            <span class="ec-headerNav__itemLink">{{ 'front.block.login.mypage'|trans }}</span>
+            <div class="ec-headerNav__dropdown">
+                <div class="ec-headerNav__dropdownItem">
+                    <a href="{{ url('mypage') }}">
+                        Hi {{ app.user.name01 }} {{ app.user.name02 }} 様
+                    </a>
+                </div>
+                <div class="ec-headerNav__dropdownItem">
+                    <a href="{{ url('mypage_favorite') }}">
+                        {{ 'front.block.login.favorite'|trans }}
+                    </a>
+                </div>
+                <div class="ec-headerNav__dropdownItem">
+                    <a href="{{ url('logout') }}">
+                        <i class="fas fa-lock fa-fw"></i> {{ 'front.block.login.logout'|trans }}
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="ec-headerNav__item">
+            <a href="{{ url('entry') }}">
+                <i class="ec-headerNav__itemIcon fas fa-user fa-fw"></i>
+                <span class="ec-headerNav__itemLink">{{ 'front.block.login.customer_registration'|trans }}</span>
+            </a>
+        </div>
+        {% if BaseInfo.option_favorite_product %}
+            <div class="ec-headerNav__item">
+                <a href="{{ url('mypage_favorite') }}">
+                    <i class="ec-headerNav__itemIcon fas fa-heart fa-fw"></i>
+                    <span class="ec-headerNav__itemLink">{{ 'front.block.login.favorite'|trans }}</span>
+                </a>
+            </div>
+        {% endif %}
+        <div class="ec-headerNav__item">
+            <a href="{{ url('mypage_login') }}">
+                <i class="ec-headerNav__itemIcon fas fa-lock fa-fw"></i>
+                <span class="ec-headerNav__itemLink">{{ 'front.block.login.login'|trans }}</span>
+            </a>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+    .ec-headerNav__item--dropdown {
+        position: relative;
+    }
+    .ec-headerNav__dropdown {
+        display: none;
+        position: absolute;
+        top: 100%;
+        transform: translateX(-50%);
+        background: #fff;
+        padding: 15px;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        z-index: 1000;
+        min-width: 180px;
+        border-radius: 4px;
+        border: 1px solid #eee;
+    }
+    .ec-headerNav__item--dropdown:hover .ec-headerNav__dropdown {
+        display: block;
+    }
+    .ec-headerNav__dropdownItem {
+        text-align: center;
+        padding: 8px 0;
+        border-bottom: 1px solid #f0f0f0;
+        color: #333;
+        font-size: 13px;
+        white-space: nowrap;
+    }
+    .ec-headerNav__dropdownItem:last-child {
+        border-bottom: none;
+    }
+    .ec-headerNav__dropdownItem a {
+        color: #333;
+        text-decoration: none;
+    }
+    .ec-headerNav__dropdownItem a:hover {
+        color: #555;
+    }
+</style>
