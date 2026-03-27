@@ -24,52 +24,19 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 class CustomCouponController extends BaseCouponController
 {
-    /**
-     * @var CustomCouponRepository
-     */
-    private $couponRepository;
-
-    /**
-     * @var CouponService
-     */
-    private $couponService;
-
-    /**
-     * @var CouponDetailRepository
-     */
-    private $couponDetailRepository;
-
-    /**
-     * @var CategoryRepository
-     */
-    private $categoryRepository;
-
-    /**
-     * @var PaginatorInterface
-     */
-    private $paginator;
-
-    /**
-     * CouponController constructor.
-     *
-     * @param CouponDetailRepository $couponDetailRepository
-     * @param CategoryRepository $categoryRepository
-     * @param PaginatorInterface $paginator
-     */
     public function __construct(
-        CustomCouponRepository $couponRepository,
-        CouponService $couponService,
-        CouponDetailRepository $couponDetailRepository,
-        CategoryRepository $categoryRepository,
-        PaginatorInterface $paginator,
+        private CustomCouponRepository $couponRepository,
+        private CouponService $couponService,
+        private CouponDetailRepository $couponDetailRepository,
+        private CategoryRepository $categoryRepository,
+        private PaginatorInterface $paginator,
         private PageMaxRepository $pageMaxRepository
     ) {
-        parent::__construct($couponRepository, $couponService, $couponDetailRepository);
-        $this->couponRepository = $couponRepository;
-        $this->couponService = $couponService;
-        $this->couponDetailRepository = $couponDetailRepository;
-        $this->categoryRepository = $categoryRepository;
-        $this->paginator = $paginator;
+        parent::__construct(
+            $couponRepository,
+            $couponService,
+            $couponDetailRepository
+        );
     }
 
     /**
