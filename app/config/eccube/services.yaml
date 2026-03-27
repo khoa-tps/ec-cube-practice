@@ -249,3 +249,21 @@ services:
     eccube.asset.user_data_version_strategy:
         alias: Eccube\Asset\FilemtimeVersionStrategy
         public: true
+
+    # Override Plugin Coupon Controller
+    Plugin\Coupon42\Controller\CouponShoppingController:
+        alias: Customize\Controller\CustomCouponShoppingController
+        public: true
+
+     # Override Plugin Coupon Controller
+    Plugin\Coupon42\Controller\Admin\CouponController:
+        alias: Customize\Controller\Admin\Coupon\CustomCouponController
+        public: true
+
+    # Override Product Repository
+    Eccube\Repository\ProductRepository:
+        class: Customize\Repository\ProductRepository
+        public: true
+        autowire: true
+        autoconfigure: true
+        tags: ['doctrine.repository_service']

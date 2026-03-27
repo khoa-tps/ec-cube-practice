@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
-use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Annotation\Route;
 use Eccube\Controller\AbstractController;
 use Eccube\Repository\CategoryRepository;
 use Plugin\Coupon42\Form\Type\Admin\CouponSearchType;
@@ -213,8 +213,8 @@ class CustomCouponController extends BaseCouponController
 
     /**
      * クーポンコードの新規生成（AJAX用）
+     * @Route("/%eccube_admin_route%/plugin/coupon/generate-coupon-cd", name="plugin_coupon_generate_coupon_cd", methods={"GET"})
      */
-    #[Route('/%eccube_admin_route%/plugin/coupon/generate-coupon-cd', name: 'plugin_coupon_generate_coupon_cd', methods: ['GET'])]
     public function generateCouponCd(): Response
     {
         $couponCd = $this->couponService->generateCouponCd();
@@ -226,8 +226,8 @@ class CustomCouponController extends BaseCouponController
 
     /**
      * クーポンCSVの出力.
+     * @Route("/%eccube_admin_route%/plugin/coupon/export", name="plugin_coupon_export", methods={"GET"})
      */
-    #[Route('/%eccube_admin_route%/plugin/coupon/export', name: 'plugin_coupon_export', methods: ['GET'])]
     public function export(Request $request): StreamedResponse
     {
         // タイムアウトを無効にする.

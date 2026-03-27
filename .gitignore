@@ -61,3 +61,4 @@ node_modules
 /.php-cs-fixer.*.php
 ###< friendsofphp/php-cs-fixer ###
 screenshots/
+env_*_resolve_*
